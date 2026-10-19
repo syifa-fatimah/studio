@@ -350,9 +350,9 @@
 <div class="splash" id="blockedScreen" hidden>
   <span data-logo class="logo"></span>
   <h1>Masuk ke Syifa Studio</h1>
-  <p>Tempel link pribadi yang dikirim owner. Cukup sekali, setelah itu app langsung terbuka.</p>
+  <p>Tempel link pribadi atau ketik kode akses dari owner. Cukup sekali, setelah itu app langsung terbuka.</p>
   <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px">
-    <input class="in" id="keyInput" autocomplete="off" placeholder="Tempel link atau kode di sini" aria-label="Link atau kode akses">
+    <input class="in" id="keyInput" autocomplete="off" placeholder="Contoh: k7m2xq9prt" autocapitalize="none" spellcheck="false" aria-label="Link atau kode akses">
     <button class="btn" id="keyBtn" type="button">Masuk</button>
     <p class="mu" id="keyMsg" role="alert"></p>
   </div>
@@ -569,7 +569,7 @@
   var hasAPI = /^https:\/\/script\.google\.com\/.+\/exec$/.test(API_URL);
   var live = !!(hasGAS || hasAPI);
   var $ = function (id) { return document.getElementById(id); };
-  var isKey = function (k) { return /^[a-f0-9]{64}$/.test(String(k || '')); };
+  var isKey = function (k) { return /^[a-z0-9]{10,64}$/.test(String(k || '')); };
 
   var memKey = null;
   var keyStore = {
@@ -577,7 +577,19 @@
     set: function (k) { memKey = k; try { localStorage.setItem(KEY_STORE, k); } catch (e) {} },
     del: function () { memKey = null; try { localStorage.removeItem(KEY_STORE); } catch (e) {} }
   };
-  function keyFrom(text) { var m = String(text || '').match(/[a-f0-9]{64}/); return m ? m[0] : ''; }
+  /** Ambil kode dari link (#k=… atau ?k=…) atau dari kode yang diketik langsung. */
+  function keyFrom(text) {
+    var t = String(text || '').trim();
+    var m = t.match(/[#?&]k=([A-Za-z0-9]{10,64})/);
+    if (m) return m[1].toLowerCase();
+    t = t.toLowerCase().replace(/\s+/g, '');
+    return /^[a-z0-9]{10,64}$/.test(t) ? t : '';
+  }
+  /** Rapikan address bar: hapus kode dari link setelah tersimpan. */
+  function cleanUrl() {
+    if (!/[#?&]k=/.test(location.href) || !window.history || !history.replaceState) return;
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  }
   if (/^#keluar/.test(location.hash)) keyStore.del();
   var token = isKey(URL_KEY) ? URL_KEY : (keyFrom(location.hash) || keyFrom(location.search) || keyStore.get());
   if (!live && !isKey(token)) token = location.hash === '#tim' ? 'demo-tim' : 'demo-owner';
@@ -741,7 +753,7 @@
     playIntro();
     try {
       st.boot = await call('getBoot');
-      if (live) keyStore.set(token);
+      if (live) { keyStore.set(token); if (hasAPI) cleanUrl(); }
       var ini = st.boot.initial || {};
       if (ini.posts) { st.posts = ini.posts.items; st.kMonth = st.postsMonth = ini.posts.month; mark('posts:' + ini.posts.month, ini.posts.items); }
       if (ini.day) { st.day = ini.day; st.hDate = ini.day.date; mark('day:' + ini.day.date, ini.day); }
@@ -1547,7 +1559,7 @@
   // ====== Event ======
   $('keyBtn').onclick = function () {
     var k = keyFrom($('keyInput').value);
-    if (!k) { $('keyMsg').textContent = 'Kode tidak ditemukan. Pastikan seluruh link ikut ditempel.'; return; }
+    if (!k) { $('keyMsg').textContent = 'Kode belum benar. Kode terdiri dari 10 huruf/angka, atau tempel seluruh link.'; return; }
     keyStore.set(k);
     location.replace(location.pathname + '#k=' + k);
     location.reload();
