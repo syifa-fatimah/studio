@@ -345,6 +345,17 @@
   .news a { color: var(--ink); text-decoration: none; }
   .news a:hover b { text-decoration: underline; }
   .trend { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+  .tr { padding: 12px 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+  .tr:first-of-type { border-top: 0; }
+  .tr-main { display: flex; gap: 12px; align-items: center; text-decoration: none; color: var(--ink); }
+  .tr-thumb { width: 84px; height: 50px; border-radius: 12px; flex: none; object-fit: cover; background: var(--pink-soft); position: relative; overflow: hidden; display: grid; place-items: center; font-size: 20px; }
+  .tr-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tr-thumb .play { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, .18); color: #fff; font-size: 18px; }
+  .tr-main .t { flex: 1; min-width: 0; }
+  .tr-main .t b { display: block; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+  .tr-main .t span { display: block; font-size: 12px; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .tr-acts { display: flex; gap: 6px; flex-wrap: wrap; padding-left: 96px; }
+  @media (max-width: 360px) { .tr-acts { padding-left: 0; } }
   .ktabs { display: flex; gap: 2px; background: var(--pink-soft); border-radius: 999px; padding: 3px; margin-top: 10px; }
   .ktabs button { flex: 1; height: 34px; border: 0; border-radius: 999px; background: transparent; font-size: 13px; font-weight: 600; color: #7A2A4E; padding: 0 6px; }
   .ktabs button[aria-pressed="true"] { background: var(--fill); color: #fff; }
@@ -682,7 +693,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-4';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-6';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>',
@@ -1208,15 +1219,20 @@
             'Tips: buka <b>Mode Baca</b> (ikon aA di Safari, atau “Tampilan sederhana” di Chrome) supaya bersih tanpa iklan' + (isOwner() ? ', dan ketuk “Sembunyikan” untuk situs yang terlalu banyak iklan.' : '.') + '</p>';
         }
       } else if (st.kabarTab === 'trend') {
-        var igTag = function (t) { return String(t).toLowerCase().replace(/[^a-z0-9]+/g, ''); };
-        html += k.trends && k.trends.length ? '<small class="mu" style="display:block;margin:10px 0 2px">📈 Lagi ramai dicari di Indonesia · lihat kontennya di TikTok atau Instagram</small>' +
-          k.trends.slice(0, 8).map(function (t, i) {
-            var tag = igTag(t);
-            return '<div class="trend"><b style="width:18px;font-size:13px">' + (i + 1) + '</b><span style="flex:1;min-width:0;overflow-wrap:anywhere">' + esc(t) + '</span>' +
-              '<a class="tiny" href="https://www.tiktok.com/search?q=' + encodeURIComponent(t) + '" target="_blank" rel="noopener" style="text-decoration:none">TikTok</a>' +
-              (tag ? '<a class="tiny" href="https://www.instagram.com/explore/tags/' + encodeURIComponent(tag) + '/" target="_blank" rel="noopener" style="text-decoration:none">IG</a>' : '') +
-              '<button class="tiny" type="button" data-t="' + esc(t) + '">+ Ide</button></div>';
-          }).join('') + '<div style="height:8px"></div>' : '<p class="empty">Tren belum tersedia.</p>';
+        var trs = (k.trends || []).map(function (t) { return typeof t === 'string' ? { q: t } : t; });
+        html += trs.length ? '<small class="mu" style="display:block;margin:10px 0 2px">📈 Lagi ramai di Indonesia (topik negatif sudah disaring) · ketuk untuk lihat obrolannya di Threads</small><div>' +
+          trs.slice(0, 8).map(function (t, i) {
+            var th = 'https://www.threads.com/search?q=' + encodeURIComponent(t.q) + '&serp_type=default';
+            var tt = 'https://www.tiktok.com/search?q=' + encodeURIComponent(t.q);
+            var thumb = t.pic ? '<img src="' + esc(t.pic) + '" alt="" loading="lazy">' : (t.good ? '✨' : '📈');
+            var sub = t.news ? t.news.title : (t.traffic ? t.traffic + ' pencarian' : '');
+            return '<div class="tr"><a class="tr-main" href="' + esc(th) + '" target="_blank" rel="noopener"><span class="tr-thumb">' + thumb + '</span>' +
+              '<span class="t"><b>' + (i + 1) + '. ' + esc(t.q) + (t.good ? ' <span class="chip" style="display:inline-flex;padding:1px 8px;font-size:11px;vertical-align:middle">relevan</span>' : '') + '</b><span>' + esc(sub) + '</span></span></a>' +
+              '<div class="tr-acts">' +
+                (t.news && t.news.url ? '<a class="tiny" href="' + esc(t.news.url) + '" target="_blank" rel="noopener" style="text-decoration:none" title="' + esc(t.news.title) + '">📰 Berita</a>' : '') +
+                '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" style="text-decoration:none">TikTok</a>' +
+                '<button class="tiny" type="button" data-t="' + esc(t.q) + '">+ Ide</button></div></div>';
+          }).join('') + '</div><div style="height:6px"></div>' : '<p class="empty">Belum ada tren yang relevan hari ini.</p>';
       } else if (st.kabarTab === 'music') {
         var yt = k.music.length && k.music[0].src === 'youtube';
         html += '<small class="mu" style="display:block;margin:10px 0 4px">' + (yt ? '🎬 Musik yang lagi trending di YouTube Indonesia · ketuk untuk putar' : '🎧 Lagu paling banyak diputar di Indonesia · ketuk untuk cari di TikTok') + '</small>' +
@@ -2430,7 +2446,12 @@
       { id: 'i1', text: 'POV: pertama kali pakai pashmina ke kondangan', pilar: '😂 Hiburan', source: 'tren TikTok', note: '', date: T },
       { id: 'i2', text: '5 warna scarf yang cocok untuk kulit sawo matang', pilar: '💡 Tips', source: 'request follower', note: 'Pakai model 2 orang', date: T }
     ];
-    var KABAR = { at: new Date(Date.now() - 2 * 3600000).toISOString(), trends: ['hijab pashmina kondangan', 'tren warna akhir tahun', 'promo 11.11', 'outfit kerja simpel'],
+    var KABAR = { at: new Date(Date.now() - 2 * 3600000).toISOString(),
+      trends: [
+        { q: 'hijab pashmina kondangan', traffic: '20K+', good: true, news: { title: 'Contoh berita: tren hijab untuk musim kondangan', url: 'https://news.google.com', source: 'Contoh media' } },
+        { q: 'tren warna akhir tahun', traffic: '10K+', news: { title: 'Contoh berita: warna yang diprediksi populer', url: 'https://news.google.com', source: 'Contoh media' } },
+        { q: 'promo 11.11', traffic: '50K+' }
+      ],
       music: [{ name: 'Contoh lagu trending', artist: 'Penyanyi A', art: '', url: 'https://www.youtube.com', views: 2450000, src: 'youtube' }, { name: 'Lagu viral kedua', artist: 'Band B', art: '', url: 'https://www.youtube.com', views: 980000, src: 'youtube' }, { name: 'Lagu ketiga', artist: 'Penyanyi C', art: '', url: 'https://www.youtube.com', views: 512000, src: 'youtube' }],
       pins: { '👗 Desain baju': ['gamis modern design', 'modest dress design', 'abaya modern'], '✨ Outfit': ['outfit hijab casual', 'outfit kerja hijab', 'ootd hijab pashmina'], '🏋️‍♀️ Olahraga': ['hijab gym outfit', 'pilates outfit hijab'] },
       topics: [
