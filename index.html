@@ -385,6 +385,25 @@
   #miniBar .mb-b { width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.14); color: #fff; font-size: 15px; flex: none; }
   @media (min-width: 900px) { #miniBar { left: auto; right: 24px; bottom: 24px; width: 380px; } }
   .vthumb.btn0 { border: 0; padding: 0; cursor: pointer; }
+  #plPanel { position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 92px); z-index: 46; background: #4A1D33; border-radius: 22px;
+    padding: 8px; box-shadow: 0 14px 34px rgba(74, 29, 51, .38); color: #fff; }
+  #plPanel[hidden] { display: none; }
+  #plPanel .pl-head { display: flex; align-items: center; gap: 8px; padding: 2px 4px 8px 8px; }
+  #plPanel .pl-head b { flex: 1; min-width: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #plPanel .mb-b { width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(255,255,255,.14); color: #fff; font-size: 14px; flex: none; }
+  #plPanel iframe { display: block; width: 100%; border: 0; border-radius: 14px; background: #000; }
+  #plPanel .yt { aspect-ratio: 16 / 9; }
+  @media (min-width: 900px) { #plPanel { left: auto; right: 24px; bottom: 24px; width: 400px; } }
+  #plPanel.small[data-kind="youtube"] { left: auto; width: 236px; }
+  body.pl-open .main { padding-bottom: 260px; }
+  body.pl-open.pl-small .main { padding-bottom: 200px; }
+  .msub { display: flex; gap: 2px; background: var(--pink-soft); border-radius: 999px; padding: 3px; margin: 10px 0 4px; }
+  .msub button { flex: 1; height: 32px; border: 0; border-radius: 999px; background: transparent; font-size: 13px; font-weight: 600; color: #7A2A4E; }
+  .msub button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(190, 43, 102, .15); }
+  .plbtn { display: flex; align-items: center; gap: 12px; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 18px; padding: 12px 14px; margin-top: 8px; text-align: left; color: var(--ink); }
+  .plbtn .ic2 { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 20px; flex: none; }
+  .plbtn b { display: block; font-size: 15px; }
+  .plbtn small { display: block; font-size: 12px; color: var(--muted); }
   .vrow { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); text-decoration: none; color: var(--ink); }
   .vrow:first-child { border-top: 0; }
   .vthumb { position: relative; width: 128px; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; flex: none; background: var(--pink-soft); display: grid; place-items: center; font-size: 22px; }
@@ -617,6 +636,15 @@
   </div>
 </dialog>
 
+<div id="plPanel" hidden role="region" aria-label="Pemutar playlist">
+  <div class="pl-head">
+    <b id="plTitle">Playlist saya</b>
+    <button class="mb-b" type="button" id="plSize" aria-label="Perbesar atau perkecil">▴</button>
+    <button class="mb-b" type="button" id="plClose" aria-label="Tutup playlist">✕</button>
+  </div>
+  <div id="plBody"></div>
+</div>
+
 <div id="miniBar" hidden role="region" aria-label="Pemutar musik">
   <img id="mbArt" alt="">
   <span class="mb-t"><b id="mbTitle"></b><small id="mbSub">Cuplikan 30 detik</small></span>
@@ -636,7 +664,7 @@
       </div>
       <p class="mu" style="font-size:12px" id="ytNote"></p>
       <div class="dlg-actions">
-        <a class="btn" id="ytOpen" href="#" target="_blank" rel="noopener" data-app="youtube">Buka di YouTube</a>
+        <a class="btn" id="ytOpen" href="#" target="_blank" rel="noopener" data-app="ytmusic">Buka di YouTube Music</a>
       </div>
     </div>
   </div>
@@ -751,7 +779,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-12';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-13';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>',
@@ -858,6 +886,8 @@
   var APPS = {
     threads: { name: 'Threads', ios: 'barcelona://', android: 'com.instagram.barcelona' },
     tiktok: { name: 'TikTok', ios: 'tiktok://', android: 'com.ss.android.ugc.trill' },
+    ytmusic: { name: 'YouTube Music', android: 'com.google.android.apps.youtube.music', noCopy: true,
+      iosUrl: function (web) { var u = new URL(web); return 'youtubemusic://' + u.host + u.pathname + u.search; } },
     youtube: { name: 'YouTube', android: 'com.google.android.youtube', noCopy: true,
       iosUrl: function (web) { var u = new URL(web); return 'youtube://' + u.host + u.pathname + u.search; } }
   };
@@ -1355,27 +1385,42 @@
             '<p class="mu" style="font-size:12px;padding:6px 0 12px">Judul berbau iklan & spam sudah disaring otomatis. Iklan di dalam situs berita tidak bisa diblokir dari app. ' +
             'Tips: buka <b>Mode Baca</b> (ikon aA di Safari, atau “Tampilan sederhana” di Chrome) supaya bersih tanpa iklan' + (isOwner() ? ', dan ketuk “Sembunyikan” untuk situs yang terlalu banyak iklan.' : '.') + '</p>';
         }
+      } else if (st.kabarTab === 'music' && st.musicSub === 'mine') {
+        html += '<div class="msub" role="group"><button type="button" data-ms="pop" aria-pressed="false">🔥 Lagu pop</button><button type="button" data-ms="mine" aria-pressed="true">🎧 Playlist saya</button></div>';
+        var pl = st.boot.myPlaylists || {};
+        if (pl.youtube && !st.plEdit) {
+          html += (pl.youtube ? '<button class="plbtn" type="button" data-pl="youtube"><span class="ic2" style="background:#FF0033;color:#fff">▶</span><span style="flex:1"><b>Putar playlist YouTube Music</b><small>Lagu penuh di HP & PC</small></span><span>▶</span></button>' : '') +
+            '<p class="mu" style="font-size:12px;padding:10px 0 4px">Musik tetap berputar saat pindah menu. Tutup lewat tombol ✕ di pemutar.</p>' +
+            '<button class="link" type="button" data-pledit style="color:var(--rose);padding:4px 0 12px">Ubah link playlist</button>';
+        } else {
+          html += '<p class="mu" style="font-size:13px;padding:6px 0">Tempel link playlist YouTube Music favorit Syifa. Cukup sekali, link tersimpan untuk akunmu.</p>' +
+            '<label class="lbl" style="margin-top:6px">Link playlist YouTube Music<input class="in" id="plYt" placeholder="https://music.youtube.com/playlist?list=…" value="' + esc(pl.youtube || '') + '"></label>' +
+            '<small class="mu" style="display:block;font-size:11px;margin:4px 0 10px">Di YouTube Music: buka playlist → ⋮ → Bagikan → Salin link. Playlist pribadi perlu diubah dulu ke “Tidak publik” supaya bisa diputar.</small>' +
+            '<div style="display:flex;gap:8px;padding-bottom:12px">' + (st.plEdit ? '<button class="btn-line btn-sm" type="button" data-plcancel>Batal</button>' : '') + '<button class="btn btn-sm" type="button" data-plsave style="flex:1">Simpan playlist</button></div>';
+        }
       } else if (st.kabarTab === 'music') {
         var yt = k.music.some(function (m) { return m.src === 'youtube'; });
+        html += '<div class="msub" role="group"><button type="button" data-ms="pop" aria-pressed="true">🔥 Lagu pop</button><button type="button" data-ms="mine" aria-pressed="false">🎧 Playlist saya</button></div>';
         var limit = st.musicAll ? 10 : 5;
-        html += '<small class="mu" style="display:block;margin:10px 0 2px">🎧 Lagu pop paling banyak diputar di Indonesia · ketuk ♫ untuk musiknya, ketuk judul untuk ' + (yt ? 'videonya' : 'cari di YouTube') + '</small>' +
+        html += '<small class="mu" style="display:block;margin:6px 0 2px">🎧 Lagu pop paling banyak diputar di Indonesia · ' + (yt ? 'ketuk ♫ untuk dengar lagu penuh sambil pakai app, ketuk judul untuk video besar' : 'ketuk ♫ untuk cuplikan 30 detik') + '</small>' +
+          (yt ? '<button class="btn btn-sm" type="button" data-playall style="margin:8px 0 4px">♫ Putar semua (lagu penuh)</button>' : '') +
           (k.music.length ? '<div>' + k.music.slice(0, limit).map(function (m, i) {
             var q = m.name + ' ' + m.artist;
             var isYt = m.src === 'youtube';
             var vid = isYt ? (String(m.url).match(/[?&]v=([\w-]{6,})/) || [])[1] : '';
             var playable = vid || m.preview;
-            var href = isYt ? m.url : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
-            var audioOk = !!m.preview;
-            var titleAttr = vid ? 'data-play="' + i + '"' : 'data-app="youtube"';
+            var href = isYt ? 'https://music.youtube.com/watch?v=' + vid : 'https://music.youtube.com/search?q=' + encodeURIComponent(q);
+            var audioOk = !!(vid || m.preview);
+            var titleAttr = vid ? 'data-play="' + i + '"' : 'data-app="ytmusic"';
             return '<div class="vrow">' +
-              '<button class="vthumb btn0' + (isYt ? '' : ' sq') + '" type="button" ' + (audioOk ? 'data-audio="' + i + '" aria-label="Putar musiknya saja: ' + esc(m.name) + '"' : (vid ? 'data-play="' + i + '" aria-label="Putar video"' : 'data-app="youtube"')) + '>' +
+              '<button class="vthumb btn0' + (isYt ? '' : ' sq') + '" type="button" ' + (audioOk ? 'data-audio="' + i + '" aria-label="Putar musiknya saja: ' + esc(m.name) + '"' : (vid ? 'data-play="' + i + '" aria-label="Putar video"' : 'data-app="ytmusic"')) + '>' +
                 (m.art ? '<img src="' + esc(m.art) + '" alt="" loading="lazy">' : '🎵') +
                 '<span class="rk">' + (i + 1) + '</span><span class="pl">' + (audioOk ? '♫' : '▶') + '</span></button>' +
               '<a class="t" href="' + esc(href) + '" target="_blank" rel="noopener" ' + titleAttr + ' data-q="' + esc(q) + '" style="color:inherit;text-decoration:none"><b>' + esc(m.name) + '</b><span>' + esc(m.artist) + (m.views ? ' · ' + num(m.views) + ' ditonton' : '') + '</span></a></div>';
           }).join('') + '</div>' +
           (k.music.length > 5 ? '<button class="link" type="button" data-more style="color:var(--rose);width:100%">' + (st.musicAll ? 'Tampilkan lebih sedikit' : 'Lihat ' + (Math.min(10, k.music.length) - 5) + ' lagi') + '</button>' : '') : '<p class="empty">Daftar lagu belum tersedia.</p>') +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;padding:6px 0 12px">' +
-          ext('https://www.youtube.com/feed/trending?bp=4gINGgt5dG1hX2NoYXJ0cw%3D%3D', '▶️ Buka Trending YouTube', '').replace('<a ', '<a class="btn-line btn-sm" data-app="youtube" data-q="trending" ') + '</div>';
+          ext('https://music.youtube.com/charts', '♫ Buka chart YouTube Music', '').replace('<a ', '<a class="btn-line btn-sm" data-app="ytmusic" data-q="charts" ') + '</div>';
       } else {
         var groups = Array.isArray(k.pins) ? { '📌 Inspirasi': k.pins } : (k.pins || {});
         var gk = Object.keys(groups);
@@ -1391,8 +1436,29 @@
       card.querySelectorAll('[data-k]').forEach(function (b) { b.onclick = function () { st.kabarCat = b.dataset.k; draw(); }; });
       card.querySelectorAll('[data-pg]').forEach(function (b) { b.onclick = function () { st.pinGroup = b.dataset.pg; draw(); }; });
       bindApps(card);
+      card.querySelectorAll('[data-ms]').forEach(function (b) { b.onclick = function () { st.musicSub = b.dataset.ms; st.plEdit = false; draw(); }; });
+      card.querySelectorAll('[data-pl]').forEach(function (b) { b.onclick = function () { openPlaylist(b.dataset.pl); }; });
+      card.querySelectorAll('[data-pledit]').forEach(function (b) { b.onclick = function () { st.plEdit = true; draw(); }; });
+      card.querySelectorAll('[data-plcancel]').forEach(function (b) { b.onclick = function () { st.plEdit = false; draw(); }; });
+      card.querySelectorAll('[data-plsave]').forEach(function (b) {
+        b.onclick = async function () {
+          b.disabled = true;
+          try {
+            st.boot.myPlaylists = await call('saveMyPlaylists', { spotify: '', youtube: $('plYt').value.trim() });
+            st.plEdit = false; toast('Playlist tersimpan 🎧'); draw();
+          } catch (e) { b.disabled = false; fail(e); }
+        };
+      });
       card.querySelectorAll('[data-more]').forEach(function (b) { b.onclick = function () { st.musicAll = !st.musicAll; draw(); }; });
-      card.querySelectorAll('[data-audio]').forEach(function (b) { b.onclick = function () { playAudio(k.music[Number(b.dataset.audio)]); }; });
+      card.querySelectorAll('[data-audio]').forEach(function (b) {
+        b.onclick = function () {
+          var m = k.music[Number(b.dataset.audio)], v = vidOf(m);
+          if (v) openYtFloat([v], '♫ ' + m.name); else playAudio(m);
+        };
+      });
+      card.querySelectorAll('[data-playall]').forEach(function (b) {
+        b.onclick = function () { openYtFloat(k.music.map(vidOf).filter(Boolean), '♫ 10 lagu pop terpopuler'); };
+      });
       card.querySelectorAll('[data-play]').forEach(function (a) {
         a.addEventListener('click', function (e) { e.preventDefault(); playMusic(k.music[Number(a.dataset.play)]); });
       });
@@ -1417,9 +1483,56 @@
   }
 
   // ---------- Pemutar video di dalam app ----------
+  // ---------- Pemutar playlist pribadi (melayang, tetap jalan saat pindah menu) ----------
+  var plSmall = false;
+  function spH() { return plSmall ? 80 : 352; }
+  function plState() {
+    $('plPanel').classList.toggle('small', plSmall);
+    document.body.classList.toggle('pl-open', !$('plPanel').hidden);
+    document.body.classList.toggle('pl-small', plSmall);
+    $('plSize').textContent = plSmall ? '▴' : '▾';
+    $('plSize').setAttribute('aria-label', plSmall ? 'Perbesar pemutar' : 'Kecilkan pemutar');
+    var f = $('plBody').querySelector('iframe');
+    if (f && $('plPanel').dataset.kind === 'spotify') f.height = spH();
+  }
+  function openPlaylist(kind) {
+    var pl = st.boot.myPlaylists || {}, body = $('plBody');
+    var mb = $('mbAudio'); if (mb && !mb.paused) mb.pause(); $('miniBar').hidden = true;
+    if (kind === 'spotify') {
+      var m = String(pl.spotify).match(/open\.spotify\.com\/(playlist|album|artist|track|show)\/([A-Za-z0-9]+)/);
+      if (!m) return;
+      $('plTitle').textContent = '♫ Playlist Spotify';
+      body.innerHTML = '<iframe title="Pemutar Spotify" src="https://open.spotify.com/embed/' + m[1] + '/' + m[2] + '?utm_source=generator" height="' + spH() + '" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+    } else {
+      var id = (String(pl.youtube).match(/[?&]list=([A-Za-z0-9_-]+)/) || [])[1];
+      if (!id) return;
+      $('plTitle').textContent = '♫ Playlist YouTube Music';
+      body.innerHTML = '<iframe class="yt" title="Pemutar YouTube" src="https://www.youtube-nocookie.com/embed/videoseries?list=' + encodeURIComponent(id) + '&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+    }
+    $('plPanel').dataset.kind = kind;
+    $('plPanel').hidden = false;
+    plState();
+  }
+
+  /** Putar lagu penuh dari YouTube di pemutar kecil melayang (tetap jalan saat pindah menu). */
+  function openYtFloat(ids, title) {
+    if (!ids.length) return;
+    var mb = $('mbAudio'); if (mb && !mb.paused) mb.pause(); $('miniBar').hidden = true;
+    $('plTitle').textContent = title;
+    $('plBody').innerHTML = '<iframe class="yt" title="Pemutar musik" src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(ids[0]) +
+      '?autoplay=1&playsinline=1&rel=0' + (ids.length > 1 ? '&playlist=' + ids.slice(1).map(encodeURIComponent).join(',') : '') +
+      '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+    $('plPanel').dataset.kind = 'youtube';
+    plSmall = true;
+    $('plPanel').hidden = false;
+    plState();
+  }
+  function vidOf(m) { return m && m.src === 'youtube' ? (String(m.url).match(/[?&]v=([\w-]{6,})/) || [])[1] || '' : ''; }
+
   // ---------- Pemutar mini: musik saja (cuplikan 30 detik) ----------
   function playAudio(m) {
     if (!m || !m.preview) return;
+    if (!$('plPanel').hidden) { $('plBody').innerHTML = ''; $('plPanel').hidden = true; plState(); }
     var a = $('mbAudio');
     $('mbTitle').textContent = m.name; $('mbSub').textContent = m.artist + ' · cuplikan 30 detik';
     var art = m.cover || m.art || '';
@@ -1430,20 +1543,21 @@
   }
   function playMusic(m) {
     var mb = $('mbAudio'); if (mb && !mb.paused) mb.pause();
+    if (!$('plPanel').hidden) { $('plBody').innerHTML = ''; $('plPanel').hidden = true; plState(); }
     var q = m.name + ' ' + m.artist;
     var vid = m.src === 'youtube' ? (String(m.url).match(/[?&]v=([\w-]{6,})/) || [])[1] : '';
     $('ytTitle').textContent = m.name; $('ytSub').textContent = m.artist;
     $('ytVideo').hidden = !vid; $('ytAudio').hidden = !!vid;
     if (vid) {
       $('ytFrame').src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(vid) + '?autoplay=1&playsinline=1&rel=0';
-      $('ytOpen').href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(vid);
-      $('ytNote').textContent = 'Kalau videonya tidak bisa diputar di sini (beberapa label musik membatasinya), ketuk Buka di YouTube.';
+      $('ytOpen').href = 'https://music.youtube.com/watch?v=' + encodeURIComponent(vid);
+      $('ytNote').textContent = 'Kalau tidak bisa diputar di sini (beberapa label musik membatasinya), ketuk Buka di YouTube Music.';
     } else {
       $('ytArt').hidden = !m.art;
       if (m.art) $('ytArt').src = String(m.art).replace('100x100', '600x600');
       $('ytPlayer').src = m.preview;
-      $('ytOpen').href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
-      $('ytNote').textContent = 'Cuplikan 30 detik dari Apple Music. Untuk lagu penuh, ketuk Buka di YouTube.';
+      $('ytOpen').href = 'https://music.youtube.com/search?q=' + encodeURIComponent(q);
+      $('ytNote').textContent = 'Cuplikan 30 detik. Untuk lagu penuh, ketuk Buka di YouTube Music.';
     }
     $('ytOpen').dataset.q = q;
     $('ytDlg').showModal();
@@ -2500,6 +2614,8 @@
     t.onclick = function () { if (a.paused) a.play(); else a.pause(); };
     $('mbClose').onclick = function () { a.pause(); a.removeAttribute('src'); a.load(); $('miniBar').hidden = true; };
   })();
+  $('plClose').onclick = function () { $('plBody').innerHTML = ''; $('plPanel').hidden = true; plState(); };
+  $('plSize').onclick = function () { plSmall = !plSmall; plState(); };
   $('ytDlg').addEventListener('close', function () { $('ytFrame').src = 'about:blank'; var a = $('ytPlayer'); a.pause(); a.removeAttribute('src'); a.load(); });
   bindApps($('ytDlg'));
   $('rtSave').onclick = saveRoutineClick;
@@ -2623,6 +2739,7 @@
     ], rlog = {};
     function myR(u) { return routines.filter(function (r) { return r.owner === u.name; }).sort(function (a, b) { return a.time.localeCompare(b.time); }); }
     function rFor(u, date) { var wd = parseDate(date).getDay(); return myR(u).filter(function (r) { return r.days.indexOf(wd) >= 0; }).map(function (r) { var x = JSON.parse(JSON.stringify(r)); x.done = !!rlog[u.name + '|' + date + '|' + r.id]; return x; }); }
+    var myPl = {};
     var ideas = [
       { id: 'i1', text: 'POV: pertama kali pakai pashmina ke kondangan', pilar: '😂 Hiburan', source: 'tren TikTok', note: '', date: T },
       { id: 'i2', text: '5 warna scarf yang cocok untuk kulit sawo matang', pilar: '💡 Tips', source: 'request follower', note: 'Pakai model 2 orang', date: T }
@@ -2654,7 +2771,7 @@
     return {
       getBoot: function (t) {
         var u = auth(t);
-        return { user: u, serverVersion: APP_VERSION, brand: 'Arabelle Scarf', owner: 'Syifa', lists: LISTS, tags: ['Rapat', 'Dinas', 'Operasional', 'Produksi'], moneyCats: CATS, dayCats: ['Kerja', 'Pribadi'], today: T,
+        return { user: u, serverVersion: APP_VERSION, myPlaylists: myPl, brand: 'Arabelle Scarf', owner: 'Syifa', lists: LISTS, tags: ['Rapat', 'Dinas', 'Operasional', 'Produksi'], moneyCats: CATS, dayCats: ['Kerja', 'Pribadi'], today: T,
           routineCats: { 'Kesehatan': '💊', 'Olahraga': '🏃‍♀️', 'Ibadah': '🤲', 'Makan & minum': '🥗', 'Perawatan diri': '🧴', 'Istirahat': '😴', 'Lainnya': '✨' }, routineBefore: [0, 5, 10, 15, 30, 60],
           initial: { posts: month(T.slice(0, 7)), day: dayOf(u, T), dash: u.role === 'Owner' ? Demo.getDashboard(t) : null } };
       },
@@ -2709,6 +2826,7 @@
       saveIdea: function (t, d) { auth(t); var x = d.id ? ideas.filter(function (i) { return i.id === d.id; })[0] : null; if (!x) { x = { id: 'i' + (++seq), date: T }; ideas.unshift(x); } x.text = d.text; x.pilar = d.pilar || ''; x.source = d.source || ''; x.note = d.note || ''; return ideas; },
       deleteIdea: function (t, id) { auth(t); ideas = ideas.filter(function (i) { return i.id !== id; }); return ideas; },
       getKabar: function (t) { auth(t); return KABAR; },
+      saveMyPlaylists: function (t, d) { auth(t); myPl = { spotify: d.spotify, youtube: d.youtube }; return myPl; },
       hideKabarSource: function (t, src) { auth(t, true); KABAR.topics.forEach(function (tp) { tp.items = tp.items.filter(function (n) { return n.source !== src; }); }); return KABAR; },
       updateNote: function (t, id, text) { auth(t, true); notes.forEach(function (n) { if (n.id === id) n.text = text; }); return notes; },
       updateDayItem: function (t, id, d) { var u = auth(t), f = findDay(u, id), it = days[f.k][f.i]; it.text = d.text; if (it.type === 'Jadwal') { it.start = d.start; it.end = d.end; it.cat = d.cat; } return dayOf(u, f.k.split('|')[1]); },
