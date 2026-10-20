@@ -354,7 +354,9 @@
   .tr-main .t { flex: 1; min-width: 0; }
   .tr-main .t b { display: block; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
   .tr-main .t span { display: block; font-size: 12px; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .tr-acts { display: flex; gap: 6px; flex-wrap: wrap; padding-left: 96px; }
+  .tr-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tr-thumb .ini { width: 100%; height: 100%; display: grid; place-items: center; font-size: 22px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #F7B3CE, #BE2B66); }
+  .tiny.th { background: var(--ink); border-color: var(--ink); color: #fff; }
   @media (max-width: 360px) { .tr-acts { padding-left: 0; } }
   .ktabs { display: flex; gap: 2px; background: var(--pink-soft); border-radius: 999px; padding: 3px; margin-top: 10px; }
   .ktabs button { flex: 1; height: 34px; border: 0; border-radius: 999px; background: transparent; font-size: 13px; font-weight: 600; color: #7A2A4E; padding: 0 6px; }
@@ -693,7 +695,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-6';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-7';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>',
@@ -796,6 +798,21 @@
   function eng(p) { return (p.likes || 0) + (p.comments || 0) + (p.shares || 0) + (p.saves || 0); }
   function hasMetrics(p) { return METRIC_KEYS.some(function (k) { return p[k] != null; }); }
   function sumBy(list, key) { return list.reduce(function (a, p) { return a + (p[key] || 0); }, 0); }
+  /** Simpan & kembalikan posisi geser deretan chip saat konten digambar ulang. */
+  var chipScroll = {};
+  function keepChipScroll(root, key, fn) {
+    root.querySelectorAll('.fchips').forEach(function (f, i) { chipScroll[key + i] = f.scrollLeft; });
+    fn();
+    root.querySelectorAll('.fchips').forEach(function (f, i) {
+      if (chipScroll[key + i] != null) f.scrollLeft = chipScroll[key + i];
+      var on = f.querySelector('[aria-pressed="true"]');
+      if (on) {
+        var l = on.offsetLeft - f.offsetLeft, r = l + on.offsetWidth;
+        if (l < f.scrollLeft || r > f.scrollLeft + f.clientWidth) f.scrollLeft = Math.max(0, l - 16);
+      }
+    });
+  }
+
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 
   var toastTimer;
@@ -1219,20 +1236,28 @@
             'Tips: buka <b>Mode Baca</b> (ikon aA di Safari, atau “Tampilan sederhana” di Chrome) supaya bersih tanpa iklan' + (isOwner() ? ', dan ketuk “Sembunyikan” untuk situs yang terlalu banyak iklan.' : '.') + '</p>';
         }
       } else if (st.kabarTab === 'trend') {
-        var trs = (k.trends || []).map(function (t) { return typeof t === 'string' ? { q: t } : t; });
-        html += trs.length ? '<small class="mu" style="display:block;margin:10px 0 2px">📈 Lagi ramai di Indonesia (topik negatif sudah disaring) · ketuk untuk lihat obrolannya di Threads</small><div>' +
-          trs.slice(0, 8).map(function (t, i) {
+        var trs = (k.trends || []).filter(function (t) { return t && typeof t === 'object'; });
+        var good = trs.filter(function (t) { return t.good; });
+        var showAll = !!st.trendAll;
+        var list = showAll ? trs : good;
+        html += '<div class="fchips" style="padding:10px 0 2px"><button class="fchip" type="button" data-ta="0" aria-pressed="' + !showAll + '">✨ Relevan (' + good.length + ')</button><button class="fchip" type="button" data-ta="1" aria-pressed="' + showAll + '">Semua tren (' + trs.length + ')</button></div>' +
+          '<small class="mu" style="display:block;margin:6px 0 2px">' + (showAll ? 'Semua yang lagi ramai di Indonesia, topik negatif sudah disaring.' : 'Tren yang nyambung dengan fashion, kecantikan, musik, hiburan, olahraga, dan bisnis.') + ' Ketuk untuk lihat obrolannya di Threads.</small>';
+        if (!list.length) html += '<p class="empty">Belum ada tren yang relevan hari ini. Coba lihat “Semua tren”, atau cek tab Pinterest untuk inspirasi.</p>';
+        else html += '<div>' + list.slice(0, 8).map(function (t, i) {
             var th = 'https://www.threads.com/search?q=' + encodeURIComponent(t.q) + '&serp_type=default';
             var tt = 'https://www.tiktok.com/search?q=' + encodeURIComponent(t.q);
-            var thumb = t.pic ? '<img src="' + esc(t.pic) + '" alt="" loading="lazy">' : (t.good ? '✨' : '📈');
-            var sub = t.news ? t.news.title : (t.traffic ? t.traffic + ' pencarian' : '');
+            var img = t.pic || (t.video && t.video.thumb) || '';
+            var thumb = img ? '<img src="' + esc(img) + '" alt="" loading="lazy">' : '<span class="ini">' + esc(t.q.charAt(0).toUpperCase()) + '</span>';
+            var sub = t.news ? t.news.title : (t.traffic ? t.traffic + ' pencarian' : 'Lagi ramai dicari');
             return '<div class="tr"><a class="tr-main" href="' + esc(th) + '" target="_blank" rel="noopener"><span class="tr-thumb">' + thumb + '</span>' +
-              '<span class="t"><b>' + (i + 1) + '. ' + esc(t.q) + (t.good ? ' <span class="chip" style="display:inline-flex;padding:1px 8px;font-size:11px;vertical-align:middle">relevan</span>' : '') + '</b><span>' + esc(sub) + '</span></span></a>' +
+              '<span class="t"><b>' + (i + 1) + '. ' + esc(t.q) + '</b><span>' + esc(sub) + '</span></span></a>' +
               '<div class="tr-acts">' +
+                '<a class="tiny th" href="' + esc(th) + '" target="_blank" rel="noopener" style="text-decoration:none">@ Threads</a>' +
+                (t.video ? '<a class="tiny" href="https://www.youtube.com/watch?v=' + encodeURIComponent(t.video.id) + '" target="_blank" rel="noopener" style="text-decoration:none">▶ Video</a>' : '') +
                 (t.news && t.news.url ? '<a class="tiny" href="' + esc(t.news.url) + '" target="_blank" rel="noopener" style="text-decoration:none" title="' + esc(t.news.title) + '">📰 Berita</a>' : '') +
                 '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" style="text-decoration:none">TikTok</a>' +
                 '<button class="tiny" type="button" data-t="' + esc(t.q) + '">+ Ide</button></div></div>';
-          }).join('') + '</div><div style="height:6px"></div>' : '<p class="empty">Belum ada tren yang relevan hari ini.</p>';
+          }).join('') + '</div><div style="height:6px"></div>';
       } else if (st.kabarTab === 'music') {
         var yt = k.music.length && k.music[0].src === 'youtube';
         html += '<small class="mu" style="display:block;margin:10px 0 4px">' + (yt ? '🎬 Musik yang lagi trending di YouTube Indonesia · ketuk untuk putar' : '🎧 Lagu paling banyak diputar di Indonesia · ketuk untuk cari di TikTok') + '</small>' +
@@ -1250,17 +1275,19 @@
           ext('https://open.spotify.com/search/' + encodeURIComponent('viral indonesia'), '🎧 Spotify ↗', '').replace('<a ', '<a class="btn-line btn-sm" ') + '</div>';
       } else {
         var groups = Array.isArray(k.pins) ? { '📌 Inspirasi': k.pins } : (k.pins || {});
-        html += '<small class="mu" style="display:block;margin:10px 0 4px">📌 Referensi desain & outfit di Pinterest · ketuk untuk membuka</small>' +
-          Object.keys(groups).map(function (g) {
-            return '<div style="padding:8px 0 2px"><b style="display:block;font-size:13px;margin-bottom:6px">' + esc(g) + '</b><div style="display:flex;gap:6px;flex-wrap:wrap">' +
-              groups[g].map(function (q) { return ext('https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(q), esc(q) + ' ↗', '').replace('<a ', '<a class="fchip" '); }).join('') + '</div></div>';
-          }).join('') +
-          '<div style="padding:12px 0 8px">' + ext('https://trends.pinterest.com/?country=ID', '📈 Pinterest Trends Indonesia ↗', '').replace('<a ', '<a class="btn btn-sm" ') + '</div>' +
-          '<p class="mu" style="font-size:12px;padding-bottom:12px">Tips: simpan pin favorit ke board Pinterest, lalu catat idenya lewat Bank ide supaya bisa langsung dijadwalkan.</p>';
+        var gk = Object.keys(groups);
+        if (gk.indexOf(st.pinGroup) < 0) st.pinGroup = gk[0];
+        html += '<div class="fchips" style="padding:10px 0 4px">' + gk.map(function (g) { return '<button class="fchip" type="button" data-pg="' + esc(g) + '" aria-pressed="' + (g === st.pinGroup) + '">' + esc(g) + '</button>'; }).join('') + '</div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;padding:6px 0 4px">' + (groups[st.pinGroup] || []).slice(0, 4).map(function (q) {
+            return ext('https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(q), esc(q) + ' ↗', '').replace('<a ', '<a class="fchip" ');
+          }).join('') + '</div>' +
+          '<div style="padding:8px 0 12px">' + ext('https://trends.pinterest.com/?country=ID', '📈 Pinterest Trends ↗', '').replace('<a ', '<a class="btn-line btn-sm" ') + '</div>';
       }
-      card.innerHTML = html;
+      keepChipScroll(card, 'kabar-' + st.kabarTab + '-', function () { card.innerHTML = html; });
       card.querySelectorAll('[data-tab]').forEach(function (b) { b.onclick = function () { st.kabarTab = b.dataset.tab; draw(); }; });
       card.querySelectorAll('[data-k]').forEach(function (b) { b.onclick = function () { st.kabarCat = b.dataset.k; draw(); }; });
+      card.querySelectorAll('[data-ta]').forEach(function (b) { b.onclick = function () { st.trendAll = b.dataset.ta === '1'; draw(); }; });
+      card.querySelectorAll('[data-pg]').forEach(function (b) { b.onclick = function () { st.pinGroup = b.dataset.pg; draw(); }; });
       card.querySelectorAll('[data-t]').forEach(function (b) {
         b.onclick = async function () {
           b.disabled = true;
@@ -1522,6 +1549,9 @@
   }
 
   function drawIdeas(holder) {
+    keepChipScroll(holder, 'ideas-', function () { drawIdeasInner(holder); });
+  }
+  function drawIdeasInner(holder) {
     holder.innerHTML = '';
     st.ideaPilar = st.ideaPilar || '';
     var pilars = st.boot.lists.Pilar;
@@ -2449,8 +2479,9 @@
     var KABAR = { at: new Date(Date.now() - 2 * 3600000).toISOString(),
       trends: [
         { q: 'hijab pashmina kondangan', traffic: '20K+', good: true, news: { title: 'Contoh berita: tren hijab untuk musim kondangan', url: 'https://news.google.com', source: 'Contoh media' } },
-        { q: 'tren warna akhir tahun', traffic: '10K+', news: { title: 'Contoh berita: warna yang diprediksi populer', url: 'https://news.google.com', source: 'Contoh media' } },
-        { q: 'promo 11.11', traffic: '50K+' }
+        { q: 'tren warna akhir tahun', traffic: '10K+', good: true, video: { id: 'x', thumb: '' }, news: { title: 'Contoh berita: warna yang diprediksi populer', url: 'https://news.google.com', source: 'Contoh media' } },
+        { q: 'elon musk', traffic: '50K+' },
+        { q: 'agnez mo', traffic: '20K+', news: { title: 'Contoh berita: jadwal konser terbaru', url: 'https://news.google.com', source: 'Contoh media' }, good: true }
       ],
       music: [{ name: 'Contoh lagu trending', artist: 'Penyanyi A', art: '', url: 'https://www.youtube.com', views: 2450000, src: 'youtube' }, { name: 'Lagu viral kedua', artist: 'Band B', art: '', url: 'https://www.youtube.com', views: 980000, src: 'youtube' }, { name: 'Lagu ketiga', artist: 'Penyanyi C', art: '', url: 'https://www.youtube.com', views: 512000, src: 'youtube' }],
       pins: { '👗 Desain baju': ['gamis modern design', 'modest dress design', 'abaya modern'], '✨ Outfit': ['outfit hijab casual', 'outfit kerja hijab', 'ootd hijab pashmina'], '🏋️‍♀️ Olahraga': ['hijab gym outfit', 'pilates outfit hijab'] },
