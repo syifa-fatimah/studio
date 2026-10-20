@@ -85,6 +85,11 @@
   .intro-screen.squish .fly { animation: fly 1s cubic-bezier(.2, .7, .3, 1) forwards; }
   .intro-screen.squish .fly.f2 { animation: fly2 1.1s cubic-bezier(.2, .7, .3, 1) .1s forwards; }
   .intro-screen.pop .slot .logo { transform: scale(1); }
+  .intro-screen.greet .slot .logo { animation: logoFloat 2.4s ease-in-out infinite; }
+  @keyframes logoFloat { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-6px) rotate(-4deg); } }
+  .intro-screen { transition: opacity .32s ease; }
+  .intro-screen.leave { opacity: 0; }
+  @media (prefers-reduced-motion: reduce) { .intro-screen.greet .slot .logo { animation: none; } }
   .intro-screen.greet .pill { padding: 0 24px 0 8px; border-radius: 34px; }
   .intro-screen.greet .pill .txt { max-width: 320px; padding-left: 12px; opacity: 1; }
   .tagline { font-size: 22px; font-weight: 600; line-height: 1.3; max-width: 22ch; opacity: 0; transform: translateY(8px); transition: opacity .5s ease, transform .5s ease; }
@@ -879,7 +884,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-19';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-20';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1116,27 +1121,27 @@
   var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   function introMode() {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'still';
-    var today = iso(new Date());
-    try { if (localStorage.getItem('arabelle_intro') === today) return 'short'; localStorage.setItem('arabelle_intro', today); } catch (e) {}
-    return 'full';
+    return 'full';   // animasi penuh setiap kali app dibuka (±3,5 detik)
   }
   async function playIntro() {
     var box = $('bootScreen'), mode = introMode();
     var set = function (c) { box.classList.add(c); };
     if (mode !== 'full') ['in', 'squish', 'pop'].forEach(set);
     else {
-      await wait(30); set('in');
-      await wait(360); set('squish');
-      await wait(260); set('pop');
-      await wait(180);
+      await wait(80); set('in');
+      await wait(750); set('squish');
+      await wait(650); set('pop');
+      await wait(500);
     }
     while (!intro.ready) await wait(50);
     if (!st.boot) return;
     $('pillTxt').textContent = greet() + ', ' + st.boot.user.name + '!';
     set('greet');
-    if (mode === 'full') { await wait(200); set('tag'); }
+    if (mode === 'full') { await wait(700); set('tag'); }
     intro.done = true;
-    await wait(mode === 'full' ? 420 : 180);
+    await wait(mode === 'full' ? 1100 : 400);
+    box.classList.add('leave');
+    await wait(mode === 'full' ? 320 : 0);
     enterOnce();
   }
   function enterOnce() { if (intro.entered || !intro.done || !st.boot) return; intro.entered = true; enterApp(); }
