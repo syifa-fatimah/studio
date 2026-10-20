@@ -117,6 +117,9 @@
   .dock button { width: 52px; height: 52px; border-radius: 50%; border: 0; background: transparent; color: #FFE3EE; display: grid; place-items: center; flex: none; }
   .dock button svg { width: 22px; height: 22px; }
   .dock button[aria-current="page"] { background: #fff; color: var(--fill); }
+  .dock { justify-content: space-around; }
+  .dock button.dock-plus { width: 60px; height: 60px; margin-top: -26px; background: #fff; color: var(--fill); border: 4px solid var(--fill); box-shadow: 0 10px 22px rgba(190, 43, 102, .4); }
+  .dock button.dock-plus svg { width: 26px; height: 26px; }
   @media (min-width: 900px) { #verMob { display: none; } }
   @media (max-width: 899px) {
     .side { display: none; }
@@ -877,7 +880,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-17';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-18';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1203,13 +1206,19 @@
     $('appScreen').classList.add('has-nav');
     var side = $('sideNav'), dock = $('dock');
     side.innerHTML = ''; dock.innerHTML = '';
+    // Menu samping (PC): semua menu. Navigasi bawah (HP): 5 tombol, + di tengah; Catatan lewat + dan Beranda.
+    var dockKeys = owner ? ['dasbor', 'konten', 'agenda', 'harian', 'uang'] : keys;
     keys.forEach(function (k) {
       var quick = k === 'agenda';   // menu Agenda & dinas digantikan Tambah cepat
       var icon = quick ? I.plus : VIEWS[k].icon, label = quick ? 'Tambah cepat' : VIEWS[k].label;
       var a = el('button', 'nav-btn', icon + '<span>' + label + '</span>');
       a.type = 'button'; if (!quick) a.dataset.view = k; a.onclick = function () { if (quick) openQuick(); else go(k); };
       side.appendChild(a);
-      var m = el('button', '', icon);
+    });
+    dockKeys.forEach(function (k) {
+      var quick = k === 'agenda';
+      var icon = quick ? I.plus : VIEWS[k].icon, label = quick ? 'Tambah cepat' : VIEWS[k].label;
+      var m = el('button', quick ? 'dock-plus' : '', icon);
       m.type = 'button'; if (!quick) m.dataset.view = k; m.setAttribute('aria-label', label); m.title = label;
       m.onclick = function () { if (quick) openQuick(); else go(k); };
       dock.appendChild(m);
@@ -1496,7 +1505,7 @@
     right.appendChild(el('div', 'card', '<div class="sec"><h3>Ringkasan</h3><button class="link" type="button" data-go="report">Lihat report</button></div>' +
       '<div class="row"><span class="ic" style="background:var(--t-mint)">' + I.cal + '</span><span class="t"><small>Konten bulan ini</small><b>' + c.done + ' dari ' + c.total + ' sudah tayang</b><span>' + c.sched + ' terjadwal, ' + c.open + ' masih proses</span></span></div>' +
       (d.trips.length ? '<div class="row"><span class="ic" style="background:var(--t-pink)">' + I.clock + '</span><span class="t"><small>Dinas berikutnya</small><b>' + esc(d.trips[0].title) + '</b><span>' + esc(dayLabel(d.trips[0].date)) + (d.trips[0].time ? ', ' + esc(d.trips[0].time) : '') + '</span></span></div>' : '') +
-      (d.notes.length ? '<div class="row"><span class="ic" style="background:var(--t-lilac)">' + I.note + '</span><span class="t"><small>Catatan terbaru</small><b>' + esc(d.notes[0].text) + '</b></span></div>' : '')));
+      '<button class="row" type="button" data-go="catatan" style="width:100%;border-left:0;border-right:0;border-bottom:0;background:none;text-align:left;cursor:pointer"><span class="ic" style="background:var(--t-lilac)">' + I.note + '</span><span class="t"><small>' + (d.notes.length ? 'Catatan terbaru · ' + d.noteCount + ' catatan' : 'Catatan') + '</small><b>' + esc(d.notes.length ? d.notes[0].text : 'Tulis catatan singkat') + '</b></span><span class="mu" style="font-size:18px">›</span></button>'));
     right.querySelectorAll('[data-go]').forEach(function (b) {
       b.onclick = function () { if (b.dataset.go === 'report') { st.kTab = 'report'; go('konten'); } else go(b.dataset.go); };
     });
