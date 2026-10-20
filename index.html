@@ -394,7 +394,8 @@
   #plPanel iframe { display: block; width: 100%; border: 0; border-radius: 14px; background: #000; }
   #plPanel .yt { aspect-ratio: 16 / 9; }
   @media (min-width: 900px) { #plPanel { left: auto; right: 24px; bottom: 24px; width: 400px; } }
-  #plPanel.small[data-kind="youtube"] { left: auto; width: 236px; }
+  #plPanel.small[data-kind="youtube"] { left: auto; width: 256px; }
+  #plPanel.small[data-kind="youtube"] iframe.yt { aspect-ratio: auto; height: 200px; }
   body.pl-open .main { padding-bottom: 260px; }
   body.pl-open.pl-small .main { padding-bottom: 200px; }
   .msub { display: flex; gap: 2px; background: var(--pink-soft); border-radius: 999px; padding: 3px; margin: 10px 0 4px; }
@@ -780,7 +781,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-14';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-16';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>',
@@ -887,8 +888,15 @@
   var APPS = {
     threads: { name: 'Threads', ios: 'barcelona://', android: 'com.instagram.barcelona' },
     tiktok: { name: 'TikTok', ios: 'tiktok://', android: 'com.ss.android.ugc.trill' },
+    // iPhone: YouTube Music tidak punya alamat khusus resmi → buka di aplikasi YouTube (youtube://), yang pasti dikenali
     ytmusic: { name: 'YouTube Music', android: 'com.google.android.apps.youtube.music', noCopy: true,
-      iosUrl: function (web) { var u = new URL(web); return 'youtubemusic://' + u.host + u.pathname + u.search; } },
+      iosUrl: function (web) {
+        var u = new URL(web), v = u.searchParams.get('v'), list = u.searchParams.get('list'), q = u.searchParams.get('q');
+        if (v) return 'youtube://www.youtube.com/watch?v=' + encodeURIComponent(v);
+        if (list) return 'youtube://www.youtube.com/playlist?list=' + encodeURIComponent(list);
+        if (q) return 'youtube://www.youtube.com/results?search_query=' + encodeURIComponent(q);
+        return 'youtube://www.youtube.com/';
+      } },
     youtube: { name: 'YouTube', android: 'com.google.android.youtube', noCopy: true,
       iosUrl: function (web) { var u = new URL(web); return 'youtube://' + u.host + u.pathname + u.search; } }
   };
@@ -1391,7 +1399,7 @@
         var pl = st.boot.myPlaylists || {};
         if (pl.youtube && !st.plEdit) {
           var plId = (String(pl.youtube).match(/[?&]list=([A-Za-z0-9_-]+)/) || [])[1] || '';
-          html += '<a class="plbtn" href="https://music.youtube.com/playlist?list=' + encodeURIComponent(plId) + '" target="_blank" rel="noopener" data-app="ytmusic" data-q="playlist" style="text-decoration:none"><span class="ic2" style="background:#FF0033;color:#fff">♫</span><span style="flex:1"><b>Putar playlist saya</b><small>Lagu penuh di aplikasi YouTube Music</small></span><span>↗</span></a>' +
+          html += '<a class="plbtn" href="https://music.youtube.com/playlist?list=' + encodeURIComponent(plId) + '" target="_blank" rel="noopener" data-app="ytmusic" data-q="playlist" style="text-decoration:none"><span class="ic2" style="background:#FF0033;color:#fff">♫</span><span style="flex:1"><b>Putar playlist saya</b><small>Lagu penuh di aplikasi ' + (/iPhone|iPad|iPod/.test(navigator.userAgent) ? 'YouTube' : 'YouTube Music') + '</small></span><span>↗</span></a>' +
             '<p class="mu" style="font-size:12px;padding:10px 0 4px">Tips: dengan YouTube Music Premium, lagu tetap berputar saat kembali ke Syifa Studio atau layar dikunci.</p>' +
             '<button class="link" type="button" data-pledit style="color:var(--rose);padding:4px 0 12px">Ubah link playlist</button>';
         } else {
@@ -1404,7 +1412,8 @@
         var yt = k.music.some(function (m) { return m.src === 'youtube'; });
         html += '<div class="msub" role="group"><button type="button" data-ms="pop" aria-pressed="true">🔥 Lagu pop</button><button type="button" data-ms="mine" aria-pressed="false">🎧 Playlist saya</button></div>';
         var limit = st.musicAll ? 10 : 5;
-        html += '<small class="mu" style="display:block;margin:6px 0 2px">🎧 Lagu pop paling banyak diputar di Indonesia · ketuk ♫ untuk dengar sekilas, ketuk judul untuk lagu penuh di YouTube Music</small>' +
+        var onIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        html += '<small class="mu" style="display:block;margin:6px 0 2px">🎧 Lagu pop paling banyak diputar di Indonesia · ketuk ♫ untuk dengar sekilas, ketuk judul untuk lagu penuh di pemutar kecil</small>' +
           (k.music.length ? '<div>' + k.music.slice(0, limit).map(function (m, i) {
             var q = m.name + ' ' + m.artist;
             var isYt = m.src === 'youtube';
@@ -1416,7 +1425,7 @@
               '<button class="vthumb btn0' + (isYt ? '' : ' sq') + '" type="button" ' + (m.preview ? 'data-audio="' + i + '" aria-label="Dengar cuplikan: ' + esc(m.name) + '"' : 'data-ytm="' + i + '" aria-label="Putar di YouTube Music"') + '>' +
                 (m.art ? '<img src="' + esc(m.art) + '" alt="" loading="lazy">' : '🎵') +
                 '<span class="rk">' + (i + 1) + '</span><span class="pl">♫</span></button>' +
-              '<a class="t" href="' + esc(yurl) + '" target="_blank" rel="noopener" data-app="ytmusic" data-q="' + esc(q) + '" style="color:inherit;text-decoration:none"><b>' + esc(m.name) + '</b><span>' + esc(m.artist) + (m.views ? ' · ' + num(m.views) + ' ditonton' : '') + '</span></a></div>';
+              '<a class="t" href="' + esc(yurl) + '" target="_blank" rel="noopener" ' + (vid ? 'data-float="' + i + '"' : 'data-app="ytmusic"') + ' data-q="' + esc(q) + '" style="color:inherit;text-decoration:none"><b>' + esc(m.name) + '</b><span>' + esc(m.artist) + (m.views ? ' · ' + num(m.views) + ' ditonton' : '') + '</span></a></div>';
           }).join('') + '</div>' +
           (k.music.length > 5 ? '<button class="link" type="button" data-more style="color:var(--rose);width:100%">' + (st.musicAll ? 'Tampilkan lebih sedikit' : 'Lihat ' + (Math.min(10, k.music.length) - 5) + ' lagi') + '</button>' : '') : '<p class="empty">Daftar lagu belum tersedia.</p>') +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;padding:6px 0 12px">' +
@@ -1451,6 +1460,9 @@
       });
       card.querySelectorAll('[data-more]').forEach(function (b) { b.onclick = function () { st.musicAll = !st.musicAll; draw(); }; });
       card.querySelectorAll('[data-audio]').forEach(function (b) { b.onclick = function () { playAudio(k.music[Number(b.dataset.audio)]); }; });
+      card.querySelectorAll('[data-float]').forEach(function (a) {
+        a.addEventListener('click', function (e) { e.preventDefault(); var m = k.music[Number(a.dataset.float)]; openYtFloat([vidOf(m)], '♫ ' + m.name); });
+      });
       card.querySelectorAll('[data-ytm]').forEach(function (b) {
         b.onclick = function (e) {
           var m = k.music[Number(b.dataset.ytm)], u = ytmUrl(m);
@@ -1533,8 +1545,10 @@
     var v = vidOf(m);
     return v ? 'https://music.youtube.com/watch?v=' + v : 'https://music.youtube.com/search?q=' + encodeURIComponent(m.name + ' ' + m.artist);
   }
+  var mbCurrent = null;
   function playAudio(m) {
     if (!m || !m.preview) return;
+    mbCurrent = m;
     $('mbFull').href = ytmUrl(m); $('mbFull').dataset.q = m.name + ' ' + m.artist;
     if (!$('plPanel').hidden) { $('plBody').innerHTML = ''; $('plPanel').hidden = true; plState(); }
     var a = $('mbAudio');
@@ -2616,6 +2630,10 @@
     var sync = function () { t.textContent = a.paused ? '⏵' : '⏸'; t.setAttribute('aria-label', a.paused ? 'Putar' : 'Jeda'); };
     a.addEventListener('play', sync); a.addEventListener('pause', sync); a.addEventListener('ended', sync);
     t.onclick = function () { if (a.paused) a.play(); else a.pause(); };
+    $('mbFull').addEventListener('click', function (e) {
+      var v = vidOf(mbCurrent);
+      if (v) { e.preventDefault(); e.stopImmediatePropagation(); openYtFloat([v], '♫ ' + mbCurrent.name); }
+    }, true);
     bindApps($('miniBar'));
     $('mbClose').onclick = function () { a.pause(); a.removeAttribute('src'); a.load(); $('miniBar').hidden = true; };
   })();
