@@ -798,6 +798,35 @@
   function eng(p) { return (p.likes || 0) + (p.comments || 0) + (p.shares || 0) + (p.saves || 0); }
   function hasMetrics(p) { return METRIC_KEYS.some(function (k) { return p[k] != null; }); }
   function sumBy(list, key) { return list.reduce(function (a, p) { return a + (p[key] || 0); }, 0); }
+  /** Buka aplikasi TikTok/Threads langsung dari HP (bukan web). Kata kunci disalin supaya tinggal ditempel. */
+  var APPS = {
+    threads: { name: 'Threads', ios: 'barcelona://', android: 'com.instagram.barcelona' },
+    tiktok: { name: 'TikTok', ios: 'tiktok://', android: 'com.ss.android.ugc.trill' }
+  };
+  function isAndroid() { return /Android/i.test(navigator.userAgent); }
+  function openApp(app, q, web, ev) {
+    var a = APPS[app];
+    var iOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (!a || !(iOS || isAndroid())) return;           // laptop/PC: buka web seperti biasa
+    if (ev) ev.preventDefault();
+    if (isAndroid()) {
+      var u = new URL(web);
+      location.href = 'intent://' + u.host + u.pathname + u.search + '#Intent;scheme=https;package=' + a.android +
+        ';S.browser_fallback_url=' + encodeURIComponent(web) + ';end';
+      return;
+    }
+    try { navigator.clipboard.writeText(q).then(function () { toast('“' + q + '” disalin. Tempel di pencarian ' + a.name + ' ✨'); }, function () {}); } catch (e) {}
+    var fallback = setTimeout(function () { if (!document.hidden) window.open(web, '_blank'); }, 1800);
+    var onHide = function () { if (document.hidden) { clearTimeout(fallback); document.removeEventListener('visibilitychange', onHide); } };
+    document.addEventListener('visibilitychange', onHide);
+    location.href = a.ios;
+  }
+  function bindApps(root) {
+    root.querySelectorAll('[data-app]').forEach(function (x) {
+      x.addEventListener('click', function (e) { openApp(x.dataset.app, x.dataset.q, x.href, e); });
+    });
+  }
+
   /** Simpan & kembalikan posisi geser deretan chip saat konten digambar ulang. */
   var chipScroll = {};
   function keepChipScroll(root, key, fn) {
@@ -1249,13 +1278,13 @@
             var img = t.pic || (t.video && t.video.thumb) || '';
             var thumb = img ? '<img src="' + esc(img) + '" alt="" loading="lazy">' : '<span class="ini">' + esc(t.q.charAt(0).toUpperCase()) + '</span>';
             var sub = t.news ? t.news.title : (t.traffic ? t.traffic + ' pencarian' : 'Lagi ramai dicari');
-            return '<div class="tr"><a class="tr-main" href="' + esc(th) + '" target="_blank" rel="noopener"><span class="tr-thumb">' + thumb + '</span>' +
+            return '<div class="tr"><a class="tr-main" href="' + esc(th) + '" target="_blank" rel="noopener" data-app="threads" data-q="' + esc(t.q) + '"><span class="tr-thumb">' + thumb + '</span>' +
               '<span class="t"><b>' + (i + 1) + '. ' + esc(t.q) + '</b><span>' + esc(sub) + '</span></span></a>' +
               '<div class="tr-acts">' +
-                '<a class="tiny th" href="' + esc(th) + '" target="_blank" rel="noopener" style="text-decoration:none">@ Threads</a>' +
+                '<a class="tiny th" href="' + esc(th) + '" target="_blank" rel="noopener" data-app="threads" data-q="' + esc(t.q) + '" style="text-decoration:none">@ Threads</a>' +
                 (t.video ? '<a class="tiny" href="https://www.youtube.com/watch?v=' + encodeURIComponent(t.video.id) + '" target="_blank" rel="noopener" style="text-decoration:none">▶ Video</a>' : '') +
                 (t.news && t.news.url ? '<a class="tiny" href="' + esc(t.news.url) + '" target="_blank" rel="noopener" style="text-decoration:none" title="' + esc(t.news.title) + '">📰 Berita</a>' : '') +
-                '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" style="text-decoration:none">TikTok</a>' +
+                '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" data-app="tiktok" data-q="' + esc(t.q) + '" style="text-decoration:none">TikTok</a>' +
                 '<button class="tiny" type="button" data-t="' + esc(t.q) + '">+ Ide</button></div></div>';
           }).join('') + '</div><div style="height:6px"></div>';
       } else if (st.kabarTab === 'music') {
@@ -1267,7 +1296,7 @@
               '<a href="' + esc(yt ? m.url : tt) + '" target="_blank" rel="noopener" style="display:contents;color:inherit;text-decoration:none">' +
               (m.art ? '<img src="' + esc(m.art) + '" alt="" loading="lazy">' : '<span style="width:44px;height:44px;border-radius:10px;background:var(--pink-soft);display:grid;place-items:center">🎵</span>') +
               '<span class="t"><b>' + (i + 1) + '. ' + esc(m.name) + '</b><span>' + esc(m.artist) + (m.views ? ' · ' + num(m.views) + ' x ditonton' : '') + '</span></span></a>' +
-              (yt ? '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" style="text-decoration:none">TikTok ↗</a>' : '<span class="mu" style="font-size:18px">↗</span>') + '</div>';
+              (yt ? '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" data-app="tiktok" data-q="' + esc(m.name + ' ' + m.artist) + '" style="text-decoration:none">TikTok ↗</a>' : '<span class="mu" style="font-size:18px">↗</span>') + '</div>';
           }).join('') + '</div>' : '<p class="empty">Daftar lagu belum tersedia.</p>') +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 12px">' +
           ext('https://www.youtube.com/feed/trending?bp=4gINGgt5dG1hX2NoYXJ0cw%3D%3D', '▶️ Trending YouTube ↗', '').replace('<a ', '<a class="btn-line btn-sm" ') +
@@ -1288,6 +1317,7 @@
       card.querySelectorAll('[data-k]').forEach(function (b) { b.onclick = function () { st.kabarCat = b.dataset.k; draw(); }; });
       card.querySelectorAll('[data-ta]').forEach(function (b) { b.onclick = function () { st.trendAll = b.dataset.ta === '1'; draw(); }; });
       card.querySelectorAll('[data-pg]').forEach(function (b) { b.onclick = function () { st.pinGroup = b.dataset.pg; draw(); }; });
+      bindApps(card);
       card.querySelectorAll('[data-t]').forEach(function (b) {
         b.onclick = async function () {
           b.disabled = true;
