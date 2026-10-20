@@ -208,7 +208,7 @@
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
   .legend i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; background: var(--dot-idea); }
   .seg { display: inline-flex; background: var(--pink-soft); border-radius: 999px; padding: 4px; gap: 2px; align-self: flex-start; max-width: 100%; overflow-x: auto; }
-  .seg button { height: 40px; border: 0; border-radius: 999px; padding: 0 18px; background: transparent; font-weight: 500; font-size: 14px; color: #7A2A4E; white-space: nowrap; }
+  .seg button { height: 40px; border: 0; border-radius: 999px; padding: 0 14px; background: transparent; font-weight: 500; font-size: 14px; color: #7A2A4E; white-space: nowrap; }
   .seg button[aria-selected="true"] { background: var(--fill); color: #fff; }
   .status-sel { appearance: none; -webkit-appearance: none; border: 0; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 500; max-width: 150px; background: rgba(255, 255, 255, .78); }
 
@@ -303,6 +303,7 @@
   .dlg-head h2 { font-size: 24px; font-weight: 600; letter-spacing: -.01em; }
   .dlg-head p { font-size: 14px; color: var(--muted); }
   .dlg-body { padding: 4px 20px 22px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+  .dlg-body > * { flex-shrink: 0; }
   .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
   .cap-row { display: flex; justify-content: space-between; align-items: center; }
@@ -332,6 +333,22 @@
   .daypick button[aria-pressed="true"] { background: var(--fill); border-color: var(--fill); color: #fff; }
   .quick { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
   .quick button { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .hl { background: var(--t-pink); border-radius: 4px; padding: 0 2px; color: inherit; }
+  .fchips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; align-items: center; }
+  .fchips .lab { font-size: 12px; color: var(--muted); flex: none; min-width: 58px; }
+  .fchip { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 500; white-space: nowrap; color: var(--ink); }
+  .fchip[aria-pressed="true"] { background: var(--fill); border-color: var(--fill); color: #fff; }
+  .idea { border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .idea b { font-size: 17px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+  .ideas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  @media (min-width: 700px) { .ideas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .news a { color: var(--ink); text-decoration: none; }
+  .news a:hover b { text-decoration: underline; }
+  .trend { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+  .trend span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .tiny { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .xrow td.cb span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; }
+  .acts2 { display: flex; flex-direction: column; align-items: flex-end; gap: 0; }
   .push-bar { margin: calc(env(safe-area-inset-top, 0px) + 14px) 16px 0; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(190, 43, 102, .08); }
   .push-bar .ic { width: 42px; height: 42px; border-radius: 50%; background: var(--pink-soft); display: grid; place-items: center; flex: none; color: var(--fill); }
   .push-bar .ic svg { width: 20px; height: 20px; }
@@ -384,9 +401,15 @@
   <aside class="side">
     <div class="side-brand"><span data-logo class="logo"></span><span><b>Syifa Studio</b><small id="sideRole">Owner</small></span></div>
     <div id="sideNav" style="display:flex;flex-direction:column;gap:4px"></div>
+    <small id="verTxt" style="margin-top:auto;padding:0 10px;color:var(--muted);font-size:12px"></small>
   </aside>
 
   <main class="main">
+    <div class="push-bar" id="updBar" hidden style="background:#4A1D33;border-color:#4A1D33;color:#fff">
+      <span class="ic" style="background:rgba(255,255,255,.15);color:#fff;font-size:18px">✨</span>
+      <span class="t" id="updText"><b>Versi baru tersedia</b>Ketuk Perbarui untuk memakai versi terbaru.</span>
+      <span class="acts"><button class="btn btn-sm" type="button" id="updBtn" style="background:#fff;color:#4A1D33">Perbarui</button></span>
+    </div>
     <div class="push-bar" id="pushBar" hidden>
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span>
       <span class="t" id="pushText"><b>Nyalakan notifikasi</b>Diingatkan 1 jam sebelum agenda dan jadwal posting.</span>
@@ -537,6 +560,53 @@
   </div>
 </dialog>
 
+<dialog id="noteDlg" aria-labelledby="ndTitle">
+  <div class="dlg">
+    <div class="dlg-head"><div><h2 id="ndTitle">Ubah catatan</h2></div><button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-body">
+      <label class="lbl">Catatan<textarea class="in" id="ndText" rows="5" maxlength="500"></textarea></label>
+      <div class="dlg-actions"><button class="btn-line" type="button" data-close>Batal</button><button class="btn" type="button" id="ndSave">Simpan</button></div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="itemDlg" aria-labelledby="itTitle">
+  <div class="dlg">
+    <div class="dlg-head"><div><h2 id="itTitle">Ubah</h2><p id="itSub"></p></div><button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-body">
+      <div class="two" id="itTimes">
+        <label class="lbl">Mulai<input class="in" id="itStart" type="time"></label>
+        <label class="lbl">Selesai<input class="in" id="itEnd" type="time"></label>
+      </div>
+      <label class="lbl">Isi<input class="in" id="itText" maxlength="200"></label>
+      <label class="lbl" id="itCatWrap">Kategori<select class="in" id="itCat"></select></label>
+      <div class="dlg-actions"><button class="btn-line" type="button" data-close>Batal</button><button class="btn" type="button" id="itSave">Simpan</button></div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="ideaDlg" aria-labelledby="idTitle">
+  <div class="dlg">
+    <div class="dlg-head"><div><h2 id="idTitle">Ubah ide</h2></div><button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-body">
+      <label class="lbl">Ide<textarea class="in" id="idText" rows="3" maxlength="200"></textarea></label>
+      <div class="two">
+        <label class="lbl">Pilar<select class="in" id="idPilar"></select></label>
+        <label class="lbl">Sumber ide<input class="in" id="idSource" maxlength="60" placeholder="Contoh: tren TikTok"></label>
+      </div>
+      <label class="lbl">Catatan<input class="in" id="idNote" maxlength="300" placeholder="Opsional"></label>
+      <div class="dlg-actions"><button class="btn-line" type="button" data-close>Batal</button><button class="btn" type="button" id="idSave">Simpan</button></div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="wkDlg" aria-labelledby="wkTitle">
+  <div class="dlg">
+    <div class="dlg-head"><div><h2 id="wkTitle">Ringkasan mingguan</h2><p id="wkSub"></p></div><button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-body" id="wkBody"></div>
+  </div>
+</dialog>
+
 <dialog id="rtDlg" aria-labelledby="rtTitle">
   <div class="dlg">
     <div class="dlg-head">
@@ -599,6 +669,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
+  var APP_VERSION = '2026.10.20-1';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>',
@@ -850,6 +921,22 @@
     go(owner ? 'dasbor' : 'konten');
     if (owner) setTimeout(prefetch, 1500);
     initPush();
+    checkVersion();
+  }
+
+  /** Bandingkan versi app (GitHub) dengan versi server (Apps Script). */
+  function checkVersion() {
+    var sv = st.boot.serverVersion || '';
+    $('verTxt').textContent = 'Versi ' + APP_VERSION;
+    if (!hasAPI || !sv || sv === APP_VERSION) return;
+    if (sv > APP_VERSION) {
+      $('updText').innerHTML = '<b>Versi baru tersedia</b>Ketuk Perbarui untuk memakai versi terbaru.';
+      $('updBtn').hidden = false;
+    } else if (isOwner()) {
+      $('updText').innerHTML = '<b>Apps Script belum versi terbaru</b>Tempel Code.gs terbaru lalu Deploy → Manage deployments → Edit → New version.';
+      $('updBtn').hidden = true;
+    } else return;
+    $('updBar').hidden = false;
   }
 
   // =====================================================================
@@ -1045,6 +1132,8 @@
     left.appendChild(tiles);
     tiles.querySelectorAll('[data-post]').forEach(function (b) { b.onclick = function () { openPost(w.posts[Number(b.dataset.post)], null, loadDash); }; });
     tiles.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { go(b.dataset.go); }; });
+    left.appendChild(kabarCard(d));
+    if (d.weekly) right.appendChild(weeklyCard(d.weekly));
 
     var targets = d.focus.filter(function (x) { return x.type === 'Target'; });
     var fc = el('div', 'card', '<div class="sec"><h3>Fokus hari ini</h3><button class="link" type="button" data-go="harian">Buka jadwal</button></div>');
@@ -1061,6 +1150,78 @@
     right.querySelectorAll('[data-go]').forEach(function (b) {
       b.onclick = function () { if (b.dataset.go === 'report') { st.kTab = 'report'; go('konten'); } else go(b.dataset.go); };
     });
+  }
+
+  // ---------- Kabar hari ini ----------
+  function ago(iso) {
+    var t = new Date(iso).getTime();
+    if (!t) return '';
+    var m = Math.max(1, Math.round((Date.now() - t) / 60000));
+    return m < 60 ? m + ' menit lalu' : m < 1440 ? Math.round(m / 60) + ' jam lalu' : Math.round(m / 1440) + ' hari lalu';
+  }
+
+  function kabarCard(d) {
+    var card = el('div', 'card');
+    var k = d.kabar;
+    if (!k || !k.topics) {
+      card.innerHTML = '<div class="sec"><h3>☀️ Kabar hari ini</h3></div><p class="empty">Kabar sedang disiapkan…</p>';
+      if (!st.kabarTried) {
+        st.kabarTried = true;
+        call('getKabar').then(function (res) { if (res && res.topics) { d.kabar = res; card.replaceWith(kabarCard(d)); } else card.querySelector('.empty').textContent = 'Kabar belum tersedia. Owner bisa klik menu ☀️ Perbarui kabar sekarang di Google Sheets.'; },
+          function () { card.querySelector('.empty').textContent = 'Kabar belum bisa diambil. Coba lagi nanti.'; });
+      }
+      return card;
+    }
+    var topics = k.topics.filter(function (t) { return t.items && t.items.length; });
+    if (!topics.length) { card.innerHTML = '<div class="sec"><h3>☀️ Kabar hari ini</h3></div><p class="empty">Belum ada kabar baru hari ini.</p>'; return card; }
+    if (!topics.some(function (t) { return t.key === st.kabarCat; })) st.kabarCat = topics[0].key;
+    var draw = function () {
+      var cur = topics.filter(function (t) { return t.key === st.kabarCat; })[0];
+      card.innerHTML = '<div class="sec"><h3>☀️ Kabar hari ini</h3><span class="mu">' + esc(ago(k.at)) + '</span></div>' +
+        '<div class="fchips" style="padding:10px 0 4px">' + topics.map(function (t) { return '<button class="fchip" type="button" data-k="' + esc(t.key) + '" aria-pressed="' + (t.key === st.kabarCat) + '">' + esc(t.emoji + ' ' + t.label) + '</button>'; }).join('') + '</div>' +
+        '<div class="news">' + cur.items.slice(0, 3).map(function (n) {
+          return '<a class="row" href="' + esc(n.link) + '" target="_blank" rel="noopener"><span class="t"><small>' + esc((n.source || 'Berita') + (n.at ? ' · ' + ago(n.at) : '')) + '</small><b style="font-weight:500;line-height:1.35">' + esc(n.title) + '</b></span></a>';
+        }).join('') + '</div>' +
+        (k.trends && k.trends.length ? '<div style="padding:10px 0 12px"><small class="mu" style="display:block;margin-bottom:4px">📈 Lagi ramai dicari di Indonesia</small>' +
+          k.trends.slice(0, 5).map(function (t, i) { return '<div class="trend"><b style="width:18px;font-size:13px">' + (i + 1) + '</b><span>' + esc(t) + '</span><button class="tiny" type="button" data-t="' + esc(t) + '">+ Ide</button></div>'; }).join('') + '</div>' : '');
+      card.querySelectorAll('[data-k]').forEach(function (b) { b.onclick = function () { st.kabarCat = b.dataset.k; draw(); }; });
+      card.querySelectorAll('[data-t]').forEach(function (b) {
+        b.onclick = async function () {
+          b.disabled = true;
+          try { st.ideas = await call('saveIdea', { text: b.dataset.t, source: 'tren Google' }); b.textContent = '✓ Masuk'; toast('Masuk Bank ide 💡'); }
+          catch (e) { b.disabled = false; fail(e); }
+        };
+      });
+    };
+    draw();
+    return card;
+  }
+
+  // ---------- Ringkasan mingguan ----------
+  function pctTxt(a, b) { if (!b) return a ? 'baru' : '–'; var p = Math.round((a - b) / b * 100); return (p >= 0 ? '▲ ' : '▼ ') + Math.abs(p) + '%'; }
+  function weeklyCard(w) {
+    var c = el('div', 'card', '<div class="sec"><h3>📊 Ringkasan minggu lalu</h3><button class="link" type="button" style="color:var(--rose)">Lihat</button></div>' +
+      '<div class="row"><span class="ic" style="background:var(--t-mint)">🔥</span><span class="t"><b>' + w.last.done + ' dari ' + w.last.planned + ' posting tayang</b><span>Views ' + num(w.last.views) + ' (' + pctTxt(w.last.views, w.prev.views) + ')' + (w.streak ? ' · streak ' + w.streak + ' hari' : '') + '</span></span></div>');
+    c.querySelector('.link').onclick = function () { openWeekly(w); };
+    return c;
+  }
+  function openWeekly(w) {
+    $('wkSub').textContent = shortDate(w.range.from) + ' – ' + shortDate(w.range.to);
+    var tile = function (bg, label, val, sub) { return '<div class="kpi" style="background:' + bg + '"><small>' + label + '</small><b style="font-size:22px">' + val + '</b><span class="dl mu">' + sub + '</span></div>'; };
+    $('wkBody').innerHTML =
+      '<div class="hero" style="min-height:0"><p style="font-weight:500">Minggu lalu kamu</p><div class="big" style="font-size:26px">' + (w.last.planned && w.last.done / w.last.planned >= .8 ? 'Konsisten banget! 🔥' : w.last.done ? 'Tetap jalan, keren! 💪' : 'Minggu baru, semangat baru ✨') + '</div><p>' + w.last.done + ' dari ' + w.last.planned + ' posting tayang' + (w.streak ? ' · streak ' + w.streak + ' hari' : '') + '</p></div>' +
+      '<div class="kpis" style="grid-template-columns:repeat(2,minmax(0,1fr))">' +
+      tile('var(--t-pink)', 'Views', num(w.last.views), pctTxt(w.last.views, w.prev.views)) +
+      tile('var(--t-lilac)', 'Interaksi', num(w.last.eng), pctTxt(w.last.eng, w.prev.eng)) +
+      tile('var(--t-peach)', 'Agenda', w.agendaLast, 'minggu lalu') +
+      tile('#DDF2E6', 'Selisih kas', (w.netLast < 0 ? '−' : '+') + rp(Math.abs(w.netLast)).replace('Rp ', 'Rp '), pctTxt(w.netLast, w.netPrev)) + '</div>' +
+      '<div class="card"><div class="sec"><h3>⚠️ Perlu perhatian</h3></div>' +
+        (w.last.missing ? '<div class="row"><span class="ic">📊</span><span class="t"><b>' + w.last.missing + ' posting belum diisi hasilnya</b><span>Isi supaya report akurat</span></span></div>' : '<p class="empty">Semua beres ✓</p>') + '</div>' +
+      '<div class="card"><div class="sec"><h3>🗓️ Minggu ini</h3></div>' +
+        '<div class="row"><span class="ic">📲</span><span class="t"><b>' + w.week.posts + ' posting direncanakan</b><span>' + w.week.ideas + ' masih berupa ide · ' + w.bank + ' ide di Bank ide</span></span></div>' +
+        '<div class="row"><span class="ic">' + I.clock + '</span><span class="t"><b>' + w.week.agenda + ' agenda</b><span>' + (w.week.trip ? 'Dinas: ' + esc(w.week.trip.title) : 'Tidak ada dinas') + '</span></span></div>' +
+        (w.last.top ? '<div class="row"><span class="ic">🏆</span><span class="t"><b>Konten terbaik minggu lalu</b><span>“' + esc(w.last.top.ide || '') + '” · ' + num(w.last.top.views) + ' views</span></span></div>' : '') + '</div>';
+    $('wkDlg').showModal();
   }
 
   // =====================================================================
@@ -1086,7 +1247,7 @@
   function renderKonten() {
     if (!st.kDay || st.kDay.slice(0, 7) !== st.kMonth) st.kDay = st.boot.today.slice(0, 7) === st.kMonth ? st.boot.today : st.kMonth + '-01';
     var body = $('kBody'); body.innerHTML = '';
-    var seg = el('div', 'seg', '<button role="tab" type="button" data-tab="cal">Kalender</button><button role="tab" type="button" data-tab="list">Daftar</button><button role="tab" type="button" data-tab="report">Report</button>');
+    var seg = el('div', 'seg', '<button role="tab" type="button" data-tab="cal">Kalender</button><button role="tab" type="button" data-tab="list">Daftar</button><button role="tab" type="button" data-tab="ideas">Bank ide</button><button role="tab" type="button" data-tab="report">Report</button>');
     seg.setAttribute('role', 'tablist'); seg.setAttribute('aria-label', 'Tampilan');
     seg.querySelectorAll('[data-tab]').forEach(function (b) {
       b.setAttribute('aria-selected', String(b.dataset.tab === st.kTab));
@@ -1095,6 +1256,7 @@
     body.appendChild(seg);
     if (st.kTab === 'cal') renderCal(body);
     else if (st.kTab === 'list') renderPostList(body);
+    else if (st.kTab === 'ideas') renderIdeas(body);
     else renderReport(body);
   }
 
@@ -1183,22 +1345,171 @@
     };
   }
 
+  // ---------- Daftar + pencarian & filter ----------
+  var searchTimer = null;
+  function hiText(text, q) {
+    var out = esc(text || '');
+    if (!q) return out;
+    q.split(/\s+/).filter(function (w) { return w.length > 1; }).forEach(function (w) {
+      out = out.replace(new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark class="hl">$1</mark>');
+    });
+    return out;
+  }
+
   function renderPostList(body) {
-    body.appendChild(monthNav(monthLabel(st.kMonth), shiftKMonth, false));
-    var card = el('div', 'card');
-    if (!st.posts.length) card.appendChild(el('p', 'empty', 'Belum ada posting di bulan ini.'));
-    var last = '';
-    st.posts.forEach(function (p) {
-      if (p.date !== last) { card.appendChild(el('div', 'group', esc(dayLabel(p.date)))); last = p.date; }
+    st.q = st.q || ''; st.fPlat = st.fPlat || ''; st.fStat = st.fStat || '';
+    var wrap = el('div', 'stack');
+    wrap.style.gap = '12px';
+    wrap.innerHTML = '<div style="position:relative"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted)">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>' +
+      '<input class="in" id="pq" type="search" placeholder="Cari ide, caption, pilar…" aria-label="Cari konten" style="padding-left:44px" value="' + esc(st.q) + '"></div>' +
+      '<div class="fchips" id="fPlat"></div><div class="fchips" id="fStat"></div><div id="plistHead"></div><div id="plist"></div>';
+    body.appendChild(wrap);
+    var mk = function (box, label, opts, key) {
+      box.innerHTML = '<span class="lab">' + label + '</span>' + [''].concat(opts).map(function (o) {
+        return '<button class="fchip" type="button" data-v="' + esc(o) + '" aria-pressed="' + (st[key] === o) + '">' + (o ? esc(plain(o)) : 'Semua') + '</button>';
+      }).join('');
+      box.querySelectorAll('[data-v]').forEach(function (b) {
+        b.onclick = function () { st[key] = b.dataset.v; box.querySelectorAll('[data-v]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); fillPostList(); };
+      });
+    };
+    mk($('fPlat'), 'Platform', st.boot.lists.Platform, 'fPlat');
+    mk($('fStat'), 'Status', st.boot.lists.Status, 'fStat');
+    var q = $('pq');
+    q.oninput = function () {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(function () { runSearch(q.value.trim()); }, 400);
+    };
+    q.onkeydown = function (e) { if (e.key === 'Enter') { clearTimeout(searchTimer); runSearch(q.value.trim()); } };
+    fillPostList();
+  }
+
+  async function runSearch(v) {
+    st.q = v;
+    if (v.length < 2) { st.searchRes = null; fillPostList(); return; }
+    st.searchRes = null; fillPostList();
+    try {
+      var res = await call('searchPosts', v);
+      if (st.q !== v) return;
+      st.searchRes = res; fillPostList();
+    } catch (e) { fail(e); }
+  }
+
+  function fillPostList() {
+    var head = $('plistHead'), box = $('plist');
+    if (!box) return;
+    var searching = (st.q || '').length >= 2;
+    head.innerHTML = '';
+    if (!searching) head.appendChild(monthNav(monthLabel(st.kMonth), shiftKMonth, false));
+    if (searching && !st.searchRes) { box.innerHTML = '<p class="empty">Mencari…</p>'; return; }
+    var list = (searching ? st.searchRes : st.posts).filter(function (p) {
+      return (!st.fPlat || p.platform === st.fPlat) && (!st.fStat || p.status === st.fStat);
+    });
+    if (searching) head.appendChild(el('p', 'mu', '<b style="color:var(--ink)">' + list.length + ' hasil</b> untuk “' + esc(st.q) + '” di semua bulan'));
+    box.innerHTML = '';
+    if (!list.length) { box.appendChild(el('p', 'empty', searching ? 'Tidak ada yang cocok. Coba kata lain atau ubah filter.' : 'Belum ada posting yang cocok di bulan ini.')); return; }
+    var card = el('div', 'card'), lastM = '', lastD = '';
+    list.forEach(function (p) {
+      var m = p.date.slice(0, 7);
+      if (searching && m !== lastM) { card.appendChild(el('div', 'group', esc(monthLabel(m)))); lastM = m; lastD = ''; }
+      if (p.date !== lastD) { card.appendChild(el('div', 'group', esc(searching ? HARI[parseDate(p.date).getDay()] + ', ' + shortDate(p.date) : dayLabel(p.date)))); lastD = p.date; }
       var r = el('div', 'row', '<button type="button" style="display:flex;gap:14px;align-items:center;flex:1;min-width:0;border:0;background:none;padding:0;text-align:left">' +
         '<span class="ic" style="background:' + STATUS_TILE[statusKey(p.status)] + ';font-weight:600;font-size:13px">' + esc(p.time || '–') + '</span>' +
-        '<span class="t"><b>' + esc(p.ide || 'Tanpa judul') + '</b><span>' + esc([plain(p.platform), plain(p.format), plain(p.pilar)].filter(Boolean).join(' · ')) + '</span></span></button>' +
+        '<span class="t"><b>' + hiText(p.ide || 'Tanpa judul', searching ? st.q : '') + '</b><span>' + esc([plain(p.platform), plain(p.format), plain(p.pilar)].filter(Boolean).join(' · ')) + '</span></span></button>' +
         '<select class="status-sel" style="background:var(--pink-soft)" aria-label="Status">' + statusOptions(p.status) + '</select>');
-      r.querySelector('button').onclick = function () { openPost(p); };
+      r.querySelector('button').onclick = function () { openPost(p, null, searching ? function () { runSearch(st.q); } : null); };
       bindStatus(r.querySelector('select'), p);
       card.appendChild(r);
     });
-    body.appendChild(card);
+    box.appendChild(card);
+  }
+
+  // ---------- Bank ide ----------
+  var IDEA_BG = ['var(--t-pink)', 'var(--t-lilac)', 'var(--t-peach)', 'var(--t-mint)'];
+  async function renderIdeas(body) {
+    var holder = el('div', 'stack');
+    body.appendChild(holder);
+    if (!st.ideas) {
+      holder.innerHTML = '<p class="center-msg">Memuat bank ide…</p>';
+      try { st.ideas = await call('listIdeas'); } catch (e) { holder.innerHTML = '<p class="center-msg">' + esc(errMsg(e)) + '</p>'; return; }
+      if (st.kTab !== 'ideas' || !holder.isConnected) return;
+    }
+    drawIdeas(holder);
+  }
+
+  function drawIdeas(holder) {
+    holder.innerHTML = '';
+    st.ideaPilar = st.ideaPilar || '';
+    var pilars = st.boot.lists.Pilar;
+    var cap = el('div', 'card', '<div class="sec"><h3>Tangkap ide sebelum lupa ✨</h3></div>' +
+      '<div class="add-row" style="padding-bottom:6px"><input class="in" id="iqText" maxlength="200" placeholder="Tulis ide konten…" aria-label="Ide baru"><button class="btn btn-sm" type="button" id="iqSave">Simpan</button></div>' +
+      '<div class="fchips" id="iqPilar" style="padding-bottom:12px"></div>');
+    holder.appendChild(cap);
+    var pick = '';
+    var pBox = cap.querySelector('#iqPilar');
+    pBox.innerHTML = pilars.map(function (pl) { return '<button class="fchip" type="button" data-v="' + esc(pl) + '" aria-pressed="false">' + esc(pl) + '</button>'; }).join('');
+    pBox.querySelectorAll('[data-v]').forEach(function (b) {
+      b.onclick = function () { pick = pick === b.dataset.v ? '' : b.dataset.v; pBox.querySelectorAll('[data-v]').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.v === pick)); }); };
+    });
+    var save = async function () {
+      var t = cap.querySelector('#iqText').value.trim();
+      if (!t) { cap.querySelector('#iqText').focus(); return; }
+      cap.querySelector('#iqSave').disabled = true;
+      try { st.ideas = await call('saveIdea', { text: t, pilar: pick }); toast('Ide tersimpan 💡'); drawIdeas(holder); }
+      catch (e) { fail(e); cap.querySelector('#iqSave').disabled = false; }
+    };
+    cap.querySelector('#iqSave').onclick = save;
+    cap.querySelector('#iqText').onkeydown = function (e) { if (e.key === 'Enter') save(); };
+
+    var list = st.ideas.filter(function (i) { return !st.ideaPilar || i.pilar === st.ideaPilar; });
+    holder.appendChild(el('div', 'sec', '<h3>' + st.ideas.length + ' ide tersimpan</h3>'));
+    var f = el('div', 'fchips');
+    f.innerHTML = [''].concat(pilars).map(function (pl) { return '<button class="fchip" type="button" data-v="' + esc(pl) + '" aria-pressed="' + (st.ideaPilar === pl) + '">' + (pl ? esc(plain(pl)) : 'Semua') + '</button>'; }).join('');
+    f.querySelectorAll('[data-v]').forEach(function (b) { b.onclick = function () { st.ideaPilar = b.dataset.v; drawIdeas(holder); }; });
+    holder.appendChild(f);
+    if (!list.length) { holder.appendChild(el('p', 'empty', st.ideas.length ? 'Belum ada ide di pilar ini.' : 'Belum ada ide. Tulis di kotak atas, atau tambahkan dari tren di Kabar hari ini.')); return; }
+    var grid = el('div', 'ideas');
+    list.forEach(function (it, i) {
+      var c = el('div', 'idea');
+      c.style.background = IDEA_BG[i % IDEA_BG.length];
+      c.innerHTML = '<div style="display:flex;gap:6px;flex-wrap:wrap">' + (it.pilar ? '<span class="chip">' + esc(it.pilar) + '</span>' : '') + (it.source ? '<span class="chip">' + esc(it.source) + '</span>' : '') + '</div>' +
+        '<b>' + esc(it.text) + '</b>' + (it.note ? '<span class="mu" style="color:var(--meta)">' + esc(it.note) + '</span>' : '') +
+        '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn btn-sm" type="button" data-s>Jadwalkan</button><span style="flex:1"></span>' +
+        '<button class="link" type="button" data-e style="color:var(--rose)">Ubah</button><button class="del" type="button" data-d>Hapus</button></div>';
+      c.querySelector('[data-s]').onclick = function () {
+        openPost(null, st.kDay || st.boot.today, async function () {
+          try { st.ideas = await call('deleteIdea', it.id); } catch (e) {}
+          st.kTab = 'cal'; renderKonten(); toast('Ide dijadwalkan dan dipindah ke kalender ✨');
+        }, { ide: it.text, pilar: it.pilar || st.boot.lists.Pilar[0], status: st.boot.lists.Status.indexOf(S.SCHED) >= 0 ? S.SCHED : st.boot.lists.Status[0] });
+      };
+      c.querySelector('[data-e]').onclick = function () { openIdeaDlg(it, function () { drawIdeas(holder); }); };
+      var d = c.querySelector('[data-d]');
+      d.onclick = function () {
+        armDelete(d, async function () {
+          d.disabled = true;
+          try { st.ideas = await call('deleteIdea', it.id); drawIdeas(holder); toast('Ide dihapus'); } catch (e) { d.disabled = false; fail(e); }
+        });
+      };
+      grid.appendChild(c);
+    });
+    holder.appendChild(grid);
+  }
+
+  var ideaEdit = null, ideaAfter = null;
+  function openIdeaDlg(it, after) {
+    ideaEdit = it; ideaAfter = after;
+    $('idPilar').innerHTML = ['<option value="">—</option>'].concat(st.boot.lists.Pilar.map(function (p) { return '<option value="' + esc(p) + '">' + esc(p) + '</option>'; })).join('');
+    $('idText').value = it.text; $('idPilar').value = it.pilar || ''; $('idSource').value = it.source || ''; $('idNote').value = it.note || '';
+    $('ideaDlg').showModal();
+  }
+  async function saveIdeaDlg() {
+    if (st.busy || !ideaEdit) return;
+    var d = { id: ideaEdit.id, text: $('idText').value.trim(), pilar: $('idPilar').value, source: $('idSource').value.trim(), note: $('idNote').value.trim() };
+    if (!d.text) { toast('Tulis idenya dulu', true); return; }
+    st.busy = true; $('idSave').disabled = true;
+    try { st.ideas = await call('saveIdea', d); $('ideaDlg').close(); toast('Ide diperbarui'); if (ideaAfter) ideaAfter(); }
+    catch (e) { fail(e); }
+    finally { st.busy = false; $('idSave').disabled = false; }
   }
 
   // ---------- Report ----------
@@ -1319,11 +1630,11 @@
   }
   function toggleMetrics() { $('pMetrics').hidden = !($('pStatus').value === S.DONE || $('pLink').value.trim()); }
 
-  function openPost(p, date, cb) {
+  function openPost(p, date, cb, prefill) {
     var L = st.boot.lists, isNew = !p;
     st.editing = p || null; afterPost = cb || null;
-    p = p || { date: date || st.boot.today, time: '19:00', platform: L.Platform[0], format: L.Format[0], pilar: L.Pilar[0],
-      status: L.Status.indexOf(S.SCHED) >= 0 ? S.SCHED : L.Status[0], ide: '', caption: '', link: '' };
+    p = p || Object.assign({ date: date || st.boot.today, time: '19:00', platform: L.Platform[0], format: L.Format[0], pilar: L.Pilar[0],
+      status: L.Status.indexOf(S.SCHED) >= 0 ? S.SCHED : L.Status[0], ide: '', caption: '', link: '' }, prefill || {});
     $('pdTitle').textContent = isNew ? 'Jadwalkan posting' : 'Edit posting';
     $('pdSub').textContent = isNew ? 'Atur tanggal, jam, dan isinya' : longDate(p.date);
     $('pDate').value = p.date;
@@ -1405,6 +1716,35 @@
     return r;
   }
 
+  function editBtn(item) {
+    var b = el('button', 'link', 'Ubah'); b.type = 'button'; b.style.color = 'var(--rose)'; b.style.padding = '6px 2px';
+    b.onclick = function () { openItemDlg(item); };
+    return b;
+  }
+
+  var itemEdit = null;
+  function openItemDlg(item) {
+    itemEdit = item;
+    var isS = item.type === 'Jadwal';
+    $('itTitle').textContent = item.type === 'Target' ? 'Ubah target' : item.type === 'Todo' ? 'Ubah to-do' : 'Ubah jadwal';
+    $('itSub').textContent = longDate(st.day.date);
+    $('itTimes').hidden = !isS; $('itCatWrap').hidden = !isS;
+    $('itText').value = item.text; $('itStart').value = item.start || ''; $('itEnd').value = item.end || '';
+    $('itCat').innerHTML = (st.boot.dayCats || ['Kerja', 'Pribadi']).map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
+    if (item.cat) $('itCat').value = item.cat;
+    $('itemDlg').showModal();
+  }
+  async function saveItemDlg() {
+    if (st.busy || !itemEdit) return;
+    var d = { text: $('itText').value.trim(), start: $('itStart').value, end: $('itEnd').value, cat: $('itCat').value };
+    if (!d.text) { toast('Isi tidak boleh kosong', true); return; }
+    if (itemEdit.type === 'Jadwal' && !d.start) { toast('Isi jam mulai', true); return; }
+    st.busy = true; $('itSave').disabled = true;
+    try { st.day = await call('updateDayItem', itemEdit.id, d); forget('dash'); $('itemDlg').close(); renderDay(); toast('Tersimpan'); }
+    catch (e) { fail(e); }
+    finally { st.busy = false; $('itSave').disabled = false; }
+  }
+
   function delBtn(item) {
     var b = el('button', 'del', 'Hapus'); b.type = 'button';
     b.onclick = function () {
@@ -1452,33 +1792,53 @@
       (targets.length ? doneT + ' dari ' + targets.length + ' beres' : 'Apa 1–3 hal terpenting?') + '</div>');
     hero.style.minHeight = '0';
     var fb = el('div', 'focus-box');
-    targets.forEach(function (t) { var r = checkRow(t, renderDay); r.appendChild(delBtn(t)); fb.appendChild(r); });
+    targets.forEach(function (t) { var r = checkRow(t, renderDay); r.appendChild(editBtn(t)); r.appendChild(delBtn(t)); fb.appendChild(r); });
     fb.appendChild(addRow('Tulis target…', 'Target', 'Target ditambahkan'));
     hero.appendChild(fb);
     left.appendChild(hero);
 
+    var ext = (day.agenda || []).map(function (a) { return { kind: 'ag', start: a.time || '', a: a }; })
+      .concat((day.posts || []).map(function (p) { return { kind: 'po', start: p.time || '', p: p }; }));
+    var rows = sched.map(function (x) { return { kind: 'own', start: x.start, x: x }; }).concat(ext)
+      .sort(function (a, b) { return (a.start || '99').localeCompare(b.start || '99'); });
     var card = el('div', 'card sched-card', '<div class="sec"><h3>Agenda harian</h3>' + (sched.length ? '<span class="mu">' + sched.filter(function (x) { return x.done; }).length + '/' + sched.length + ' beres</span>' : '') + '</div>');
+    if (ext.length) card.appendChild(el('div', 'fchips', '<span class="chip" style="background:var(--t-sky)">🗓️ Agenda bisnis</span><span class="chip" style="background:var(--t-lilac)">📲 Posting</span><span class="chip">✓ Jadwal pribadi</span>')).style.padding = '10px 0 4px';
     if (!sched.length) {
-      var em = el('div', '', '<p class="empty">Belum ada jadwal per jam. Mulai dari template, lalu sesuaikan.</p>');
-      var tpl = el('button', 'btn-line btn-sm', 'Pakai template harian'); tpl.type = 'button';
+      var em = el('div', '', '<p class="empty">' + (ext.length ? 'Belum ada jadwal pribadi per jam.' : 'Belum ada jadwal per jam. Mulai dari template, lalu sesuaikan.') + '</p>');
+      var tpl = el('button', 'btn-line btn-sm', 'Pakai template harian'); tpl.type = 'button'; tpl.style.marginBottom = '10px';
       tpl.onclick = async function () {
         tpl.disabled = true;
-        if (await addItems(DAY_TEMPLATE.map(function (t) { return { type: 'Jadwal', start: t[0], end: t[1], text: t[2], cat: t[3] }; }))) toast('Template dipasang. Hapus yang tidak perlu.');
+        if (await addItems(DAY_TEMPLATE.map(function (t) { return { type: 'Jadwal', start: t[0], end: t[1], text: t[2], cat: t[3] }; }))) toast('Template dipasang. Ubah atau hapus yang tidak perlu.');
         else tpl.disabled = false;
       };
       em.appendChild(tpl); card.appendChild(em);
-    } else {
+    }
+    if (rows.length) {
       var now = nowMin();
-      var tbl = el('table', 'sched-table', '<thead><tr><th style="width:40px"><span class="sr">Beres</span></th><th>Waktu</th><th>Aktivitas / tugas</th><th>Kategori</th><th><span class="sr">Hapus</span></th></tr></thead><tbody></tbody>');
+      var tbl = el('table', 'sched-table', '<thead><tr><th style="width:40px"><span class="sr">Beres</span></th><th>Waktu</th><th>Aktivitas / tugas</th><th>Kategori</th><th><span class="sr">Aksi</span></th></tr></thead><tbody></tbody>');
       var tbody = tbl.querySelector('tbody');
-      sched.forEach(function (x) {
+      var refreshDay = function () { forget('day:' + st.hDate); st.day = null; loadDay(); };
+      rows.forEach(function (r) {
+        if (r.kind !== 'own') {
+          var isAg = r.kind === 'ag', it = isAg ? r.a : r.p;
+          var tr2 = el('tr', 'xrow',
+            '<td class="cb"><span style="background:' + (isAg ? 'var(--t-sky)' : 'var(--t-lilac)') + '">' + (isAg ? '🗓️' : '📲') + '</span></td>' +
+            '<td class="tm">' + esc(r.start || '–') + '</td>' +
+            '<td class="act">' + esc(isAg ? it.title : (it.ide || 'Posting')) + (isAg ? '' : ' <span class="mu" style="font-size:12px">· ' + esc(plain(it.status)) + '</span>') + '</td>' +
+            '<td class="ct"><span class="chip" style="background:' + (isAg ? 'var(--t-sky)' : 'var(--t-lilac)') + '">' + esc(isAg ? 'Agenda · ' + it.tag : 'Posting · ' + plain(it.platform)) + '</span></td>' +
+            '<td class="dl"><button class="link" type="button" style="color:var(--rose)">Buka</button></td>');
+          tr2.querySelector('.link').onclick = function () { if (isAg) openAgendaDlg(it, refreshDay); else openPost(it, null, refreshDay); };
+          tbody.appendChild(tr2);
+          return;
+        }
+        var x = r.x;
         var live = isToday && !x.done && toMin(x.start) <= now && (x.end ? toMin(x.end) > now : toMin(x.start) + 60 > now);
         var tr = el('tr', (live ? 'now ' : '') + (x.done ? 'done' : ''),
           '<td class="cb"><input type="checkbox" aria-label="Tandai beres: ' + esc(x.text) + '"' + (x.done ? ' checked' : '') + '></td>' +
           '<td class="tm">' + esc(x.start) + (x.end ? '–' + esc(x.end) : '') + (live ? ' <span class="chip" style="background:var(--fill);color:#fff;padding:2px 8px">sekarang</span>' : '') + '</td>' +
           '<td class="act">' + esc(x.text) + '</td>' +
-          '<td class="ct">' + (x.cat ? '<span class="chip ' + (x.cat === 'Kerja' ? 'cat-k' : 'cat-p') + '">' + esc(x.cat) + '</span>' : '') + '</td><td class="dl"></td>');
-        tr.querySelector('.dl').appendChild(delBtn(x));
+          '<td class="ct">' + (x.cat ? '<span class="chip ' + (x.cat === 'Kerja' ? 'cat-k' : 'cat-p') + '">' + esc(x.cat) + '</span>' : '') + '</td><td class="dl"><span class="acts2"></span></td>');
+        var a2 = tr.querySelector('.acts2'); a2.appendChild(editBtn(x)); a2.appendChild(delBtn(x));
         var cb = tr.querySelector('input');
         cb.onchange = async function () {
           cb.disabled = true;
@@ -1510,7 +1870,7 @@
 
     var openTodo = todos.filter(function (x) { return !x.done; }).length;
     var td = el('div', 'card', '<div class="sec"><h3>To-do list</h3><span class="mu">' + (todos.length ? openTodo + ' belum beres' : 'di luar jadwal') + '</span></div>');
-    todos.forEach(function (t) { var r = checkRow(t, renderDay); r.appendChild(delBtn(t)); td.appendChild(r); });
+    todos.forEach(function (t) { var r = checkRow(t, renderDay); r.appendChild(editBtn(t)); r.appendChild(delBtn(t)); td.appendChild(r); });
     td.appendChild(addRow('Tambah to-do…', 'Todo', 'To-do ditambahkan'));
     right.appendChild(td);
 
@@ -1684,12 +2044,15 @@
       var h = a.time ? a.time.split(':') : null, hr = h ? Number(h[0]) : 0;
       return '<span class="hr">' + (h ? esc(h[0]) + '<br><span class="mu" style="font-size:12px;font-weight:400">' + (hr < 11 ? 'pagi' : hr < 15 ? 'siang' : hr < 18 ? 'sore' : 'malam') + '</span>' : '–') + '</span>' +
         '<div class="block" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '"><div class="top"><span><b>' + esc(a.title) + '</b><br><span class="k">' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span>' +
-        '<button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></div><div class="tm">' + I.clock + esc(a.time || 'Sepanjang hari') + '</div></div>';
+        '<span class="acts2"><button class="link" type="button" data-edit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></span></div><div class="tm">' + I.clock + esc(a.time || 'Sepanjang hari') + '</div></div>';
     }).join('')));
     var later = list.filter(function (a) { return a.date > addDays(today, 6); });
     right.appendChild(el('div', 'card', '<div class="sec"><h3>Lebih jauh</h3></div>' + (later.length ? later.map(function (a) {
-      return '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(dayLabel(a.date)) + (a.time ? ' · ' + esc(a.time) : '') + '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + '</span></span><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></div>';
+      return '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(dayLabel(a.date)) + (a.time ? ' · ' + esc(a.time) : '') + '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + '</span></span><span class="acts2"><button class="link" type="button" data-edit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></span></div>';
     }).join('') : '<p class="empty">Tidak ada agenda setelah 7 hari ke depan.</p>')));
+    box.querySelectorAll('[data-edit]').forEach(function (b) {
+      b.onclick = function () { var a = list.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (a) openAgendaDlg(a); };
+    });
     box.querySelectorAll('.del').forEach(function (b) {
       b.onclick = function () {
         armDelete(b, async function () {
@@ -1701,24 +2064,31 @@
     });
   }
 
-  function openAgendaDlg() {
+  var agEdit = null, agAfter = null;
+  function openAgendaDlg(a, after) {
+    agEdit = a && a.id ? a : null; agAfter = after || null;
     var sel = $('agTag');
     if (!sel.options.length) sel.innerHTML = st.boot.tags.map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
-    $('agDate').value = st.aDay || st.boot.today; $('agTitle').value = ''; $('agTime').value = ''; $('agNote').value = '';
-    $('agDlg').showModal(); setTimeout(function () { $('agTitle').focus(); }, 50);
+    $('agTitleH').textContent = agEdit ? 'Ubah agenda' : 'Agenda baru';
+    $('agAdd').textContent = agEdit ? 'Simpan perubahan' : 'Simpan agenda';
+    $('agDate').value = agEdit ? agEdit.date : (st.aDay || st.boot.today);
+    $('agTitle').value = agEdit ? agEdit.title : ''; $('agTime').value = agEdit ? agEdit.time : ''; $('agNote').value = agEdit ? agEdit.note : '';
+    if (agEdit) sel.value = agEdit.tag;
+    $('agDlg').showModal(); if (!agEdit) setTimeout(function () { $('agTitle').focus(); }, 50);
   }
 
   async function addAgenda() {
     if (st.busy) return;
-    var d = { date: $('agDate').value, time: $('agTime').value, title: $('agTitle').value.trim(), tag: $('agTag').value, note: $('agNote').value.trim() };
+    var d = { id: agEdit ? agEdit.id : '', date: $('agDate').value, time: $('agTime').value, title: $('agTitle').value.trim(), tag: $('agTag').value, note: $('agNote').value.trim() };
     if (!d.title) { toast('Judul agenda belum diisi', true); $('agTitle').focus(); return; }
     if (!d.date) { toast('Tanggal belum diisi', true); return; }
     st.busy = true; $('agAdd').disabled = true;
     try {
-      st.agenda = await call('addAgenda', d);
+      st.agenda = await call('addAgenda', d); mark('agenda', st.agenda);
       st.aDay = d.date >= st.boot.today ? d.date : st.boot.today; forget('dash');
-      $('agDlg').close(); renderAgenda();
-      toast(d.date < st.boot.today ? 'Tersimpan, tapi tanggalnya sudah lewat' : 'Agenda ditambahkan');
+      $('agDlg').close();
+      if (agAfter) agAfter(); else if (st.view === 'agenda') renderAgenda();
+      toast(d.id ? 'Agenda diperbarui' : d.date < st.boot.today ? 'Tersimpan, tapi tanggalnya sudah lewat' : 'Agenda ditambahkan');
     } catch (e) { fail(e); }
     finally { st.busy = false; $('agAdd').disabled = false; }
   }
@@ -1765,9 +2135,12 @@
       var isIn = t.type === 'Pemasukan';
       card.appendChild(el('div', 'row', '<span class="ic" style="background:' + (isIn ? '#DDF2E6' : 'var(--t-pink)') + '">' + (isIn ? I.down : I.up) + '</span>' +
         '<span class="t"><b>' + esc(t.cat) + '</b>' + (t.note ? '<span>' + esc(t.note) + '</span>' : '') + '</span>' +
-        '<span style="text-align:right"><span class="' + (isIn ? 'amt-in' : 'amt-out') + '">' + (isIn ? '+' : '−') + rp(t.amount) + '</span><br><button class="del" type="button" data-id="' + esc(t.id) + '">Hapus</button></span>'));
+        '<span style="text-align:right"><span class="' + (isIn ? 'amt-in' : 'amt-out') + '">' + (isIn ? '+' : '−') + rp(t.amount) + '</span><br><button class="link" type="button" data-edit="' + esc(t.id) + '" style="color:var(--rose);padding:6px 4px">Ubah</button><button class="del" type="button" data-id="' + esc(t.id) + '">Hapus</button></span>'));
     });
     right.appendChild(card);
+    card.querySelectorAll('[data-edit]').forEach(function (b) {
+      b.onclick = function () { var t = f.items.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (t) openTxDlg(t); };
+    });
     card.querySelectorAll('.del').forEach(function (b) {
       b.onclick = function () {
         armDelete(b, async function () {
@@ -1784,20 +2157,29 @@
     document.querySelectorAll('#txDlg [data-type]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.type === type)); });
     $('txCat').innerHTML = st.boot.moneyCats[type].map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
   }
-  function openTxDlg() { setTxType(st.txType); $('txAmount').value = ''; $('txNote').value = ''; $('txDate').value = st.boot.today; $('txDlg').showModal(); setTimeout(function () { $('txAmount').focus(); }, 50); }
+  var txEdit = null;
+  function openTxDlg(t) {
+    txEdit = t && t.id ? t : null;
+    setTxType(txEdit ? txEdit.type : st.txType);
+    $('txTitle').textContent = txEdit ? 'Ubah transaksi' : 'Catat transaksi';
+    $('txAmount').value = txEdit ? Number(txEdit.amount).toLocaleString('id-ID') : '';
+    if (txEdit) $('txCat').value = txEdit.cat;
+    $('txNote').value = txEdit ? txEdit.note : ''; $('txDate').value = txEdit ? txEdit.date : st.boot.today;
+    $('txDlg').showModal(); if (!txEdit) setTimeout(function () { $('txAmount').focus(); }, 50);
+  }
   function formatAmount(inp) { var d = inp.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 13); inp.value = d ? Number(d).toLocaleString('id-ID') : ''; }
 
   async function saveTx() {
     if (st.busy) return;
     var amount = Number($('txAmount').value.replace(/\D/g, ''));
-    var d = { type: st.txType, amount: amount, cat: $('txCat').value, date: $('txDate').value, note: $('txNote').value.trim() };
+    var d = { id: txEdit ? txEdit.id : '', type: st.txType, amount: amount, cat: $('txCat').value, date: $('txDate').value, note: $('txNote').value.trim() };
     if (!amount) { toast('Nominal belum diisi', true); $('txAmount').focus(); return; }
     if (!d.date) { toast('Tanggal belum diisi', true); return; }
     st.busy = true; $('txSave').disabled = true;
     try {
       st.fin = await call('addTx', d); st.fMonth = d.date.slice(0, 7); invalidate();
       $('txDlg').close(); if (st.view === 'uang') renderFinance();
-      toast((d.type === 'Pemasukan' ? 'Pemasukan ' : 'Pengeluaran ') + rp(amount) + ' dicatat');
+      toast(d.id ? 'Transaksi diperbarui' : (d.type === 'Pemasukan' ? 'Pemasukan ' : 'Pengeluaran ') + rp(amount) + ' dicatat');
     } catch (e) { fail(e); }
     finally { st.busy = false; $('txSave').disabled = false; }
   }
@@ -1819,7 +2201,10 @@
     st.notes = list;
     var box = $('ntList');
     if (!list.length) { box.innerHTML = '<p class="empty" style="grid-column:1/-1">Belum ada catatan. Tulis yang pertama di atas.</p>'; return; }
-    box.innerHTML = list.map(function (n) { return '<div class="note" style="background:' + esc(n.color) + '"><p>' + esc(n.text) + '</p><button class="del" type="button" data-id="' + esc(n.id) + '">Hapus</button></div>'; }).join('');
+    box.innerHTML = list.map(function (n) { return '<div class="note" style="background:' + esc(n.color) + '"><p>' + esc(n.text) + '</p><span style="display:flex;justify-content:flex-end;gap:6px"><button class="link" type="button" data-edit="' + esc(n.id) + '" style="color:var(--rose);padding:6px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(n.id) + '">Hapus</button></span></div>'; }).join('');
+    box.querySelectorAll('[data-edit]').forEach(function (b) {
+      b.onclick = function () { var n = list.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (!n) return; noteEdit = n; $('ndText').value = n.text; $('noteDlg').showModal(); };
+    });
     box.querySelectorAll('.del').forEach(function (b) {
       b.onclick = function () {
         armDelete(b, async function () {
@@ -1830,6 +2215,17 @@
       };
     });
   }
+  var noteEdit = null;
+  async function saveNoteDlg() {
+    if (st.busy || !noteEdit) return;
+    var text = $('ndText').value.trim();
+    if (!text) { toast('Catatan masih kosong', true); return; }
+    st.busy = true; $('ndSave').disabled = true;
+    try { renderNotes(await call('updateNote', noteEdit.id, text)); forget('dash'); $('noteDlg').close(); toast('Catatan diperbarui'); }
+    catch (e) { fail(e); }
+    finally { st.busy = false; $('ndSave').disabled = false; }
+  }
+
   async function addNote() {
     if (st.busy) return;
     var text = $('ntText').value.trim();
@@ -1842,6 +2238,10 @@
 
   // ====== Event ======
   $('rtSave').onclick = saveRoutineClick;
+  $('ndSave').onclick = saveNoteDlg;
+  $('itSave').onclick = saveItemDlg;
+  $('idSave').onclick = saveIdeaDlg;
+  $('updBtn').onclick = function () { location.replace(location.pathname + '?v=' + Date.now()); };
   $('rtCancel').onclick = resetRoutineForm;
   $('rtAll').onclick = function () { rtDays = [0, 1, 2, 3, 4, 5, 6]; paintDays(); };
   $('rtWork').onclick = function () { rtDays = [1, 2, 3, 4, 5]; paintDays(); };
@@ -1866,9 +2266,9 @@
   $('pStatus').onchange = toggleMetrics;
   $('pLink').oninput = toggleMetrics;
   METRIC_KEYS.forEach(function (k) { var inp = $(METRIC_IDS[k]); inp.addEventListener('input', function () { formatAmount(inp); }); });
-  $('agOpen').onclick = openAgendaDlg;
+  $('agOpen').onclick = function () { openAgendaDlg(null); };
   $('agAdd').onclick = addAgenda;
-  $('txOpen').onclick = openTxDlg;
+  $('txOpen').onclick = function () { openTxDlg(null); };
   $('txSave').onclick = saveTx;
   $('txAmount').addEventListener('input', function () { formatAmount($('txAmount')); });
   document.querySelectorAll('#txDlg [data-type]').forEach(function (b) { b.onclick = function () { setTxType(b.dataset.type); }; });
@@ -1958,7 +2358,18 @@
     ], rlog = {};
     function myR(u) { return routines.filter(function (r) { return r.owner === u.name; }).sort(function (a, b) { return a.time.localeCompare(b.time); }); }
     function rFor(u, date) { var wd = parseDate(date).getDay(); return myR(u).filter(function (r) { return r.days.indexOf(wd) >= 0; }).map(function (r) { var x = JSON.parse(JSON.stringify(r)); x.done = !!rlog[u.name + '|' + date + '|' + r.id]; return x; }); }
-    function dayOf(u, date) { var k = u.name + '|' + date; days[k] = days[k] || []; return { date: date, items: days[k].slice().sort(function (a, b) { return (a.start || '99').localeCompare(b.start || '99'); }), routines: rFor(u, date), myRoutines: myR(u) }; }
+    var ideas = [
+      { id: 'i1', text: 'POV: pertama kali pakai pashmina ke kondangan', pilar: '😂 Hiburan', source: 'tren TikTok', note: '', date: T },
+      { id: 'i2', text: '5 warna scarf yang cocok untuk kulit sawo matang', pilar: '💡 Tips', source: 'request follower', note: 'Pakai model 2 orang', date: T }
+    ];
+    var KABAR = { at: new Date(Date.now() - 2 * 3600000).toISOString(), trends: ['hijab pashmina kondangan', 'tren warna akhir tahun', 'promo 11.11', 'outfit kerja simpel'],
+      topics: [
+        { key: 'fashion', label: 'Fashion muslim', emoji: '🧕', items: [{ title: 'Contoh judul: warna earth tone tetap favorit hijab akhir tahun', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 2 * 3600000).toISOString() }, { title: 'Contoh judul: tips padu padan scarf untuk acara formal', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 5 * 3600000).toISOString() }] },
+        { key: 'sosmed', label: 'Media sosial', emoji: '📱', items: [{ title: 'Contoh judul: fitur baru untuk kreator di Instagram', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 3 * 3600000).toISOString() }] },
+        { key: 'bisnis', label: 'Bisnis & UMKM', emoji: '🛍️', items: [{ title: 'Contoh judul: persiapan promo 11.11 untuk UMKM', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 6 * 3600000).toISOString() }] }
+      ] };
+    function dayOf(u, date) { var k = u.name + '|' + date; days[k] = days[k] || []; return { date: date, items: days[k].slice().sort(function (a, b) { return (a.start || '99').localeCompare(b.start || '99'); }), routines: rFor(u, date), myRoutines: myR(u),
+      agenda: u.role === 'Owner' ? agenda.filter(function (a) { return a.date === date; }) : [], posts: sorted(posts.filter(function (p) { return p.date === date; })) }; }
     function findDay(u, id) {
       for (var k in days) { if (k.indexOf(u.name + '|') !== 0) continue; for (var i = 0; i < days[k].length; i++) if (days[k][i].id === id) return { k: k, i: i }; }
       throw new Error('Data tidak ditemukan.');
@@ -1966,7 +2377,7 @@
     return {
       getBoot: function (t) {
         var u = auth(t);
-        return { user: u, brand: 'Arabelle Scarf', owner: 'Syifa', lists: LISTS, tags: ['Rapat', 'Dinas', 'Operasional', 'Produksi'], moneyCats: CATS, dayCats: ['Kerja', 'Pribadi'], today: T,
+        return { user: u, serverVersion: APP_VERSION, brand: 'Arabelle Scarf', owner: 'Syifa', lists: LISTS, tags: ['Rapat', 'Dinas', 'Operasional', 'Produksi'], moneyCats: CATS, dayCats: ['Kerja', 'Pribadi'], today: T,
           routineCats: { 'Kesehatan': '💊', 'Olahraga': '🏃‍♀️', 'Ibadah': '🤲', 'Makan & minum': '🥗', 'Perawatan diri': '🧴', 'Istirahat': '😴', 'Lainnya': '✨' }, routineBefore: [0, 5, 10, 15, 30, 60],
           initial: { posts: month(T.slice(0, 7)), day: dayOf(u, T), dash: u.role === 'Owner' ? Demo.getDashboard(t) : null } };
       },
@@ -1993,7 +2404,9 @@
         var c = function (s) { return m.filter(function (p) { return p.status === s; }).length; };
         var f = fin(T.slice(0, 7));
         return { today: T, week: week, moneyToday: { in: f.todayIn, out: f.todayOut, count: money.filter(function (x) { return x.date === T; }).length },
-          trips: up.filter(function (a) { return a.tag === 'Dinas'; }), focus: dayOf(u, T).items, routines: rFor(u, T), notes: notes.slice(0, 3), noteCount: notes.length,
+          trips: up.filter(function (a) { return a.tag === 'Dinas'; }), focus: dayOf(u, T).items, routines: rFor(u, T), notes: notes.slice(0, 3), noteCount: notes.length, kabar: KABAR,
+          weekly: { range: { from: addDays(T, -8), to: addDays(T, -2) }, last: { planned: 9, done: 8, views: 12400, eng: 1380, missing: 2, top: { ide: '3 tips padu padan scarf', views: 2900 } }, prev: { views: 10500, eng: 1260 },
+            netLast: 2100000, netPrev: 1870000, agendaLast: 10, streak: 12, week: { posts: 7, ideas: 2, agenda: 3, trip: { title: 'Kunjungan supplier' } }, bank: ideas.length },
           content: { total: m.length, done: c(S.DONE), sched: c(S.SCHED), open: c(S.IDEA) + c(S.MADE) } };
       },
       getDay: function (t, date) { return dayOf(auth(t), date); },
@@ -2013,10 +2426,17 @@
       deleteRoutine: function (t, id, date) { var u = auth(t); routines = routines.filter(function (r) { return r.id !== id; }); return dayOf(u, date || T); },
       toggleRoutine: function (t, id, date, done) { var u = auth(t), k = u.name + '|' + date + '|' + id; if (done) rlog[k] = 1; else delete rlog[k]; return dayOf(u, date); },
       listAgenda: function (t) { auth(t, true); return upcoming(); },
-      addAgenda: function (t, d) { auth(t, true); agenda.push({ id: 'a' + (++seq), date: d.date, time: d.time, title: d.title, tag: d.tag, note: d.note }); return upcoming(); },
+      addAgenda: function (t, d) { auth(t, true); var a = d.id ? agenda.filter(function (x) { return x.id === d.id; })[0] : null; if (!a) { a = { id: 'a' + (++seq) }; agenda.push(a); } a.date = d.date; a.time = d.time; a.title = d.title; a.tag = d.tag; a.note = d.note; return upcoming(); },
+      searchPosts: function (t, q) { auth(t); var w = q.toLowerCase().split(/\s+/); return posts.filter(function (p) { var h = [p.ide, p.caption, p.pilar, p.platform, p.format, p.status].join(' ').toLowerCase(); return w.every(function (x) { return h.indexOf(x) >= 0; }); }).sort(function (a, b) { return b.date.localeCompare(a.date); }).slice(0, 60); },
+      listIdeas: function (t) { auth(t); return ideas; },
+      saveIdea: function (t, d) { auth(t); var x = d.id ? ideas.filter(function (i) { return i.id === d.id; })[0] : null; if (!x) { x = { id: 'i' + (++seq), date: T }; ideas.unshift(x); } x.text = d.text; x.pilar = d.pilar || ''; x.source = d.source || ''; x.note = d.note || ''; return ideas; },
+      deleteIdea: function (t, id) { auth(t); ideas = ideas.filter(function (i) { return i.id !== id; }); return ideas; },
+      getKabar: function (t) { auth(t); return KABAR; },
+      updateNote: function (t, id, text) { auth(t, true); notes.forEach(function (n) { if (n.id === id) n.text = text; }); return notes; },
+      updateDayItem: function (t, id, d) { var u = auth(t), f = findDay(u, id), it = days[f.k][f.i]; it.text = d.text; if (it.type === 'Jadwal') { it.start = d.start; it.end = d.end; it.cat = d.cat; } return dayOf(u, f.k.split('|')[1]); },
       deleteAgenda: function (t, id) { auth(t, true); agenda = agenda.filter(function (a) { return a.id !== id; }); return upcoming(); },
       getFinance: function (t, ym) { auth(t, true); return fin(ym); },
-      addTx: function (t, d) { auth(t, true); money.push({ id: 'm' + (++seq), date: d.date, type: d.type, cat: d.cat, amount: Number(d.amount), note: d.note }); return fin(d.date.slice(0, 7)); },
+      addTx: function (t, d) { auth(t, true); var m = d.id ? money.filter(function (x) { return x.id === d.id; })[0] : null; if (!m) { m = { id: 'm' + (++seq) }; money.push(m); } m.date = d.date; m.type = d.type; m.cat = d.cat; m.amount = Number(d.amount); m.note = d.note; return fin(d.date.slice(0, 7)); },
       deleteTx: function (t, id, ym) { auth(t, true); money = money.filter(function (m) { return m.id !== id; }); return fin(ym); },
       listNotes: function (t) { auth(t, true); return notes; },
       addNote: function (t, text) { auth(t, true); notes.unshift({ id: 'n' + (++seq), text: text, color: COLORS[notes.length % 4] }); return notes; },
