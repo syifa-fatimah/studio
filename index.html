@@ -682,7 +682,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-3';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-4';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>',
@@ -1208,10 +1208,13 @@
             'Tips: buka <b>Mode Baca</b> (ikon aA di Safari, atau “Tampilan sederhana” di Chrome) supaya bersih tanpa iklan' + (isOwner() ? ', dan ketuk “Sembunyikan” untuk situs yang terlalu banyak iklan.' : '.') + '</p>';
         }
       } else if (st.kabarTab === 'trend') {
-        html += k.trends && k.trends.length ? '<small class="mu" style="display:block;margin:10px 0 2px">📈 Lagi ramai dicari di Indonesia · ketuk untuk lihat di Google</small>' +
+        var igTag = function (t) { return String(t).toLowerCase().replace(/[^a-z0-9]+/g, ''); };
+        html += k.trends && k.trends.length ? '<small class="mu" style="display:block;margin:10px 0 2px">📈 Lagi ramai dicari di Indonesia · lihat kontennya di TikTok atau Instagram</small>' +
           k.trends.slice(0, 8).map(function (t, i) {
-            return '<div class="trend"><b style="width:18px;font-size:13px">' + (i + 1) + '</b>' +
-              ext('https://www.google.com/search?q=' + encodeURIComponent(t), esc(t) + ' ↗', 'flex:1;min-width:0;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;overflow-wrap:anywhere') +
+            var tag = igTag(t);
+            return '<div class="trend"><b style="width:18px;font-size:13px">' + (i + 1) + '</b><span style="flex:1;min-width:0;overflow-wrap:anywhere">' + esc(t) + '</span>' +
+              '<a class="tiny" href="https://www.tiktok.com/search?q=' + encodeURIComponent(t) + '" target="_blank" rel="noopener" style="text-decoration:none">TikTok</a>' +
+              (tag ? '<a class="tiny" href="https://www.instagram.com/explore/tags/' + encodeURIComponent(tag) + '/" target="_blank" rel="noopener" style="text-decoration:none">IG</a>' : '') +
               '<button class="tiny" type="button" data-t="' + esc(t) + '">+ Ide</button></div>';
           }).join('') + '<div style="height:8px"></div>' : '<p class="empty">Tren belum tersedia.</p>';
       } else if (st.kabarTab === 'music') {
@@ -1230,12 +1233,14 @@
           ext('https://ads.tiktok.com/business/creativecenter/inspiration/popular/music/pc/en', '🎵 Viral TikTok ↗', '').replace('<a ', '<a class="btn-line btn-sm" ') +
           ext('https://open.spotify.com/search/' + encodeURIComponent('viral indonesia'), '🎧 Spotify ↗', '').replace('<a ', '<a class="btn-line btn-sm" ') + '</div>';
       } else {
-        html += '<small class="mu" style="display:block;margin:10px 0 8px">📌 Inspirasi visual di Pinterest · ketuk untuk membuka</small>' +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap">' + (k.pins || []).map(function (q) {
-            return ext('https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(q), esc(q) + ' ↗', '').replace('<a ', '<a class="fchip" ');
-          }).join('') + '</div>' +
-          '<div style="padding:12px 0">' + ext('https://trends.pinterest.com/?country=ID', '📈 Lihat Pinterest Trends Indonesia ↗', '').replace('<a ', '<a class="btn btn-sm" ') + '</div>' +
-          '<p class="mu" style="font-size:12px;padding-bottom:12px">Data tren Pinterest belum bisa ditarik otomatis karena butuh akses API bisnis dari Pinterest, jadi ditampilkan sebagai pintasan.</p>';
+        var groups = Array.isArray(k.pins) ? { '📌 Inspirasi': k.pins } : (k.pins || {});
+        html += '<small class="mu" style="display:block;margin:10px 0 4px">📌 Referensi desain & outfit di Pinterest · ketuk untuk membuka</small>' +
+          Object.keys(groups).map(function (g) {
+            return '<div style="padding:8px 0 2px"><b style="display:block;font-size:13px;margin-bottom:6px">' + esc(g) + '</b><div style="display:flex;gap:6px;flex-wrap:wrap">' +
+              groups[g].map(function (q) { return ext('https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(q), esc(q) + ' ↗', '').replace('<a ', '<a class="fchip" '); }).join('') + '</div></div>';
+          }).join('') +
+          '<div style="padding:12px 0 8px">' + ext('https://trends.pinterest.com/?country=ID', '📈 Pinterest Trends Indonesia ↗', '').replace('<a ', '<a class="btn btn-sm" ') + '</div>' +
+          '<p class="mu" style="font-size:12px;padding-bottom:12px">Tips: simpan pin favorit ke board Pinterest, lalu catat idenya lewat Bank ide supaya bisa langsung dijadwalkan.</p>';
       }
       card.innerHTML = html;
       card.querySelectorAll('[data-tab]').forEach(function (b) { b.onclick = function () { st.kabarTab = b.dataset.tab; draw(); }; });
@@ -2427,7 +2432,7 @@
     ];
     var KABAR = { at: new Date(Date.now() - 2 * 3600000).toISOString(), trends: ['hijab pashmina kondangan', 'tren warna akhir tahun', 'promo 11.11', 'outfit kerja simpel'],
       music: [{ name: 'Contoh lagu trending', artist: 'Penyanyi A', art: '', url: 'https://www.youtube.com', views: 2450000, src: 'youtube' }, { name: 'Lagu viral kedua', artist: 'Band B', art: '', url: 'https://www.youtube.com', views: 980000, src: 'youtube' }, { name: 'Lagu ketiga', artist: 'Penyanyi C', art: '', url: 'https://www.youtube.com', views: 512000, src: 'youtube' }],
-      pins: ['hijab outfit', 'pashmina style', 'modest fashion', 'scarf styling', 'hijab color palette', 'outfit kondangan hijab'],
+      pins: { '👗 Desain baju': ['gamis modern design', 'modest dress design', 'abaya modern'], '✨ Outfit': ['outfit hijab casual', 'outfit kerja hijab', 'ootd hijab pashmina'], '🏋️‍♀️ Olahraga': ['hijab gym outfit', 'pilates outfit hijab'] },
       topics: [
         { key: 'fashion', label: 'Fashion muslim', emoji: '🧕', items: [{ title: 'Contoh judul: warna earth tone tetap favorit hijab akhir tahun', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 2 * 3600000).toISOString() }, { title: 'Contoh judul: tips padu padan scarf untuk acara formal', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 5 * 3600000).toISOString() }] },
         { key: 'sosmed', label: 'Media sosial', emoji: '📱', items: [{ title: 'Contoh judul: fitur baru untuk kreator di Instagram', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 3 * 3600000).toISOString() }] },
