@@ -310,6 +310,7 @@
   .cap-row { display: flex; justify-content: space-between; align-items: center; }
   .dlg-actions { display: flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
   .dlg-actions button { flex: 1; }
+  .dlg-actions a { flex: 1; justify-content: center; white-space: nowrap; }
   .metrics { background: var(--pink-soft); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
   .metrics .in { min-height: 44px; }
   @media (max-width: 600px) {
@@ -595,6 +596,20 @@
   </div>
 </dialog>
 
+<dialog id="ytDlg" aria-labelledby="ytTitle">
+  <div class="dlg">
+    <div class="dlg-head"><div><h2 id="ytTitle" style="font-size:19px">Musik</h2><p id="ytSub"></p></div><button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-body">
+      <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:#000"><iframe id="ytFrame" title="Pemutar video" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+      <p class="mu" style="font-size:12px">Kalau videonya tidak bisa diputar di sini (beberapa label musik membatasinya), ketuk Buka di YouTube.</p>
+      <div class="dlg-actions">
+        <a class="btn-line" id="ytTikTok" href="#" target="_blank" rel="noopener" data-app="tiktok" style="flex:1">TikTok</a>
+        <a class="btn" id="ytOpen" href="#" target="_blank" rel="noopener" data-app="youtube" style="flex:1">Buka di YouTube</a>
+      </div>
+    </div>
+  </div>
+</dialog>
+
 <dialog id="noteDlg" aria-labelledby="ndTitle">
   <div class="dlg">
     <div class="dlg-head"><div><h2 id="ndTitle">Ubah catatan</h2></div><button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
@@ -810,7 +825,9 @@
   /** Buka aplikasi TikTok/Threads langsung dari HP (bukan web). Kata kunci disalin supaya tinggal ditempel. */
   var APPS = {
     threads: { name: 'Threads', ios: 'barcelona://', android: 'com.instagram.barcelona' },
-    tiktok: { name: 'TikTok', ios: 'tiktok://', android: 'com.ss.android.ugc.trill' }
+    tiktok: { name: 'TikTok', ios: 'tiktok://', android: 'com.ss.android.ugc.trill' },
+    youtube: { name: 'YouTube', android: 'com.google.android.youtube', noCopy: true,
+      iosUrl: function (web) { var u = new URL(web); return 'youtube://' + u.host + u.pathname + u.search; } }
   };
   function isAndroid() { return /Android/i.test(navigator.userAgent); }
   function openApp(app, q, web, ev) {
@@ -824,11 +841,13 @@
         ';S.browser_fallback_url=' + encodeURIComponent(web) + ';end';
       return;
     }
-    try { navigator.clipboard.writeText(q).then(function () { toast('“' + q + '” disalin. Tempel di pencarian ' + a.name + ' ✨'); }, function () {}); } catch (e) {}
+    if (!a.noCopy) {
+      try { navigator.clipboard.writeText(q).then(function () { toast('“' + q + '” disalin. Tempel di pencarian ' + a.name + ' ✨'); }, function () {}); } catch (e) {}
+    }
     var fallback = setTimeout(function () { if (!document.hidden) window.open(web, '_blank'); }, 1800);
     var onHide = function () { if (document.hidden) { clearTimeout(fallback); document.removeEventListener('visibilitychange', onHide); } };
     document.addEventListener('visibilitychange', onHide);
-    location.href = a.ios;
+    location.href = a.iosUrl ? a.iosUrl(web) : a.ios;
   }
   function bindApps(root) {
     root.querySelectorAll('[data-app]').forEach(function (x) {
@@ -1277,14 +1296,17 @@
         }
       } else if (st.kabarTab === 'music') {
         var yt = k.music.length && k.music[0].src === 'youtube';
-        html += '<small class="mu" style="display:block;margin:10px 0 4px">' + (yt ? '🎬 Musik yang lagi trending di YouTube Indonesia · ketuk untuk putar' : '🎧 Lagu paling banyak diputar di Indonesia · ketuk untuk cari di TikTok') + '</small>' +
+        html += '<small class="mu" style="display:block;margin:10px 0 4px">' + (yt ? '🎬 Musik yang lagi trending di YouTube Indonesia' : '🎧 Lagu paling banyak diputar di Indonesia') + ' · ketuk untuk putar di YouTube</small>' +
           (k.music.length ? '<div>' + k.music.slice(0, 10).map(function (m, i) {
-            var tt = 'https://www.tiktok.com/search?q=' + encodeURIComponent(m.name + ' ' + m.artist);
+            var q = m.name + ' ' + m.artist;
+            var ytUrl = yt ? m.url : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
+            var tt = 'https://www.tiktok.com/search?q=' + encodeURIComponent(q);
+            var vid = yt ? (String(m.url).match(/[?&]v=([\w-]{6,})/) || [])[1] : '';
             return '<div class="song' + (yt ? ' yt' : '') + '">' +
-              '<a href="' + esc(yt ? m.url : tt) + '" target="_blank" rel="noopener" style="display:contents;color:inherit;text-decoration:none">' +
+              '<a href="' + esc(ytUrl) + '" target="_blank" rel="noopener" ' + (vid ? 'data-play="' + esc(vid) + '" data-i="' + i + '"' : 'data-app="youtube"') + ' data-q="' + esc(q) + '" style="display:contents;color:inherit;text-decoration:none">' +
               (m.art ? '<img src="' + esc(m.art) + '" alt="" loading="lazy">' : '<span style="width:44px;height:44px;border-radius:10px;background:var(--pink-soft);display:grid;place-items:center">🎵</span>') +
               '<span class="t"><b>' + (i + 1) + '. ' + esc(m.name) + '</b><span>' + esc(m.artist) + (m.views ? ' · ' + num(m.views) + ' x ditonton' : '') + '</span></span></a>' +
-              (yt ? '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" data-app="tiktok" data-q="' + esc(m.name + ' ' + m.artist) + '" style="text-decoration:none">TikTok ↗</a>' : '<span class="mu" style="font-size:18px">↗</span>') + '</div>';
+              '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" data-app="tiktok" data-q="' + esc(q) + '" style="text-decoration:none">TikTok</a></div>';
           }).join('') + '</div>' : '<p class="empty">Daftar lagu belum tersedia.</p>') +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 12px">' +
           ext('https://www.youtube.com/feed/trending?bp=4gINGgt5dG1hX2NoYXJ0cw%3D%3D', '▶️ Trending YouTube ↗', '').replace('<a ', '<a class="btn-line btn-sm" ') +
@@ -1305,6 +1327,9 @@
       card.querySelectorAll('[data-k]').forEach(function (b) { b.onclick = function () { st.kabarCat = b.dataset.k; draw(); }; });
       card.querySelectorAll('[data-pg]').forEach(function (b) { b.onclick = function () { st.pinGroup = b.dataset.pg; draw(); }; });
       bindApps(card);
+      card.querySelectorAll('[data-play]').forEach(function (a) {
+        a.addEventListener('click', function (e) { e.preventDefault(); playVideo(a.dataset.play, k.music[Number(a.dataset.i)]); });
+      });
       card.querySelectorAll('[data-t]').forEach(function (b) {
         b.onclick = async function () {
           b.disabled = true;
@@ -1323,6 +1348,18 @@
     };
     draw();
     return card;
+  }
+
+  // ---------- Pemutar video di dalam app ----------
+  function playVideo(id, m) {
+    var q = m ? m.name + ' ' + m.artist : '';
+    $('ytTitle').textContent = m ? m.name : 'Musik';
+    $('ytSub').textContent = m ? m.artist : '';
+    $('ytFrame').src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?autoplay=1&playsinline=1&rel=0';
+    var web = 'https://www.youtube.com/watch?v=' + encodeURIComponent(id);
+    $('ytOpen').href = web; $('ytOpen').dataset.q = q;
+    $('ytTikTok').href = 'https://www.tiktok.com/search?q=' + encodeURIComponent(q); $('ytTikTok').dataset.q = q;
+    $('ytDlg').showModal();
   }
 
   // ---------- Ringkasan mingguan ----------
@@ -2368,6 +2405,8 @@
   }
 
   // ====== Event ======
+  $('ytDlg').addEventListener('close', function () { $('ytFrame').src = 'about:blank'; });
+  bindApps($('ytDlg'));
   $('rtSave').onclick = saveRoutineClick;
   $('ndSave').onclick = saveNoteDlg;
   $('itSave').onclick = saveItemDlg;
@@ -2500,7 +2539,7 @@
         { q: 'elon musk', traffic: '50K+' },
         { q: 'agnez mo', traffic: '20K+', news: { title: 'Contoh berita: jadwal konser terbaru', url: 'https://news.google.com', source: 'Contoh media' }, good: true }
       ],
-      music: [{ name: 'Contoh lagu trending', artist: 'Penyanyi A', art: '', url: 'https://www.youtube.com', views: 2450000, src: 'youtube' }, { name: 'Lagu viral kedua', artist: 'Band B', art: '', url: 'https://www.youtube.com', views: 980000, src: 'youtube' }, { name: 'Lagu ketiga', artist: 'Penyanyi C', art: '', url: 'https://www.youtube.com', views: 512000, src: 'youtube' }],
+      music: [{ name: 'Contoh lagu trending', artist: 'Penyanyi A', art: '', url: 'https://www.youtube.com/watch?v=abc123DEF45', views: 2450000, src: 'youtube' }, { name: 'Lagu viral kedua', artist: 'Band B', art: '', url: 'https://www.youtube.com', views: 980000, src: 'youtube' }, { name: 'Lagu ketiga', artist: 'Penyanyi C', art: '', url: 'https://www.youtube.com', views: 512000, src: 'youtube' }],
       pins: { '👗 Desain baju': ['gamis modern design', 'modest dress design', 'abaya modern'], '✨ Outfit': ['outfit hijab casual', 'outfit kerja hijab', 'ootd hijab pashmina'], '🏋️‍♀️ Olahraga': ['hijab gym outfit', 'pilates outfit hijab'] },
       topics: [
         { key: 'fashion', label: 'Fashion muslim', emoji: '🧕', items: [{ title: 'Contoh judul: warna earth tone tetap favorit hijab akhir tahun', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 2 * 3600000).toISOString() }, { title: 'Contoh judul: tips padu padan scarf untuk acara formal', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 5 * 3600000).toISOString() }] },
