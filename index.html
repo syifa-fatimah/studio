@@ -648,6 +648,7 @@
 <div id="miniBar" hidden role="region" aria-label="Pemutar musik">
   <img id="mbArt" alt="">
   <span class="mb-t"><b id="mbTitle"></b><small id="mbSub">Cuplikan 30 detik</small></span>
+  <a class="mb-b" id="mbFull" href="#" target="_blank" rel="noopener" data-app="ytmusic" aria-label="Putar lagu penuh di YouTube Music" style="display:grid;place-items:center;text-decoration:none;font-size:11px;font-weight:700;width:auto;padding:0 10px;border-radius:999px">Penuh ↗</a>
   <button class="mb-b" type="button" id="mbToggle" aria-label="Jeda">⏸</button>
   <button class="mb-b" type="button" id="mbClose" aria-label="Tutup pemutar">✕</button>
   <audio id="mbAudio" preload="none"></audio>
@@ -1389,8 +1390,9 @@
         html += '<div class="msub" role="group"><button type="button" data-ms="pop" aria-pressed="false">🔥 Lagu pop</button><button type="button" data-ms="mine" aria-pressed="true">🎧 Playlist saya</button></div>';
         var pl = st.boot.myPlaylists || {};
         if (pl.youtube && !st.plEdit) {
-          html += (pl.youtube ? '<button class="plbtn" type="button" data-pl="youtube"><span class="ic2" style="background:#FF0033;color:#fff">▶</span><span style="flex:1"><b>Putar playlist YouTube Music</b><small>Lagu penuh di HP & PC</small></span><span>▶</span></button>' : '') +
-            '<p class="mu" style="font-size:12px;padding:10px 0 4px">Musik tetap berputar saat pindah menu. Tutup lewat tombol ✕ di pemutar.</p>' +
+          var plId = (String(pl.youtube).match(/[?&]list=([A-Za-z0-9_-]+)/) || [])[1] || '';
+          html += '<a class="plbtn" href="https://music.youtube.com/playlist?list=' + encodeURIComponent(plId) + '" target="_blank" rel="noopener" data-app="ytmusic" data-q="playlist" style="text-decoration:none"><span class="ic2" style="background:#FF0033;color:#fff">♫</span><span style="flex:1"><b>Putar playlist saya</b><small>Lagu penuh di aplikasi YouTube Music</small></span><span>↗</span></a>' +
+            '<p class="mu" style="font-size:12px;padding:10px 0 4px">Tips: dengan YouTube Music Premium, lagu tetap berputar saat kembali ke Syifa Studio atau layar dikunci.</p>' +
             '<button class="link" type="button" data-pledit style="color:var(--rose);padding:4px 0 12px">Ubah link playlist</button>';
         } else {
           html += '<p class="mu" style="font-size:13px;padding:6px 0">Tempel link playlist YouTube Music favorit Syifa. Cukup sekali, link tersimpan untuk akunmu.</p>' +
@@ -1402,21 +1404,19 @@
         var yt = k.music.some(function (m) { return m.src === 'youtube'; });
         html += '<div class="msub" role="group"><button type="button" data-ms="pop" aria-pressed="true">🔥 Lagu pop</button><button type="button" data-ms="mine" aria-pressed="false">🎧 Playlist saya</button></div>';
         var limit = st.musicAll ? 10 : 5;
-        html += '<small class="mu" style="display:block;margin:6px 0 2px">🎧 Lagu pop paling banyak diputar di Indonesia · ' + (yt ? 'ketuk ♫ untuk dengar lagu penuh sambil pakai app, ketuk judul untuk video besar' : 'ketuk ♫ untuk cuplikan 30 detik') + '</small>' +
-          (yt ? '<button class="btn btn-sm" type="button" data-playall style="margin:8px 0 4px">♫ Putar semua (lagu penuh)</button>' : '') +
+        html += '<small class="mu" style="display:block;margin:6px 0 2px">🎧 Lagu pop paling banyak diputar di Indonesia · ketuk ♫ untuk dengar sekilas, ketuk judul untuk lagu penuh di YouTube Music</small>' +
           (k.music.length ? '<div>' + k.music.slice(0, limit).map(function (m, i) {
             var q = m.name + ' ' + m.artist;
             var isYt = m.src === 'youtube';
             var vid = isYt ? (String(m.url).match(/[?&]v=([\w-]{6,})/) || [])[1] : '';
             var playable = vid || m.preview;
             var href = isYt ? 'https://music.youtube.com/watch?v=' + vid : 'https://music.youtube.com/search?q=' + encodeURIComponent(q);
-            var audioOk = !!(vid || m.preview);
-            var titleAttr = vid ? 'data-play="' + i + '"' : 'data-app="ytmusic"';
+            var yurl = ytmUrl(m);
             return '<div class="vrow">' +
-              '<button class="vthumb btn0' + (isYt ? '' : ' sq') + '" type="button" ' + (audioOk ? 'data-audio="' + i + '" aria-label="Putar musiknya saja: ' + esc(m.name) + '"' : (vid ? 'data-play="' + i + '" aria-label="Putar video"' : 'data-app="ytmusic"')) + '>' +
+              '<button class="vthumb btn0' + (isYt ? '' : ' sq') + '" type="button" ' + (m.preview ? 'data-audio="' + i + '" aria-label="Dengar cuplikan: ' + esc(m.name) + '"' : 'data-ytm="' + i + '" aria-label="Putar di YouTube Music"') + '>' +
                 (m.art ? '<img src="' + esc(m.art) + '" alt="" loading="lazy">' : '🎵') +
-                '<span class="rk">' + (i + 1) + '</span><span class="pl">' + (audioOk ? '♫' : '▶') + '</span></button>' +
-              '<a class="t" href="' + esc(href) + '" target="_blank" rel="noopener" ' + titleAttr + ' data-q="' + esc(q) + '" style="color:inherit;text-decoration:none"><b>' + esc(m.name) + '</b><span>' + esc(m.artist) + (m.views ? ' · ' + num(m.views) + ' ditonton' : '') + '</span></a></div>';
+                '<span class="rk">' + (i + 1) + '</span><span class="pl">♫</span></button>' +
+              '<a class="t" href="' + esc(yurl) + '" target="_blank" rel="noopener" data-app="ytmusic" data-q="' + esc(q) + '" style="color:inherit;text-decoration:none"><b>' + esc(m.name) + '</b><span>' + esc(m.artist) + (m.views ? ' · ' + num(m.views) + ' ditonton' : '') + '</span></a></div>';
           }).join('') + '</div>' +
           (k.music.length > 5 ? '<button class="link" type="button" data-more style="color:var(--rose);width:100%">' + (st.musicAll ? 'Tampilkan lebih sedikit' : 'Lihat ' + (Math.min(10, k.music.length) - 5) + ' lagi') + '</button>' : '') : '<p class="empty">Daftar lagu belum tersedia.</p>') +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;padding:6px 0 12px">' +
@@ -1450,14 +1450,13 @@
         };
       });
       card.querySelectorAll('[data-more]').forEach(function (b) { b.onclick = function () { st.musicAll = !st.musicAll; draw(); }; });
-      card.querySelectorAll('[data-audio]').forEach(function (b) {
-        b.onclick = function () {
-          var m = k.music[Number(b.dataset.audio)], v = vidOf(m);
-          if (v) openYtFloat([v], '♫ ' + m.name); else playAudio(m);
+      card.querySelectorAll('[data-audio]').forEach(function (b) { b.onclick = function () { playAudio(k.music[Number(b.dataset.audio)]); }; });
+      card.querySelectorAll('[data-ytm]').forEach(function (b) {
+        b.onclick = function (e) {
+          var m = k.music[Number(b.dataset.ytm)], u = ytmUrl(m);
+          var mobile = /Android|iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+          if (mobile) openApp('ytmusic', m.name, u, e); else window.open(u, '_blank', 'noopener');
         };
-      });
-      card.querySelectorAll('[data-playall]').forEach(function (b) {
-        b.onclick = function () { openYtFloat(k.music.map(vidOf).filter(Boolean), '♫ 10 lagu pop terpopuler'); };
       });
       card.querySelectorAll('[data-play]').forEach(function (a) {
         a.addEventListener('click', function (e) { e.preventDefault(); playMusic(k.music[Number(a.dataset.play)]); });
@@ -1530,8 +1529,13 @@
   function vidOf(m) { return m && m.src === 'youtube' ? (String(m.url).match(/[?&]v=([\w-]{6,})/) || [])[1] || '' : ''; }
 
   // ---------- Pemutar mini: musik saja (cuplikan 30 detik) ----------
+  function ytmUrl(m) {
+    var v = vidOf(m);
+    return v ? 'https://music.youtube.com/watch?v=' + v : 'https://music.youtube.com/search?q=' + encodeURIComponent(m.name + ' ' + m.artist);
+  }
   function playAudio(m) {
     if (!m || !m.preview) return;
+    $('mbFull').href = ytmUrl(m); $('mbFull').dataset.q = m.name + ' ' + m.artist;
     if (!$('plPanel').hidden) { $('plBody').innerHTML = ''; $('plPanel').hidden = true; plState(); }
     var a = $('mbAudio');
     $('mbTitle').textContent = m.name; $('mbSub').textContent = m.artist + ' · cuplikan 30 detik';
@@ -2612,6 +2616,7 @@
     var sync = function () { t.textContent = a.paused ? '⏵' : '⏸'; t.setAttribute('aria-label', a.paused ? 'Putar' : 'Jeda'); };
     a.addEventListener('play', sync); a.addEventListener('pause', sync); a.addEventListener('ended', sync);
     t.onclick = function () { if (a.paused) a.play(); else a.pause(); };
+    bindApps($('miniBar'));
     $('mbClose').onclick = function () { a.pause(); a.removeAttribute('src'); a.load(); $('miniBar').hidden = true; };
   })();
   $('plClose').onclick = function () { $('plBody').innerHTML = ''; $('plPanel').hidden = true; plState(); };
