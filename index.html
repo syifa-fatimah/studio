@@ -117,6 +117,7 @@
   .dock button { width: 52px; height: 52px; border-radius: 50%; border: 0; background: transparent; color: #FFE3EE; display: grid; place-items: center; flex: none; }
   .dock button svg { width: 22px; height: 22px; }
   .dock button[aria-current="page"] { background: #fff; color: var(--fill); }
+  @media (min-width: 900px) { #verMob { display: none; } }
   @media (max-width: 899px) {
     .side { display: none; }
     .app.has-nav .dock { display: flex; }
@@ -489,6 +490,7 @@
       </div>
       <div class="notes" id="ntList"><p class="empty">Memuat…</p></div>
     </section>
+    <p id="verMob" class="mu" style="text-align:center;font-size:11px;margin:0;padding:4px 0 8px"></p>
   </main>
 
   <nav class="dock" id="dock" aria-label="Navigasi"></nav>
@@ -695,7 +697,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-7';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-9';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>',
@@ -998,6 +1000,7 @@
   function checkVersion() {
     var sv = st.boot.serverVersion || '';
     $('verTxt').textContent = 'Versi ' + APP_VERSION;
+    $('verMob').textContent = 'Syifa Studio · versi ' + APP_VERSION;
     if (!hasAPI || !sv || sv === APP_VERSION) return;
     if (sv > APP_VERSION) {
       $('updText').innerHTML = '<b>Versi baru tersedia</b>Ketuk Perbarui untuk memakai versi terbaru.';
@@ -1248,7 +1251,8 @@
     var ext = function (url, text, style) { return '<a href="' + esc(url) + '" target="_blank" rel="noopener" style="' + (style || '') + '">' + text + '</a>'; };
 
     var draw = function () {
-      var tabs = [['news', 'Berita'], ['trend', 'Tren'], ['music', 'Musik'], ['pin', 'Pinterest']];
+      var tabs = [['news', 'Berita'], ['music', 'Musik'], ['pin', 'Pinterest']];
+      if (st.kabarTab === 'trend') st.kabarTab = 'news';
       var html = '<div class="sec"><h3>☀️ Kabar hari ini</h3><span class="mu">' + esc(ago(k.at)) + '</span></div>' +
         '<div class="ktabs" role="group" aria-label="Jenis kabar">' + tabs.map(function (t) { return '<button type="button" data-tab="' + t[0] + '" aria-pressed="' + (st.kabarTab === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</div>';
 
@@ -1264,29 +1268,6 @@
             '<p class="mu" style="font-size:12px;padding:6px 0 12px">Judul berbau iklan & spam sudah disaring otomatis. Iklan di dalam situs berita tidak bisa diblokir dari app. ' +
             'Tips: buka <b>Mode Baca</b> (ikon aA di Safari, atau “Tampilan sederhana” di Chrome) supaya bersih tanpa iklan' + (isOwner() ? ', dan ketuk “Sembunyikan” untuk situs yang terlalu banyak iklan.' : '.') + '</p>';
         }
-      } else if (st.kabarTab === 'trend') {
-        var trs = (k.trends || []).filter(function (t) { return t && typeof t === 'object'; });
-        var good = trs.filter(function (t) { return t.good; });
-        var showAll = !!st.trendAll;
-        var list = showAll ? trs : good;
-        html += '<div class="fchips" style="padding:10px 0 2px"><button class="fchip" type="button" data-ta="0" aria-pressed="' + !showAll + '">✨ Relevan (' + good.length + ')</button><button class="fchip" type="button" data-ta="1" aria-pressed="' + showAll + '">Semua tren (' + trs.length + ')</button></div>' +
-          '<small class="mu" style="display:block;margin:6px 0 2px">' + (showAll ? 'Semua yang lagi ramai di Indonesia, topik negatif sudah disaring.' : 'Tren yang nyambung dengan fashion, kecantikan, musik, hiburan, olahraga, dan bisnis.') + ' Ketuk untuk lihat obrolannya di Threads.</small>';
-        if (!list.length) html += '<p class="empty">Belum ada tren yang relevan hari ini. Coba lihat “Semua tren”, atau cek tab Pinterest untuk inspirasi.</p>';
-        else html += '<div>' + list.slice(0, 8).map(function (t, i) {
-            var th = 'https://www.threads.com/search?q=' + encodeURIComponent(t.q) + '&serp_type=default';
-            var tt = 'https://www.tiktok.com/search?q=' + encodeURIComponent(t.q);
-            var img = t.pic || (t.video && t.video.thumb) || '';
-            var thumb = img ? '<img src="' + esc(img) + '" alt="" loading="lazy">' : '<span class="ini">' + esc(t.q.charAt(0).toUpperCase()) + '</span>';
-            var sub = t.news ? t.news.title : (t.traffic ? t.traffic + ' pencarian' : 'Lagi ramai dicari');
-            return '<div class="tr"><a class="tr-main" href="' + esc(th) + '" target="_blank" rel="noopener" data-app="threads" data-q="' + esc(t.q) + '"><span class="tr-thumb">' + thumb + '</span>' +
-              '<span class="t"><b>' + (i + 1) + '. ' + esc(t.q) + '</b><span>' + esc(sub) + '</span></span></a>' +
-              '<div class="tr-acts">' +
-                '<a class="tiny th" href="' + esc(th) + '" target="_blank" rel="noopener" data-app="threads" data-q="' + esc(t.q) + '" style="text-decoration:none">@ Threads</a>' +
-                (t.video ? '<a class="tiny" href="https://www.youtube.com/watch?v=' + encodeURIComponent(t.video.id) + '" target="_blank" rel="noopener" style="text-decoration:none">▶ Video</a>' : '') +
-                (t.news && t.news.url ? '<a class="tiny" href="' + esc(t.news.url) + '" target="_blank" rel="noopener" style="text-decoration:none" title="' + esc(t.news.title) + '">📰 Berita</a>' : '') +
-                '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" data-app="tiktok" data-q="' + esc(t.q) + '" style="text-decoration:none">TikTok</a>' +
-                '<button class="tiny" type="button" data-t="' + esc(t.q) + '">+ Ide</button></div></div>';
-          }).join('') + '</div><div style="height:6px"></div>';
       } else if (st.kabarTab === 'music') {
         var yt = k.music.length && k.music[0].src === 'youtube';
         html += '<small class="mu" style="display:block;margin:10px 0 4px">' + (yt ? '🎬 Musik yang lagi trending di YouTube Indonesia · ketuk untuk putar' : '🎧 Lagu paling banyak diputar di Indonesia · ketuk untuk cari di TikTok') + '</small>' +
@@ -1315,7 +1296,6 @@
       keepChipScroll(card, 'kabar-' + st.kabarTab + '-', function () { card.innerHTML = html; });
       card.querySelectorAll('[data-tab]').forEach(function (b) { b.onclick = function () { st.kabarTab = b.dataset.tab; draw(); }; });
       card.querySelectorAll('[data-k]').forEach(function (b) { b.onclick = function () { st.kabarCat = b.dataset.k; draw(); }; });
-      card.querySelectorAll('[data-ta]').forEach(function (b) { b.onclick = function () { st.trendAll = b.dataset.ta === '1'; draw(); }; });
       card.querySelectorAll('[data-pg]').forEach(function (b) { b.onclick = function () { st.pinGroup = b.dataset.pg; draw(); }; });
       bindApps(card);
       card.querySelectorAll('[data-t]').forEach(function (b) {
