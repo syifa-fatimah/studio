@@ -345,6 +345,19 @@
   .news a { color: var(--ink); text-decoration: none; }
   .news a:hover b { text-decoration: underline; }
   .trend { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+  .ktabs { display: flex; gap: 2px; background: var(--pink-soft); border-radius: 999px; padding: 3px; margin-top: 10px; }
+  .ktabs button { flex: 1; height: 34px; border: 0; border-radius: 999px; background: transparent; font-size: 13px; font-weight: 600; color: #7A2A4E; padding: 0 6px; }
+  .ktabs button[aria-pressed="true"] { background: var(--fill); color: #fff; }
+  .song { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); text-decoration: none; color: var(--ink); }
+  .song:first-child { border-top: 0; }
+  .song img { width: 44px; height: 44px; border-radius: 10px; flex: none; background: var(--pink-soft); object-fit: cover; }
+  .song.yt img { width: 72px; height: 44px; }
+  .song .acts3 { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; }
+  .song .t { flex: 1; min-width: 0; }
+  .song .t b { display: block; font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+  .song .t span { display: block; font-size: 12px; color: var(--muted); }
+  a.fchip, a.btn, a.btn-line { text-decoration: none; display: inline-flex; align-items: center; }
+  .hide-src { border: 0; background: none; color: var(--muted); font-size: 12px; padding: 4px 0; text-decoration: underline; text-underline-offset: 2px; }
   .trend span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
   .tiny { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
   .xrow td.cb span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; }
@@ -669,7 +682,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-1';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-3';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>',
@@ -1163,7 +1176,7 @@
   function kabarCard(d) {
     var card = el('div', 'card');
     var k = d.kabar;
-    if (!k || !k.topics) {
+    if (!k || !k.topics || !k.music) {
       card.innerHTML = '<div class="sec"><h3>☀️ Kabar hari ini</h3></div><p class="empty">Kabar sedang disiapkan…</p>';
       if (!st.kabarTried) {
         st.kabarTried = true;
@@ -1173,22 +1186,72 @@
       return card;
     }
     var topics = k.topics.filter(function (t) { return t.items && t.items.length; });
-    if (!topics.length) { card.innerHTML = '<div class="sec"><h3>☀️ Kabar hari ini</h3></div><p class="empty">Belum ada kabar baru hari ini.</p>'; return card; }
-    if (!topics.some(function (t) { return t.key === st.kabarCat; })) st.kabarCat = topics[0].key;
+    st.kabarTab = st.kabarTab || 'news';
+    if (!topics.some(function (t) { return t.key === st.kabarCat; }) && topics.length) st.kabarCat = topics[0].key;
+    var ext = function (url, text, style) { return '<a href="' + esc(url) + '" target="_blank" rel="noopener" style="' + (style || '') + '">' + text + '</a>'; };
+
     var draw = function () {
-      var cur = topics.filter(function (t) { return t.key === st.kabarCat; })[0];
-      card.innerHTML = '<div class="sec"><h3>☀️ Kabar hari ini</h3><span class="mu">' + esc(ago(k.at)) + '</span></div>' +
-        '<div class="fchips" style="padding:10px 0 4px">' + topics.map(function (t) { return '<button class="fchip" type="button" data-k="' + esc(t.key) + '" aria-pressed="' + (t.key === st.kabarCat) + '">' + esc(t.emoji + ' ' + t.label) + '</button>'; }).join('') + '</div>' +
-        '<div class="news">' + cur.items.slice(0, 3).map(function (n) {
-          return '<a class="row" href="' + esc(n.link) + '" target="_blank" rel="noopener"><span class="t"><small>' + esc((n.source || 'Berita') + (n.at ? ' · ' + ago(n.at) : '')) + '</small><b style="font-weight:500;line-height:1.35">' + esc(n.title) + '</b></span></a>';
-        }).join('') + '</div>' +
-        (k.trends && k.trends.length ? '<div style="padding:10px 0 12px"><small class="mu" style="display:block;margin-bottom:4px">📈 Lagi ramai dicari di Indonesia</small>' +
-          k.trends.slice(0, 5).map(function (t, i) { return '<div class="trend"><b style="width:18px;font-size:13px">' + (i + 1) + '</b><span>' + esc(t) + '</span><button class="tiny" type="button" data-t="' + esc(t) + '">+ Ide</button></div>'; }).join('') + '</div>' : '');
+      var tabs = [['news', 'Berita'], ['trend', 'Tren'], ['music', 'Musik'], ['pin', 'Pinterest']];
+      var html = '<div class="sec"><h3>☀️ Kabar hari ini</h3><span class="mu">' + esc(ago(k.at)) + '</span></div>' +
+        '<div class="ktabs" role="group" aria-label="Jenis kabar">' + tabs.map(function (t) { return '<button type="button" data-tab="' + t[0] + '" aria-pressed="' + (st.kabarTab === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</div>';
+
+      if (st.kabarTab === 'news') {
+        if (!topics.length) html += '<p class="empty">Belum ada berita baru hari ini.</p>';
+        else {
+          var cur = topics.filter(function (t) { return t.key === st.kabarCat; })[0];
+          html += '<div class="fchips" style="padding:10px 0 4px">' + topics.map(function (t) { return '<button class="fchip" type="button" data-k="' + esc(t.key) + '" aria-pressed="' + (t.key === st.kabarCat) + '">' + esc(t.emoji + ' ' + t.label) + '</button>'; }).join('') + '</div>' +
+            '<div class="news">' + cur.items.slice(0, 4).map(function (n) {
+              return '<div class="row" style="align-items:flex-start"><a href="' + esc(n.link) + '" target="_blank" rel="noopener" class="t" style="color:var(--ink);text-decoration:none"><small>' + esc((n.source || 'Berita') + (n.at ? ' · ' + ago(n.at) : '')) + '</small><b style="font-weight:500;line-height:1.35">' + esc(n.title) + '</b></a>' +
+                (isOwner() && n.source ? '<button class="hide-src" type="button" data-src="' + esc(n.source) + '" title="Jangan tampilkan berita dari ' + esc(n.source) + '">Sembunyikan</button>' : '') + '</div>';
+            }).join('') + '</div>' +
+            '<p class="mu" style="font-size:12px;padding:6px 0 12px">Judul berbau iklan & spam sudah disaring otomatis. Iklan di dalam situs berita tidak bisa diblokir dari app. ' +
+            'Tips: buka <b>Mode Baca</b> (ikon aA di Safari, atau “Tampilan sederhana” di Chrome) supaya bersih tanpa iklan' + (isOwner() ? ', dan ketuk “Sembunyikan” untuk situs yang terlalu banyak iklan.' : '.') + '</p>';
+        }
+      } else if (st.kabarTab === 'trend') {
+        html += k.trends && k.trends.length ? '<small class="mu" style="display:block;margin:10px 0 2px">📈 Lagi ramai dicari di Indonesia · ketuk untuk lihat di Google</small>' +
+          k.trends.slice(0, 8).map(function (t, i) {
+            return '<div class="trend"><b style="width:18px;font-size:13px">' + (i + 1) + '</b>' +
+              ext('https://www.google.com/search?q=' + encodeURIComponent(t), esc(t) + ' ↗', 'flex:1;min-width:0;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;overflow-wrap:anywhere') +
+              '<button class="tiny" type="button" data-t="' + esc(t) + '">+ Ide</button></div>';
+          }).join('') + '<div style="height:8px"></div>' : '<p class="empty">Tren belum tersedia.</p>';
+      } else if (st.kabarTab === 'music') {
+        var yt = k.music.length && k.music[0].src === 'youtube';
+        html += '<small class="mu" style="display:block;margin:10px 0 4px">' + (yt ? '🎬 Musik yang lagi trending di YouTube Indonesia · ketuk untuk putar' : '🎧 Lagu paling banyak diputar di Indonesia · ketuk untuk cari di TikTok') + '</small>' +
+          (k.music.length ? '<div>' + k.music.slice(0, 10).map(function (m, i) {
+            var tt = 'https://www.tiktok.com/search?q=' + encodeURIComponent(m.name + ' ' + m.artist);
+            return '<div class="song' + (yt ? ' yt' : '') + '">' +
+              '<a href="' + esc(yt ? m.url : tt) + '" target="_blank" rel="noopener" style="display:contents;color:inherit;text-decoration:none">' +
+              (m.art ? '<img src="' + esc(m.art) + '" alt="" loading="lazy">' : '<span style="width:44px;height:44px;border-radius:10px;background:var(--pink-soft);display:grid;place-items:center">🎵</span>') +
+              '<span class="t"><b>' + (i + 1) + '. ' + esc(m.name) + '</b><span>' + esc(m.artist) + (m.views ? ' · ' + num(m.views) + ' x ditonton' : '') + '</span></span></a>' +
+              (yt ? '<a class="tiny" href="' + esc(tt) + '" target="_blank" rel="noopener" style="text-decoration:none">TikTok ↗</a>' : '<span class="mu" style="font-size:18px">↗</span>') + '</div>';
+          }).join('') + '</div>' : '<p class="empty">Daftar lagu belum tersedia.</p>') +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 12px">' +
+          ext('https://www.youtube.com/feed/trending?bp=4gINGgt5dG1hX2NoYXJ0cw%3D%3D', '▶️ Trending YouTube ↗', '').replace('<a ', '<a class="btn-line btn-sm" ') +
+          ext('https://ads.tiktok.com/business/creativecenter/inspiration/popular/music/pc/en', '🎵 Viral TikTok ↗', '').replace('<a ', '<a class="btn-line btn-sm" ') +
+          ext('https://open.spotify.com/search/' + encodeURIComponent('viral indonesia'), '🎧 Spotify ↗', '').replace('<a ', '<a class="btn-line btn-sm" ') + '</div>';
+      } else {
+        html += '<small class="mu" style="display:block;margin:10px 0 8px">📌 Inspirasi visual di Pinterest · ketuk untuk membuka</small>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">' + (k.pins || []).map(function (q) {
+            return ext('https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(q), esc(q) + ' ↗', '').replace('<a ', '<a class="fchip" ');
+          }).join('') + '</div>' +
+          '<div style="padding:12px 0">' + ext('https://trends.pinterest.com/?country=ID', '📈 Lihat Pinterest Trends Indonesia ↗', '').replace('<a ', '<a class="btn btn-sm" ') + '</div>' +
+          '<p class="mu" style="font-size:12px;padding-bottom:12px">Data tren Pinterest belum bisa ditarik otomatis karena butuh akses API bisnis dari Pinterest, jadi ditampilkan sebagai pintasan.</p>';
+      }
+      card.innerHTML = html;
+      card.querySelectorAll('[data-tab]').forEach(function (b) { b.onclick = function () { st.kabarTab = b.dataset.tab; draw(); }; });
       card.querySelectorAll('[data-k]').forEach(function (b) { b.onclick = function () { st.kabarCat = b.dataset.k; draw(); }; });
       card.querySelectorAll('[data-t]').forEach(function (b) {
         b.onclick = async function () {
           b.disabled = true;
           try { st.ideas = await call('saveIdea', { text: b.dataset.t, source: 'tren Google' }); b.textContent = '✓ Masuk'; toast('Masuk Bank ide 💡'); }
+          catch (e) { b.disabled = false; fail(e); }
+        };
+      });
+      card.querySelectorAll('[data-src]').forEach(function (b) {
+        b.onclick = async function () {
+          if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = 'Ketuk lagi untuk sembunyikan ' + b.dataset.src; setTimeout(function () { if (b.isConnected) { delete b.dataset.armed; b.textContent = 'Sembunyikan'; } }, 3500); return; }
+          b.disabled = true;
+          try { var res = await call('hideKabarSource', b.dataset.src); k = d.kabar = res; topics = k.topics.filter(function (t) { return t.items && t.items.length; }); if (!topics.some(function (t) { return t.key === st.kabarCat; }) && topics.length) st.kabarCat = topics[0].key; draw(); toast('Berita dari ' + b.dataset.src + ' tidak ditampilkan lagi'); }
           catch (e) { b.disabled = false; fail(e); }
         };
       });
@@ -2363,6 +2426,8 @@
       { id: 'i2', text: '5 warna scarf yang cocok untuk kulit sawo matang', pilar: '💡 Tips', source: 'request follower', note: 'Pakai model 2 orang', date: T }
     ];
     var KABAR = { at: new Date(Date.now() - 2 * 3600000).toISOString(), trends: ['hijab pashmina kondangan', 'tren warna akhir tahun', 'promo 11.11', 'outfit kerja simpel'],
+      music: [{ name: 'Contoh lagu trending', artist: 'Penyanyi A', art: '', url: 'https://www.youtube.com', views: 2450000, src: 'youtube' }, { name: 'Lagu viral kedua', artist: 'Band B', art: '', url: 'https://www.youtube.com', views: 980000, src: 'youtube' }, { name: 'Lagu ketiga', artist: 'Penyanyi C', art: '', url: 'https://www.youtube.com', views: 512000, src: 'youtube' }],
+      pins: ['hijab outfit', 'pashmina style', 'modest fashion', 'scarf styling', 'hijab color palette', 'outfit kondangan hijab'],
       topics: [
         { key: 'fashion', label: 'Fashion muslim', emoji: '🧕', items: [{ title: 'Contoh judul: warna earth tone tetap favorit hijab akhir tahun', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 2 * 3600000).toISOString() }, { title: 'Contoh judul: tips padu padan scarf untuk acara formal', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 5 * 3600000).toISOString() }] },
         { key: 'sosmed', label: 'Media sosial', emoji: '📱', items: [{ title: 'Contoh judul: fitur baru untuk kreator di Instagram', source: 'Contoh media', link: 'https://news.google.com', at: new Date(Date.now() - 3 * 3600000).toISOString() }] },
@@ -2432,6 +2497,7 @@
       saveIdea: function (t, d) { auth(t); var x = d.id ? ideas.filter(function (i) { return i.id === d.id; })[0] : null; if (!x) { x = { id: 'i' + (++seq), date: T }; ideas.unshift(x); } x.text = d.text; x.pilar = d.pilar || ''; x.source = d.source || ''; x.note = d.note || ''; return ideas; },
       deleteIdea: function (t, id) { auth(t); ideas = ideas.filter(function (i) { return i.id !== id; }); return ideas; },
       getKabar: function (t) { auth(t); return KABAR; },
+      hideKabarSource: function (t, src) { auth(t, true); KABAR.topics.forEach(function (tp) { tp.items = tp.items.filter(function (n) { return n.source !== src; }); }); return KABAR; },
       updateNote: function (t, id, text) { auth(t, true); notes.forEach(function (n) { if (n.id === id) n.text = text; }); return notes; },
       updateDayItem: function (t, id, d) { var u = auth(t), f = findDay(u, id), it = days[f.k][f.i]; it.text = d.text; if (it.type === 'Jadwal') { it.start = d.start; it.end = d.end; it.cat = d.cat; } return dayOf(u, f.k.split('|')[1]); },
       deleteAgenda: function (t, id) { auth(t, true); agenda = agenda.filter(function (a) { return a.id !== id; }); return upcoming(); },
