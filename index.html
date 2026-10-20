@@ -759,11 +759,10 @@
 
 <dialog id="finDlg" aria-labelledby="finTitle">
   <div class="dlg">
-    <div class="dlg-head"><div><h2 id="finTitle">Atur keuangan</h2><p>Saldo awal, target, dan anggaran bulanan</p></div><button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-head"><div><h2 id="finTitle">Atur keuangan</h2><p>Saldo awal dan anggaran bulanan</p></div><button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="dlg-body">
       <label class="lbl">Saldo kas awal<span class="rp"><span>Rp</span><input class="in" id="finOpen" inputmode="numeric" placeholder="0"></span></label>
       <small class="mu" style="font-size:12px;margin-top:-8px">Uang kas sebelum mulai dicatat di app. Saldo = saldo awal + semua pemasukan − semua pengeluaran.</small>
-      <label class="lbl">Target penjualan per bulan<span class="rp"><span>Rp</span><input class="in" id="finTarget" inputmode="numeric" placeholder="0"></span></label>
       <div class="lbl">Anggaran pengeluaran per bulan<small class="mu" style="font-size:12px;font-weight:400">Kosongkan kalau tidak dibatasi</small></div>
       <div id="finBud" class="stack" style="gap:10px"></div>
       <div class="dlg-actions"><button class="btn-line" type="button" data-close>Batal</button><button class="btn" type="button" id="finSave">Simpan</button></div>
@@ -880,7 +879,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-18';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-19';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
@@ -2671,19 +2670,6 @@
     left.appendChild(el('div', 'hero', '<p style="font-weight:500">Saldo kas sekarang</p><div class="big">' + rpSigned(f.balance || 0).replace('+', '') + '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1"><span class="chip">Hari ini +' + rp(f.todayIn) + '</span><span class="chip">−' + rp(f.todayOut) + '</span></div>'));
 
-    var tg = f.target || { goal: 0, sales: 0, daysLeft: 0 };
-    var tc = el('div', 'card');
-    if (tg.goal > 0) {
-      var pc = Math.min(100, Math.round(tg.sales / tg.goal * 100)), need = Math.max(0, tg.goal - tg.sales);
-      tc.innerHTML = '<div class="sec"><h3>🎯 Target penjualan ' + esc(monthLabel(f.month).split(' ')[0]) + '</h3><span class="chip">' + pc + '%</span></div>' +
-        '<div style="font-size:24px;font-weight:600;margin-top:8px">' + short(tg.sales) + ' <span class="mu" style="font-size:15px;font-weight:400">/ ' + short(tg.goal) + '</span></div>' +
-        '<div class="bar" style="margin:8px 0 6px;height:10px"><span style="width:' + pc + '%"></span></div>' +
-        '<p class="mu" style="font-size:13px;padding-bottom:12px">' + (need === 0 ? 'Target tercapai! 🎉' : tg.daysLeft > 0 ? 'Butuh ±' + rp(Math.ceil(need / tg.daysLeft)) + ' per hari untuk ' + tg.daysLeft + ' hari tersisa' : 'Kurang ' + rp(need) + ' dari target') + '</p>';
-    } else {
-      tc.innerHTML = '<div class="sec"><h3>🎯 Target penjualan</h3><button class="link" type="button" data-cfg style="color:var(--rose)">Atur</button></div><p class="empty">Belum ada target. Atur target penjualan per bulan supaya progresnya terlihat di sini.</p>';
-    }
-    left.appendChild(tc);
-
     var bc = el('div', 'card', '<div class="sec"><h3>📊 Anggaran bulan ini</h3><button class="link" type="button" data-cfg style="color:var(--rose)">Atur</button></div>');
     var buds = (f.budgets || []);
     if (!buds.length) bc.appendChild(el('p', 'empty', 'Belum ada anggaran. Ketuk Atur untuk memberi batas per kategori, misalnya iklan atau belanja bahan.'));
@@ -2696,7 +2682,6 @@
     if (buds.length) bc.appendChild(el('div', '', '<div style="height:6px"></div>'));
     left.appendChild(bc);
     box.querySelectorAll('[data-cfg]').forEach(function (b) { b.onclick = openFinCfg; });
-    tc.querySelectorAll('[data-cfg]').forEach(function (b) { b.onclick = openFinCfg; });
 
     right.appendChild(monthNav(monthLabel(f.month) + ' <span>· masuk ' + short(mIn) + ' · keluar ' + short(mOut) + '</span>', function (n) { st.fMonth = shiftMonth(st.fMonth, n); loadFinance(); }, f.month >= st.boot.today.slice(0, 7)));
     var card = el('div', 'card', '<div class="sec"><h3>Transaksi</h3></div>');
@@ -2732,7 +2717,7 @@
   function openFinCfg() {
     var c = (st.fin && st.fin.cfg) || { opening: 0, target: 0, budgets: {} };
     var fmt = function (n) { return n ? Number(n).toLocaleString('id-ID') : ''; };
-    $('finOpen').value = fmt(c.opening); $('finTarget').value = fmt(c.target);
+    $('finOpen').value = fmt(c.opening);
     $('finBud').innerHTML = ((st.fin && st.fin.outCats) || st.boot.moneyCats['Pengeluaran']).map(function (k) {
       return '<label class="lbl" style="flex-direction:row;align-items:center;gap:10px"><span style="flex:1;font-weight:500">' + esc(k) + '</span><span class="rp" style="flex:1"><span>Rp</span><input class="in" data-bud="' + esc(k) + '" inputmode="numeric" placeholder="—" value="' + fmt((c.budgets || {})[k]) + '"></span></label>';
     }).join('');
@@ -2745,7 +2730,7 @@
     var budgets = {};
     $('finBud').querySelectorAll('[data-bud]').forEach(function (i) { var v = n(i.value); if (v) budgets[i.dataset.bud] = v; });
     st.busy = true; $('finSave').disabled = true;
-    try { st.fin = await call('saveFinanceCfg', { opening: n($('finOpen').value), target: n($('finTarget').value), budgets: budgets }, st.fMonth); invalidate(); $('finDlg').close(); renderFinance(); toast('Pengaturan keuangan disimpan'); }
+    try { st.fin = await call('saveFinanceCfg', { opening: n($('finOpen').value), target: 0, budgets: budgets }, st.fMonth); invalidate(); $('finDlg').close(); renderFinance(); toast('Pengaturan keuangan disimpan'); }
     catch (e) { fail(e); }
     finally { st.busy = false; $('finSave').disabled = false; }
   }
