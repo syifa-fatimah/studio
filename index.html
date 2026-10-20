@@ -751,7 +751,7 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-11';  // samakan dengan APP_VERSION di Code.gs
+  var APP_VERSION = '2026.10.20-12';  // samakan dengan APP_VERSION di Code.gs
 
   var I = {
     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>',
@@ -1356,18 +1356,19 @@
             'Tips: buka <b>Mode Baca</b> (ikon aA di Safari, atau “Tampilan sederhana” di Chrome) supaya bersih tanpa iklan' + (isOwner() ? ', dan ketuk “Sembunyikan” untuk situs yang terlalu banyak iklan.' : '.') + '</p>';
         }
       } else if (st.kabarTab === 'music') {
-        var yt = k.music.length && k.music[0].src === 'youtube';
+        var yt = k.music.some(function (m) { return m.src === 'youtube'; });
         var limit = st.musicAll ? 10 : 5;
-        html += '<small class="mu" style="display:block;margin:10px 0 2px">' + (yt ? '🎬 Lagi trending di YouTube Indonesia · ketuk ♫ untuk musiknya saja, ketuk judul untuk videonya' : '🎧 Lagu paling banyak diputar di Indonesia · ketuk ♫ untuk cuplikan 30 detik') + '</small>' +
+        html += '<small class="mu" style="display:block;margin:10px 0 2px">🎧 Lagu pop paling banyak diputar di Indonesia · ketuk ♫ untuk musiknya, ketuk judul untuk ' + (yt ? 'videonya' : 'cari di YouTube') + '</small>' +
           (k.music.length ? '<div>' + k.music.slice(0, limit).map(function (m, i) {
             var q = m.name + ' ' + m.artist;
-            var vid = yt ? (String(m.url).match(/[?&]v=([\w-]{6,})/) || [])[1] : '';
+            var isYt = m.src === 'youtube';
+            var vid = isYt ? (String(m.url).match(/[?&]v=([\w-]{6,})/) || [])[1] : '';
             var playable = vid || m.preview;
-            var href = yt ? m.url : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
+            var href = isYt ? m.url : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
             var audioOk = !!m.preview;
             var titleAttr = vid ? 'data-play="' + i + '"' : 'data-app="youtube"';
             return '<div class="vrow">' +
-              '<button class="vthumb btn0' + (yt ? '' : ' sq') + '" type="button" ' + (audioOk ? 'data-audio="' + i + '" aria-label="Putar musiknya saja: ' + esc(m.name) + '"' : (vid ? 'data-play="' + i + '" aria-label="Putar video"' : 'data-app="youtube"')) + '>' +
+              '<button class="vthumb btn0' + (isYt ? '' : ' sq') + '" type="button" ' + (audioOk ? 'data-audio="' + i + '" aria-label="Putar musiknya saja: ' + esc(m.name) + '"' : (vid ? 'data-play="' + i + '" aria-label="Putar video"' : 'data-app="youtube"')) + '>' +
                 (m.art ? '<img src="' + esc(m.art) + '" alt="" loading="lazy">' : '🎵') +
                 '<span class="rk">' + (i + 1) + '</span><span class="pl">' + (audioOk ? '♫' : '▶') + '</span></button>' +
               '<a class="t" href="' + esc(href) + '" target="_blank" rel="noopener" ' + titleAttr + ' data-q="' + esc(q) + '" style="color:inherit;text-decoration:none"><b>' + esc(m.name) + '</b><span>' + esc(m.artist) + (m.views ? ' · ' + num(m.views) + ' ditonton' : '') + '</span></a></div>';
