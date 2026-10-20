@@ -334,6 +334,13 @@
   .daypick button[aria-pressed="true"] { background: var(--fill); border-color: var(--fill); color: #fff; }
   .quick { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
   .quick button { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+  /* Deretan chip/tab: tanpa batang geser. HP digeser dengan jari, PC berjajar ke bawah. */
+  .fchips, .seg, .quick, .chips { scrollbar-width: none; -ms-overflow-style: none; }
+  .fchips::-webkit-scrollbar, .seg::-webkit-scrollbar, .quick::-webkit-scrollbar, .chips::-webkit-scrollbar { display: none; }
+  @media (hover: hover) and (pointer: fine) {
+    .fchips, .quick { flex-wrap: wrap; overflow: visible; }
+    .fchips .lab { min-width: 0; margin-right: 4px; }
+  }
   .hl { background: var(--t-pink); border-radius: 4px; padding: 0 2px; color: inherit; }
   .fchips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; align-items: center; }
   .fchips .lab { font-size: 12px; color: var(--muted); flex: none; min-width: 58px; }
