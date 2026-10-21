@@ -2639,10 +2639,12 @@
         });
       };
     });
+    box.querySelectorAll('[data-edit^="TB"],.del[data-id^="TB"]').forEach(function (b) { b.remove(); });
   }
 
   var agEdit = null, agAfter = null;
   function openAgendaDlg(a, after) {
+    if (a && /^TB/.test(String(a.id || ''))) { toast('Agenda ini dari ThinKerBelle. Ubahnya lewat app tim ya.'); return; }
     agEdit = a && a.id ? a : null; agAfter = after || null;
     var sel = $('agTag');
     if (!sel.options.length) sel.innerHTML = st.boot.tags.map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
