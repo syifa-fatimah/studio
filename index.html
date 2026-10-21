@@ -503,6 +503,18 @@
   .demo-note { border: 1px dashed var(--pink); border-radius: 16px; padding: 8px 14px; font-size: 13px; color: var(--muted); }
   .agt { min-height: 40px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 0 16px; font-weight: 500; font-size: 14px; }
   .agt[aria-pressed="true"] { background: var(--fill); border-color: var(--fill); color: #fff; }
+  .ntl { background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 6px 20px 16px; display: block !important; }
+  .ntr { display: grid; grid-template-columns: 40px 18px minmax(0, 1fr); gap: 0 12px; padding: 16px 0; border-bottom: 2px dotted var(--line); }
+  .ntd { text-align: right; color: var(--rose); font-size: 12px; line-height: 1.15; padding-top: 1px; } .ntd b { display: block; font-size: 18px; font-weight: 600; }
+  .ntn { position: relative; display: flex; justify-content: center; } .ntn::before { content: ''; position: absolute; top: 0; bottom: -18px; width: 2px; background: var(--rose); opacity: .45; }
+  .ntn i { position: relative; width: 16px; height: 16px; border-radius: 50%; background: var(--rose); box-shadow: 0 0 0 4px var(--surface); margin-top: 3px; }
+  .ntn i::after { content: ''; position: absolute; inset: 4px; border-radius: 50%; background: var(--nc, #fff); }
+  .ntend { margin-left: 52px; width: 18px; height: 6px; border-top: 2px solid var(--rose); border-bottom: 2px solid var(--rose); opacity: .45; }
+  .nth { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; } .ntt { font-size: 15.5px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+  .ntp { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; flex: none; max-width: 58%; }
+  .ntp .link, .ntp .del { border: 1px solid var(--rose); color: var(--rose); background: transparent; border-radius: 999px; padding: 4px 11px; min-height: 0; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .ntb small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 4px; } .ntb p { margin: 10px 0 0; font-style: italic; opacity: .85; font-size: 14px; line-height: 1.6; white-space: pre-line; }
+  @media (max-width: 899px) { .ntb { display: flex; flex-direction: column; } .nth { display: contents; } .ntp { order: 5; justify-content: flex-start; max-width: none; margin-top: 10px; } }
   #toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); z-index: 20; transform: translate(-50%, 16px); opacity: 0; pointer-events: none; background: var(--fill); color: #fff; padding: 11px 20px; border-radius: 999px; font-size: 14px; max-width: calc(100% - 32px); transition: opacity .2s, transform .2s; }
   #toast.show { opacity: 1; transform: translate(-50%, 0); }
   #toast.error { background: var(--danger); }
@@ -2872,10 +2884,18 @@
     st.notes = list;
     var box = $('ntList');
     if (!list.length) { box.innerHTML = '<p class="empty" style="grid-column:1/-1">Belum ada catatan. Tulis yang pertama di atas.</p>'; return; }
-    box.innerHTML = list.map(function (n) { return '<div class="note" style="background:' + esc(n.color) + '">' + (/#atin|#tim/i.test(n.text) ? '<span style="display:flex;gap:6px;flex-wrap:wrap">' + (/#atin/i.test(n.text) ? '<span class="chip">Dibagikan ke Atin</span>' : '') + (/#tim/i.test(n.text) ? '<span class="chip">Dibagikan ke tim</span>' : '') + '</span>' : '') +
-      '<p>' + esc(n.text.replace(/#atin|#tim/ig, '').replace(/\s{2,}/g, ' ').trim()) + '</p><span style="display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap">' +
-      '<button class="link" type="button" data-share="atin" data-nid="' + esc(n.id) + '" style="color:var(--rose);padding:6px 2px">' + (/#atin/i.test(n.text) ? 'Batal bagikan Atin' : 'Bagikan ke Atin') + '</button>' +
-      '<button class="link" type="button" data-share="tim" data-nid="' + esc(n.id) + '" style="color:var(--rose);padding:6px 2px">' + (/#tim/i.test(n.text) ? 'Batal bagikan tim' : 'Bagikan ke tim') + '</button><button class="link" type="button" data-edit="' + esc(n.id) + '" style="color:var(--rose);padding:6px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(n.id) + '">Hapus</button></span></div>'; }).join('');
+    box.className = 'ntl';
+    box.innerHTML = list.map(function (n) {
+      var tx = n.text.replace(/#atin|#tim/ig, '').replace(/[ \t]{2,}/g, ' ').trim(), baris = tx.split('\n'), judul = baris.shift(), isi = baris.join('\n').trim();
+      var d = n.date ? parseDate(n.date) : null, tags = [];
+      if (/#atin/i.test(n.text)) tags.push('Dibagikan ke Atin'); if (/#tim/i.test(n.text)) tags.push('Dibagikan ke tim');
+      return '<div class="ntr"><div class="ntd">' + (d ? '<span>' + BULAN_SHORT[d.getMonth()] + '</span><b>' + d.getDate() + '</b>' : '') + '</div><div class="ntn"><i style="--nc:' + esc(n.color) + '"></i></div>' +
+        '<div class="ntb"><div class="nth"><b class="ntt">' + esc(judul) + '</b><span class="ntp">' +
+        '<button class="link" type="button" data-share="atin" data-nid="' + esc(n.id) + '">' + (/#atin/i.test(n.text) ? 'Batal Atin' : 'Bagikan ke Atin') + '</button>' +
+        '<button class="link" type="button" data-share="tim" data-nid="' + esc(n.id) + '">' + (/#tim/i.test(n.text) ? 'Batal tim' : 'Bagikan ke tim') + '</button>' +
+        '<button class="link" type="button" data-edit="' + esc(n.id) + '">Ubah</button><button class="del" type="button" data-id="' + esc(n.id) + '">Hapus</button></span></div>' +
+        '<small>' + esc(n.by || 'Syifa') + (tags.length ? ' · ' + esc(tags.join(' · ')) : ' · Pribadi') + '</small>' + (isi ? '<p>' + esc(isi) + '</p>' : '') + '</div></div>';
+    }).join('') + '<div class="ntend"></div>';
     box.querySelectorAll('[data-edit]').forEach(function (b) {
       b.onclick = function () { var n = list.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (!n) return; noteEdit = n; $('ndText').value = n.text; $('noteDlg').showModal(); };
     });
