@@ -233,6 +233,13 @@
   .bar span { display: block; height: 100%; background: var(--rose); border-radius: 8px; }
   .barrow { padding: 8px 0; }
   .kinlap { margin-top: 6px; border-top: 1px dashed var(--line); padding-top: 8px; }
+  details.lipat { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; margin: 0 0 12px; overflow: hidden; }
+  details.lipat summary { list-style: none; display: flex; align-items: center; gap: 8px; padding: 16px 18px; min-height: 58px; cursor: pointer; }
+  details.lipat summary::-webkit-details-marker { display: none; }
+  details.lipat summary b { flex: 1; font-size: 16px; }
+  details.lipat summary .cv { color: var(--muted); transition: transform .2s; }
+  details.lipat[open] summary .cv { transform: rotate(180deg); }
+  details.lipat > .card.dalam, details.lipat > .dalam { border: 0; box-shadow: none; margin: 0; padding-top: 0; background: none; }
   .kinjudul { font-size: 14px; font-weight: 600; color: var(--rose); padding: 6px 0 2px; }
   .kinlap .hasil { display: inline-block; margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--rose); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; text-decoration: none; }
   .kinlap summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--rose); list-style: none; padding: 6px 0; }
@@ -1771,6 +1778,17 @@
     return c;
   }
 
+  // Di HP: kartu tambahan di beranda dilipat jadi baris ringkas (ketuk untuk membuka), supaya tidak padat
+  var LIPAT_SS = {}; try { LIPAT_SS = JSON.parse(localStorage.getItem('ss_lipat') || '{}') || {}; } catch (e) {}
+  function taruh(induk, kartu, kunci, judul, info) {
+    if (window.innerWidth >= 760) { induk.appendChild(kartu); return; }
+    var d = document.createElement('details'); d.className = 'lipat';
+    if (LIPAT_SS[kunci]) d.open = true;
+    d.innerHTML = '<summary><b>' + esc(judul) + '</b>' + (info ? '<span class="chip">' + esc(info) + '</span>' : '') + '<span class="cv">▾</span></summary>';
+    d.addEventListener('toggle', function () { LIPAT_SS[kunci] = d.open; try { localStorage.setItem('ss_lipat', JSON.stringify(LIPAT_SS)); } catch (e) {} });
+    var sec = kartu.querySelector && kartu.querySelector('.sec h3'); if (sec && sec.parentNode && sec.parentNode.children.length === 1) sec.parentNode.remove(); else if (sec) sec.remove();
+    kartu.classList.add('dalam'); d.appendChild(kartu); induk.appendChild(d);
+  }
   function renderDash() {
     var d = st.dash, today = d.today, w0 = d.week[0];
     var open = w0.posts.filter(function (p) { return p.status !== S.DONE; });
@@ -1816,21 +1834,21 @@
       mc.type = 'button'; mc.onclick = function () { go('uang'); };
       left.appendChild(mc);
     }
-    left.appendChild(kabarCard(d));
-    if (d.weekly) right.appendChild(weeklyCard(d.weekly));
+    taruh(left, kabarCard(d), 'kabar', '📰 Kabar hari ini', '');
+    if (d.weekly) taruh(right, weeklyCard(d.weekly), 'mingguan', '🗓️ Ringkasan mingguan', '');
 
     var targets = d.focus.filter(function (x) { return x.type === 'Target'; });
     var fc = el('div', 'card', '<div class="sec"><h3>Fokus hari ini</h3><button class="link" type="button" data-go="harian">Buka jadwal</button></div>');
     if (targets.length) targets.forEach(function (t) { fc.appendChild(checkRow(t, function () { forget('dash'); loadDash(); })); });
     else fc.appendChild(el('p', 'empty', 'Belum ada target. Tulis 1–3 hal terpenting hari ini di Jadwal harian.'));
-    right.appendChild(fc);
-    right.appendChild(routineCard(d.routines || [], today, function (res) { d.routines = res.routines; forget('dash'); }));
+    taruh(right, fc, 'fokus', '🎯 Fokus hari ini', targets.length ? targets.filter(function (x) { return !x.done; }).length + ' belum' : '');
+    taruh(right, routineCard(d.routines || [], today, function (res) { d.routines = res.routines; forget('dash'); }), 'rutin', '🔁 Rutinitas', (d.routines || []).length ? String((d.routines || []).length) : '');
 
     var c = d.content;
-    right.appendChild(el('div', 'card', '<div class="sec"><h3>Ringkasan</h3><button class="link" type="button" data-go="report">Lihat report</button></div>' +
+    taruh(right, el('div', 'card', '<div class="sec"><h3>Ringkasan</h3><button class="link" type="button" data-go="report">Lihat report</button></div>' +
       '<div class="row"><span class="ic" style="background:var(--t-mint)">' + I.cal + '</span><span class="t"><small>Konten bulan ini</small><b>' + c.done + ' dari ' + c.total + ' sudah tayang</b><span>' + c.sched + ' terjadwal, ' + c.open + ' masih proses</span></span></div>' +
       (d.trips.length ? '<div class="row"><span class="ic" style="background:var(--t-pink)">' + I.clock + '</span><span class="t"><small>Dinas berikutnya</small><b>' + esc(d.trips[0].title) + '</b><span>' + esc(dayLabel(d.trips[0].date)) + (d.trips[0].time ? ', ' + esc(d.trips[0].time) : '') + '</span></span></div>' : '') +
-      '<button class="row" type="button" data-go="catatan" style="width:100%;border-left:0;border-right:0;border-bottom:0;background:none;text-align:left;cursor:pointer"><span class="ic" style="background:var(--t-lilac)">' + I.note + '</span><span class="t"><small>' + (d.notes.length ? 'Catatan terbaru · ' + d.noteCount + ' catatan' : 'Catatan') + '</small><b>' + esc(d.notes.length ? d.notes[0].text : 'Tulis catatan singkat') + '</b></span><span class="mu" style="font-size:18px">›</span></button>'));
+      '<button class="row" type="button" data-go="catatan" style="width:100%;border-left:0;border-right:0;border-bottom:0;background:none;text-align:left;cursor:pointer"><span class="ic" style="background:var(--t-lilac)">' + I.note + '</span><span class="t"><small>' + (d.notes.length ? 'Catatan terbaru · ' + d.noteCount + ' catatan' : 'Catatan') + '</small><b>' + esc(d.notes.length ? d.notes[0].text : 'Tulis catatan singkat') + '</b></span><span class="mu" style="font-size:18px">›</span></button>'), 'ringkasan', '📊 Ringkasan konten', c.total ? c.done + '/' + c.total + ' tayang' : '');
     var semuaAg = st.agenda || [].concat.apply([], d.week.map(function (w) { return w.agenda; }));
     var up = semuaAg.filter(function (a) { return a.date >= today; }).slice(0, 5);
     var ac = el('div', 'card', '<div class="sec"><h3>Agenda akan datang</h3><button class="link" type="button">Lihat semua</button></div>' + (up.length ? up.map(function (a) {
@@ -1838,8 +1856,8 @@
         '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span></div>';
     }).join('') : '<p class="empty">Belum ada agenda yang akan datang.</p>'));
     ac.querySelector('.link').onclick = function () { go('agenda'); };
-    right.appendChild(ac);
-    if (d.tim) right.appendChild(timCard(d.tim));
+    taruh(right, ac, 'agenda', '📅 Agenda akan datang', up.length ? String(up.length) : '');
+    if (d.tim) taruh(right, timCard(d.tim), 'tim', '👥 Tim Arabelle', d.tim.error ? '' : d.tim.lapor + '/' + d.tim.wajib + ' lapor');
     right.querySelectorAll('[data-go]').forEach(function (b) {
       b.onclick = function () { if (b.dataset.go === 'report') { st.kTab = 'report'; go('konten'); } else go(b.dataset.go); };
     });
