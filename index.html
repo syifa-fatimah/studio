@@ -672,6 +672,16 @@
   </div>
 </dialog>
 
+<dialog id="kinDlg" aria-labelledby="kinTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div><h2 id="kinTitle">Kinerja Tim Arabelle</h2><p id="kinSub">Dari ThinKerBelle</p></div>
+      <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dlg-body" id="kinBody"></div>
+  </div>
+</dialog>
+
 <dialog id="agDlg" aria-labelledby="agTitleH">
   <div class="dlg">
     <div class="dlg-head">
@@ -1472,11 +1482,35 @@
   }
 
   // ---------- Kartu Tim Arabelle (dari ThinKerBelle) ----------
+  var kinPeriode = 'minggu';
+  function bukaKinerja(t) {
+    var k = t.kinerja; if (!k || k.error) { toast(k && k.error ? 'Kinerja belum terbaca: ' + k.error : 'Data kinerja belum tersedia', true); return; }
+    var r = k[kinPeriode], pct = function (a, b) { return b ? Math.round(a / b * 100) : 0; };
+    $('kinSub').textContent = shortDate(r.dari) + ' – ' + shortDate(r.sampai) + ' · ' + r.hariKerja + ' hari kerja';
+    var warna = function (o) { return o.label === 'Baik' ? '#DDF2E6' : o.label === 'Cukup' ? 'var(--t-peach)' : 'var(--t-pink)'; };
+    var bar = function (lbl, a, b, txt) { return '<div class="barrow"><div class="top"><span>' + lbl + '</span><b>' + txt + '</b></div><div class="bar"><span style="width:' + (b ? Math.min(100, pct(a, b)) : 0) + '%"></span></div></div>'; };
+    var h = '<div class="seg" role="tablist"><button type="button" data-p="minggu" aria-selected="' + (kinPeriode === 'minggu') + '">Minggu ini</button><button type="button" data-p="bulan" aria-selected="' + (kinPeriode === 'bulan') + '">Bulan ini</button></div>';
+    h += '<div class="kpis">' +
+      '<div class="kpi" style="background:var(--t-pink)"><small>Laporan masuk</small><b>' + pct(r.total.lapor, r.total.wajib) + '%</b><span class="dl mu">' + r.total.lapor + ' dari ' + r.total.wajib + ' hari</span></div>' +
+      '<div class="kpi" style="background:var(--t-lilac)"><small>Posting tayang</small><b>' + pct(r.total.tayang, r.total.post) + '%</b><span class="dl mu">' + r.total.tayang + ' dari ' + r.total.post + ' jadwal</span></div>' +
+      '<div class="kpi" style="background:var(--t-peach)"><small>Hari izin</small><b>' + r.total.izin + '</b><span class="dl mu">izin, sakit, cuti</span></div>' +
+      '<div class="kpi" style="background:var(--t-sky)"><small>Anggota</small><b>' + r.orang.length + '</b><span class="dl mu">dinilai</span></div></div>';
+    h += r.orang.map(function (o) {
+      return '<div class="card" style="padding-bottom:14px"><div class="sec"><h3>' + esc(o.nama) + '</h3><span class="chip" style="background:' + warna(o) + '">' + o.skor + ' · ' + o.label + '</span></div>' +
+        bar('Laporan harian', o.lapor, o.wajib, o.lapor + ' / ' + o.wajib + ' hari') +
+        (o.post ? bar('Posting tayang', o.tayang, o.post, o.tayang + ' / ' + o.post) : '<div class="barrow"><div class="top"><span>Posting tayang</span><b class="mu">tidak ada jadwal</b></div></div>') +
+        '<div class="barrow"><div class="top"><span>Rata-rata progres</span><b>' + (o.progres === null ? '–' : o.progres + '%') + '</b></div></div>' +
+        (o.izin ? '<div class="barrow"><div class="top"><span>Izin / sakit / cuti</span><b>' + o.izin + ' hari</b></div></div>' : '') + '</div>';
+    }).join('') + '<p class="mu">Skor = laporan harian 60% + posting tayang 40% (kalau tidak ada jadwal posting, skor = laporan harian). Hari kerja Senin–Sabtu, dikurangi hari izin.</p>';
+    $('kinBody').innerHTML = h;
+    $('kinBody').querySelectorAll('[data-p]').forEach(function (b) { b.onclick = function () { kinPeriode = b.dataset.p; bukaKinerja(t); }; });
+    if (!$('kinDlg').open) $('kinDlg').showModal();
+  }
   function timCard(t) {
     var row = function (bg, icon, small, title, sub) {
       return '<div class="row"><span class="ic" style="background:' + bg + '">' + icon + '</span><span class="t"><small>' + esc(small) + '</small><b>' + esc(title) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span></div>';
     };
-    var h = '<div class="sec"><h3>Tim Arabelle</h3><span class="mu">dari ThinKerBelle</span></div>';
+    var h = '<div class="sec"><h3>Tim Arabelle</h3>' + (t.kinerja && !t.kinerja.error ? '<button class="link" type="button" data-kinerja>Kinerja tim</button>' : '<span class="mu">dari ThinKerBelle</span>') + '</div>';
     if (t.error) return el('div', 'card', h + '<p class="empty">Belum bisa membaca data tim: ' + esc(t.error) + '</p>');
     h += row('var(--t-mint)', I.list, 'Laporan hari ini', t.lapor + ' dari ' + t.wajib + ' sudah lapor', t.belum.length ? 'Belum: ' + t.belum.join(', ') : 'Semua sudah lapor 🎉');
     h += row('var(--t-sky)', I.cal, 'Posting tim hari ini', t.tayang + ' dari ' + t.post + ' sudah tayang', '');
@@ -1484,7 +1518,8 @@
     (t.agenda || []).slice(0, 3).forEach(function (a) { h += row('var(--t-lilac)', I.clock, dayLabel(a.date), a.text, a.tim ? '👥 ' + a.tim : ''); });
     (t.perintah || []).forEach(function (p) { h += row('var(--t-peach)', I.note, 'Perintahmu ke ' + (p.untuk || 'tim'), '📣 ' + p.isi, '👀 ' + p.dibaca + ' dibaca · ✅ ' + p.selesai + ' selesai'); });
     (t.catatan || []).forEach(function (c) { h += row('var(--t-butter)', I.note, 'Catatan tim dari ' + c.dari, '📌 ' + c.isi, ''); });
-    return el('div', 'card', h);
+    var c = el('div', 'card', h), kb = c.querySelector('[data-kinerja]'); if (kb) kb.onclick = function () { bukaKinerja(t); };
+    return c;
   }
 
   function renderDash() {
