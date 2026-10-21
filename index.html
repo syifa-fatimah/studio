@@ -1677,7 +1677,8 @@ function salinTautan_(u, selesai) {
     var a = e.target.closest && e.target.closest('a[href]'); if (!a || a.dataset.langsung) return;
     var u = a.href; if (!/^https?:/i.test(u)) return;
     var info = kenaliApp_(u); if (!info) return;
-    e.preventDefault(); e.stopPropagation(); pilihBukaLink(u, info);
+    var tuju = tautanApp_(u, info); if (tuju === u || !/android/i.test(navigator.userAgent)) return;   // sekali ketuk: langsung ke alamatnya (Android: langsung ke aplikasinya)
+    e.preventDefault(); e.stopPropagation(); var w = window.open(tuju, '_blank'); if (!w) location.href = u;
   }, true);
   function tbCall(api, d, ulang) {
     return fetch(TB_API + '?app=1&api=' + api + '&d=' + encodeURIComponent(JSON.stringify(d || {})) + '&_=' + Date.now(), { redirect: 'follow', cache: 'no-store' })
