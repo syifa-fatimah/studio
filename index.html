@@ -1450,6 +1450,22 @@
     } catch (e) { if (!have) $('dsBody').innerHTML = '<p class="center-msg">' + esc(errMsg(e)) + '</p>'; }
   }
 
+  // ---------- Kartu Tim Arabelle (dari ThinKerBelle) ----------
+  function timCard(t) {
+    var row = function (bg, icon, small, title, sub) {
+      return '<div class="row"><span class="ic" style="background:' + bg + '">' + icon + '</span><span class="t"><small>' + esc(small) + '</small><b>' + esc(title) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span></div>';
+    };
+    var h = '<div class="sec"><h3>Tim Arabelle</h3><span class="mu">dari ThinKerBelle</span></div>';
+    if (t.error) return el('div', 'card', h + '<p class="empty">Belum bisa membaca data tim: ' + esc(t.error) + '</p>');
+    h += row('var(--t-mint)', I.list, 'Laporan hari ini', t.lapor + ' dari ' + t.wajib + ' sudah lapor', t.belum.length ? 'Belum: ' + t.belum.join(', ') : 'Semua sudah lapor 🎉');
+    h += row('var(--t-sky)', I.cal, 'Posting tim hari ini', t.tayang + ' dari ' + t.post + ' sudah tayang', '');
+    (t.launch || []).slice(0, 3).forEach(function (l) { h += row('var(--t-pink)', I.clock, dayLabel(l.date), '🚀 ' + l.text, ''); });
+    (t.agenda || []).slice(0, 3).forEach(function (a) { h += row('var(--t-lilac)', I.clock, dayLabel(a.date), a.text, a.tim ? '👥 ' + a.tim : ''); });
+    (t.perintah || []).forEach(function (p) { h += row('var(--t-peach)', I.note, 'Perintahmu ke ' + (p.untuk || 'tim'), '📣 ' + p.isi, '👀 ' + p.dibaca + ' dibaca · ✅ ' + p.selesai + ' selesai'); });
+    (t.catatan || []).forEach(function (c) { h += row('var(--t-butter)', I.note, 'Catatan tim dari ' + c.dari, '📌 ' + c.isi, ''); });
+    return el('div', 'card', h);
+  }
+
   function renderDash() {
     var d = st.dash, today = d.today, w0 = d.week[0];
     var open = w0.posts.filter(function (p) { return p.status !== S.DONE; });
@@ -1510,6 +1526,7 @@
       '<div class="row"><span class="ic" style="background:var(--t-mint)">' + I.cal + '</span><span class="t"><small>Konten bulan ini</small><b>' + c.done + ' dari ' + c.total + ' sudah tayang</b><span>' + c.sched + ' terjadwal, ' + c.open + ' masih proses</span></span></div>' +
       (d.trips.length ? '<div class="row"><span class="ic" style="background:var(--t-pink)">' + I.clock + '</span><span class="t"><small>Dinas berikutnya</small><b>' + esc(d.trips[0].title) + '</b><span>' + esc(dayLabel(d.trips[0].date)) + (d.trips[0].time ? ', ' + esc(d.trips[0].time) : '') + '</span></span></div>' : '') +
       '<button class="row" type="button" data-go="catatan" style="width:100%;border-left:0;border-right:0;border-bottom:0;background:none;text-align:left;cursor:pointer"><span class="ic" style="background:var(--t-lilac)">' + I.note + '</span><span class="t"><small>' + (d.notes.length ? 'Catatan terbaru · ' + d.noteCount + ' catatan' : 'Catatan') + '</small><b>' + esc(d.notes.length ? d.notes[0].text : 'Tulis catatan singkat') + '</b></span><span class="mu" style="font-size:18px">›</span></button>'));
+    if (d.tim) right.appendChild(timCard(d.tim));
     right.querySelectorAll('[data-go]').forEach(function (b) {
       b.onclick = function () { if (b.dataset.go === 'report') { st.kTab = 'report'; go('konten'); } else go(b.dataset.go); };
     });
