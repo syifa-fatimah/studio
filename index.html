@@ -501,6 +501,8 @@
   @media (min-width: 900px) { .push-bar { margin: 24px 40px 0; max-width: 1160px; } }
   @media (max-width: 480px) { .push-bar { flex-wrap: wrap; } .push-bar .acts { width: 100%; } .push-bar .acts .btn { flex: 1; } }
   .demo-note { border: 1px dashed var(--pink); border-radius: 16px; padding: 8px 14px; font-size: 13px; color: var(--muted); }
+  .agt { min-height: 40px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 0 16px; font-weight: 500; font-size: 14px; }
+  .agt[aria-pressed="true"] { background: var(--fill); border-color: var(--fill); color: #fff; }
   #toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); z-index: 20; transform: translate(-50%, 16px); opacity: 0; pointer-events: none; background: var(--fill); color: #fff; padding: 11px 20px; border-radius: 999px; font-size: 14px; max-width: calc(100% - 32px); transition: opacity .2s, transform .2s; }
   #toast.show { opacity: 1; transform: translate(-50%, 0); }
   #toast.error { background: var(--danger); }
@@ -670,7 +672,10 @@
         <label class="lbl">Jam<input class="in" id="agTime" type="time"></label>
       </div>
       <label class="lbl">Kategori<select class="in" id="agTag"></select></label>
-      <label class="lbl">Catatan<input class="in" id="agNote" maxlength="500" placeholder="Opsional"></label>
+      <label class="lbl">Catatan<input class="in" id="agNote" maxlength="400" placeholder="Opsional, misalnya lokasi"></label>
+      <div class="lbl" id="agTimWrap" hidden>Ajak tim Arabelle<div id="agTim" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px"></div>
+        <span class="mu" id="agTimInfo">Tidak ada yang dipilih = info saja untuk tim (Syifa sendiri).</span></div>
+      <label style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)"><input type="checkbox" id="agPriv" style="width:20px;height:20px;accent-color:var(--fill)"> 🔒 Rahasiakan dari tim (tidak tampil di ThinKerBelle)</label>
       <div class="dlg-actions">
         <button class="btn-line" type="button" data-close>Batal</button>
         <button class="btn" id="agAdd" type="button">Simpan agenda</button>
@@ -2644,14 +2649,35 @@
     $('agTitleH').textContent = agEdit ? 'Ubah agenda' : 'Agenda baru';
     $('agAdd').textContent = agEdit ? 'Simpan perubahan' : 'Simpan agenda';
     $('agDate').value = agEdit ? agEdit.date : (st.aDay || st.boot.today);
-    $('agTitle').value = agEdit ? agEdit.title : ''; $('agTime').value = agEdit ? agEdit.time : ''; $('agNote').value = agEdit ? agEdit.note : '';
+    $('agTitle').value = agEdit ? agEdit.title : ''; $('agTime').value = agEdit ? agEdit.time : '';
+    var raw = agEdit ? String(agEdit.note || '') : '', names = (st.dash && st.dash.tim && st.dash.tim.nama) || [];
+    var low = function (x) { return String(x).toLowerCase().replace(/\s+/g, ''); };
+    var tagged = (raw.match(/@([^\s@,]+)/g) || []).map(function (x) { return low(x.slice(1)); });
+    var all = tagged.indexOf('semua') >= 0 || tagged.indexOf('tim') >= 0;
+    $('agPriv').checked = /#pribadi/i.test(raw);
+    $('agNote').value = raw.replace(/@[^\s@,]+/g, '').replace(/#pribadi/ig, '').replace(/\s{2,}/g, ' ').trim();
+    $('agTimWrap').hidden = !names.length;
+    $('agTim').innerHTML = names.length ? ['Semua tim'].concat(names).map(function (n) {
+      var on = n === 'Semua tim' ? all : (all || tagged.indexOf(low(n)) >= 0);
+      return '<button type="button" class="agt" data-n="' + esc(n) + '" aria-pressed="' + on + '">' + esc(n) + '</button>';
+    }).join('') : '';
+    $('agTim').querySelectorAll('.agt').forEach(function (b) {
+      b.onclick = function () {
+        var on = b.getAttribute('aria-pressed') !== 'true';
+        if (b.dataset.n === 'Semua tim') $('agTim').querySelectorAll('.agt').forEach(function (x) { x.setAttribute('aria-pressed', String(on)); });
+        else { b.setAttribute('aria-pressed', String(on)); if (!on) $('agTim').querySelector('[data-n="Semua tim"]').setAttribute('aria-pressed', 'false'); }
+      };
+    });
     if (agEdit) sel.value = agEdit.tag;
     $('agDlg').showModal(); if (!agEdit) setTimeout(function () { $('agTitle').focus(); }, 50);
   }
 
   async function addAgenda() {
     if (st.busy) return;
-    var d = { id: agEdit ? agEdit.id : '', date: $('agDate').value, time: $('agTime').value, title: $('agTitle').value.trim(), tag: $('agTag').value, note: $('agNote').value.trim() };
+    var pilih = Array.prototype.slice.call($('agTim').querySelectorAll('.agt[aria-pressed="true"]')).map(function (b) { return b.dataset.n; });
+    var tagTim = pilih.indexOf('Semua tim') >= 0 ? '@semua' : pilih.map(function (n) { return '@' + n.replace(/\s+/g, ''); }).join(' ');
+    var note = [$('agNote').value.trim(), tagTim, $('agPriv').checked ? '#pribadi' : ''].filter(Boolean).join(' ').slice(0, 500);
+    var d = { id: agEdit ? agEdit.id : '', date: $('agDate').value, time: $('agTime').value, title: $('agTitle').value.trim(), tag: $('agTag').value, note: note };
     if (!d.title) { toast('Judul agenda belum diisi', true); $('agTitle').focus(); return; }
     if (!d.date) { toast('Tanggal belum diisi', true); return; }
     st.busy = true; $('agAdd').disabled = true;
