@@ -1224,6 +1224,8 @@
       a.type = 'button'; if (!quick) a.dataset.view = k; a.onclick = function () { if (quick) openQuick(); else go(k); };
       side.appendChild(a);
     });
+    if (owner) { var agb = el('button', 'nav-btn', VIEWS.agenda.icon + '<span>' + VIEWS.agenda.label + '</span>'); agb.type = 'button'; agb.dataset.view = 'agenda';
+      agb.onclick = function () { go('agenda'); }; side.insertBefore(agb, side.children[3] || null); }
     dockKeys.forEach(function (k) {
       var quick = k === 'agenda';
       var icon = quick ? I.plus : VIEWS[k].icon, label = quick ? 'Tambah cepat' : VIEWS[k].label;
@@ -1531,6 +1533,14 @@
       '<div class="row"><span class="ic" style="background:var(--t-mint)">' + I.cal + '</span><span class="t"><small>Konten bulan ini</small><b>' + c.done + ' dari ' + c.total + ' sudah tayang</b><span>' + c.sched + ' terjadwal, ' + c.open + ' masih proses</span></span></div>' +
       (d.trips.length ? '<div class="row"><span class="ic" style="background:var(--t-pink)">' + I.clock + '</span><span class="t"><small>Dinas berikutnya</small><b>' + esc(d.trips[0].title) + '</b><span>' + esc(dayLabel(d.trips[0].date)) + (d.trips[0].time ? ', ' + esc(d.trips[0].time) : '') + '</span></span></div>' : '') +
       '<button class="row" type="button" data-go="catatan" style="width:100%;border-left:0;border-right:0;border-bottom:0;background:none;text-align:left;cursor:pointer"><span class="ic" style="background:var(--t-lilac)">' + I.note + '</span><span class="t"><small>' + (d.notes.length ? 'Catatan terbaru · ' + d.noteCount + ' catatan' : 'Catatan') + '</small><b>' + esc(d.notes.length ? d.notes[0].text : 'Tulis catatan singkat') + '</b></span><span class="mu" style="font-size:18px">›</span></button>'));
+    var semuaAg = st.agenda || [].concat.apply([], d.week.map(function (w) { return w.agenda; }));
+    var up = semuaAg.filter(function (a) { return a.date >= today; }).slice(0, 5);
+    var ac = el('div', 'card', '<div class="sec"><h3>Agenda akan datang</h3><button class="link" type="button">Lihat semua</button></div>' + (up.length ? up.map(function (a) {
+      return '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(dayLabel(a.date)) + (a.time ? ' · ' + esc(a.time) : '') +
+        '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span></div>';
+    }).join('') : '<p class="empty">Belum ada agenda yang akan datang.</p>'));
+    ac.querySelector('.link').onclick = function () { go('agenda'); };
+    right.appendChild(ac);
     if (d.tim) right.appendChild(timCard(d.tim));
     right.querySelectorAll('[data-go]').forEach(function (b) {
       b.onclick = function () { if (b.dataset.go === 'report') { st.kTab = 'report'; go('konten'); } else go(b.dataset.go); };
@@ -2623,10 +2633,11 @@
         '<div class="block" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '"><div class="top"><span><b>' + esc(a.title) + '</b><br><span class="k">' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span>' +
         '<span class="acts2"><button class="link" type="button" data-edit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></span></div><div class="tm">' + I.clock + esc(a.time || 'Sepanjang hari') + '</div></div>';
     }).join('')));
-    var later = list.filter(function (a) { return a.date > addDays(today, 6); });
-    right.appendChild(el('div', 'card', '<div class="sec"><h3>Lebih jauh</h3></div>' + (later.length ? later.map(function (a) {
-      return '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(dayLabel(a.date)) + (a.time ? ' · ' + esc(a.time) : '') + '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + '</span></span><span class="acts2"><button class="link" type="button" data-edit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></span></div>';
-    }).join('') : '<p class="empty">Tidak ada agenda setelah 7 hari ke depan.</p>')));
+    var later = list.filter(function (a) { return a.date >= today; }), lastD = '';
+    right.appendChild(el('div', 'card', '<div class="sec"><h3>Agenda akan datang</h3><span class="mu">' + later.length + ' agenda</span></div>' + (later.length ? later.map(function (a) {
+      var grp = a.date !== lastD ? '<div class="group">' + esc(dayLabel(a.date)) + '</div>' : ''; lastD = a.date;
+      return grp + '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(dayLabel(a.date)) + (a.time ? ' · ' + esc(a.time) : '') + '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span><span class="acts2"><button class="link" type="button" data-edit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></span></div>';
+    }).join('') : '<p class="empty">Belum ada agenda yang akan datang.</p>')));
     box.querySelectorAll('[data-edit]').forEach(function (b) {
       b.onclick = function () { var a = list.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (a) openAgendaDlg(a); };
     });
@@ -2861,9 +2872,23 @@
     st.notes = list;
     var box = $('ntList');
     if (!list.length) { box.innerHTML = '<p class="empty" style="grid-column:1/-1">Belum ada catatan. Tulis yang pertama di atas.</p>'; return; }
-    box.innerHTML = list.map(function (n) { return '<div class="note" style="background:' + esc(n.color) + '"><p>' + esc(n.text) + '</p><span style="display:flex;justify-content:flex-end;gap:6px"><button class="link" type="button" data-edit="' + esc(n.id) + '" style="color:var(--rose);padding:6px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(n.id) + '">Hapus</button></span></div>'; }).join('');
+    box.innerHTML = list.map(function (n) { return '<div class="note" style="background:' + esc(n.color) + '">' + (/#atin|#tim/i.test(n.text) ? '<span style="display:flex;gap:6px;flex-wrap:wrap">' + (/#atin/i.test(n.text) ? '<span class="chip">Dibagikan ke Atin</span>' : '') + (/#tim/i.test(n.text) ? '<span class="chip">Dibagikan ke tim</span>' : '') + '</span>' : '') +
+      '<p>' + esc(n.text.replace(/#atin|#tim/ig, '').replace(/\s{2,}/g, ' ').trim()) + '</p><span style="display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap">' +
+      '<button class="link" type="button" data-share="atin" data-nid="' + esc(n.id) + '" style="color:var(--rose);padding:6px 2px">' + (/#atin/i.test(n.text) ? 'Batal bagikan Atin' : 'Bagikan ke Atin') + '</button>' +
+      '<button class="link" type="button" data-share="tim" data-nid="' + esc(n.id) + '" style="color:var(--rose);padding:6px 2px">' + (/#tim/i.test(n.text) ? 'Batal bagikan tim' : 'Bagikan ke tim') + '</button><button class="link" type="button" data-edit="' + esc(n.id) + '" style="color:var(--rose);padding:6px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(n.id) + '">Hapus</button></span></div>'; }).join('');
     box.querySelectorAll('[data-edit]').forEach(function (b) {
       b.onclick = function () { var n = list.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (!n) return; noteEdit = n; $('ndText').value = n.text; $('noteDlg').showModal(); };
+    });
+    box.querySelectorAll('[data-share]').forEach(function (b) {
+      b.onclick = async function () {
+        var n = list.filter(function (x) { return x.id === b.dataset.nid; })[0]; if (!n || st.busy) return;
+        var tag = '#' + b.dataset.share, re = new RegExp('\\s*' + tag, 'ig'), on = re.test(n.text);
+        var teks = on ? n.text.replace(new RegExp('\\s*' + tag, 'ig'), '').trim() : (n.text.trim() + ' ' + tag);
+        st.busy = true; b.disabled = true;
+        try { renderNotes(await call('updateNote', n.id, teks.slice(0, 500))); forget('dash'); toast(on ? 'Berhenti dibagikan' : (b.dataset.share === 'atin' ? 'Dibagikan ke Atin' : 'Dibagikan ke tim')); }
+        catch (e) { b.disabled = false; fail(e); }
+        finally { st.busy = false; }
+      };
     });
     box.querySelectorAll('.del').forEach(function (b) {
       b.onclick = function () {
