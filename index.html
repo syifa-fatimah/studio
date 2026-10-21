@@ -673,7 +673,7 @@
       </div>
       <label class="lbl">Kategori<select class="in" id="agTag"></select></label>
       <label class="lbl">Catatan<input class="in" id="agNote" maxlength="400" placeholder="Opsional, misalnya lokasi"></label>
-      <div class="lbl" id="agTimWrap" hidden>Ajak tim Arabelle<div id="agTim" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px"></div>
+      <div class="lbl" id="agTimWrap">Ajak tim Arabelle<div id="agTim" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px"></div>
         <span class="mu" id="agTimInfo">Tidak ada yang dipilih = info saja untuk tim (Syifa sendiri).</span></div>
       <label style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)"><input type="checkbox" id="agPriv" style="width:20px;height:20px;accent-color:var(--fill)"> 🔒 Rahasiakan dari tim (tidak tampil di ThinKerBelle)</label>
       <div class="dlg-actions">
@@ -2656,7 +2656,9 @@
     var all = tagged.indexOf('semua') >= 0 || tagged.indexOf('tim') >= 0;
     $('agPriv').checked = /#pribadi/i.test(raw);
     $('agNote').value = raw.replace(/@[^\s@,]+/g, '').replace(/#pribadi/ig, '').replace(/\s{2,}/g, ' ').trim();
-    $('agTimWrap').hidden = !names.length;
+    $('agTimWrap').hidden = false;
+    $('agTimInfo').textContent = names.length ? 'Tidak ada yang dipilih = info saja untuk tim (Syifa sendiri).'
+      : (st.dash && st.dash.tim && st.dash.tim.error ? '⚠️ Daftar tim belum terbaca: ' + st.dash.tim.error : '⚠️ Daftar tim belum terbaca. Pastikan HUB_SHEET_ID di file Sinkron sudah diisi, lalu jalankan cekHub.');
     $('agTim').innerHTML = names.length ? ['Semua tim'].concat(names).map(function (n) {
       var on = n === 'Semua tim' ? all : (all || tagged.indexOf(low(n)) >= 0);
       return '<button type="button" class="agt" data-n="' + esc(n) + '" aria-pressed="' + on + '">' + esc(n) + '</button>';
