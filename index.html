@@ -1584,9 +1584,10 @@
     tbCall('saya', { t: t }).then(function (j) { if (!j.ok) throw new Error(j.pesan); if (!j.data.pimpinan) { $('perBody').innerHTML = '<p class="empty">🔒 Perintah hanya untuk owner, GM &amp; leader.</p>'; return; } perForm(j.data); })
       .catch(function (e) { if (!tbToken()) perMasuk('perBody', bukaPerintah); else $('perBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
   }
+  var SY_ALASAN = '';
   function perMasuk(bid, lanjut) {
     bid = bid || 'perBody'; lanjut = lanjut || bukaPerintah;
-    $(bid).innerHTML = '<p class="mu" style="margin:0">Sambungkan sekali ke ThinKerBelle. Kode masuk dikirim ke WA kamu.</p>' +
+    $(bid).innerHTML = (SY_ALASAN ? '<p class="mu" style="margin:0 0 6px;font-size:12.5px">ℹ️ Izin otomatis belum aktif: ' + esc(SY_ALASAN) + '</p>' : '') + '<p class="mu" style="margin:0">Sambungkan sekali ke ThinKerBelle. Kode masuk dikirim ke WA kamu.</p>' +
       '<label class="lbl">Nama di ThinKerBelle<select class="in" id="perNama"><option>Memuat…</option></select></label>' +
       '<div class="dlg-actions"><button class="btn" type="button" id="perKode">📲 Kirim kode ke WA</button></div>' +
       '<div id="perOtp" hidden><label class="lbl">Kode 6 digit dari WA<input class="in" id="perOtpIn" inputmode="numeric" maxlength="6" placeholder="••••••" style="letter-spacing:8px;text-align:center;font-size:22px"></label>' +
@@ -1635,8 +1636,9 @@
     $('rapBody').innerHTML = h;
     $('rapBody').querySelectorAll('[data-rap]').forEach(function (b) { b.onclick = function () { bukaRapor(Number(b.dataset.rap)); }; });
   }
+  var PER_EDIT = null, PER_LIST = [];
   function perForm(me) {
-    var nama = me.tim || [];
+    var nama = me.tim || []; PER_EDIT = null;
     $('perBody').innerHTML =
       '<label class="lbl">Tulis perintah<textarea class="in" id="perIsi" rows="4" maxlength="1500" placeholder="Contoh: Tolong siapkan 2 opsi lokasi photoshoot Bandung"></textarea></label>' +
       '<div class="lbl">Tag yang bersangkutan<div id="perUntuk" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px">' + nama.map(function (n) {
@@ -1671,27 +1673,40 @@
       if (!pil.length) return toast('Tag minimal 1 orang, atau pilih Semua tim', true);
       var untuk = pil.indexOf('Semua') >= 0 ? [] : pil;
       $('perKirim').disabled = true;
-      tbPakai('perintah', { isi: isi, tenggat: $('perTgt').value || '', untuk: untuk }).then(function (j) {
-        $('perKirim').disabled = false; toast(j.pesan, !j.ok); if (j.ok) { $('perIsi').value = ''; $('perTgt').value = ''; $('perUntuk').querySelectorAll('.agt').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); info(); perDaftar(); forget('dash'); }
+      tbPakai(PER_EDIT ? 'perintahUbah' : 'perintah', { id: PER_EDIT || '', isi: isi, tenggat: $('perTgt').value || '', untuk: untuk }).then(function (j) {
+        $('perKirim').disabled = false; toast(j.pesan, !j.ok); if (j.ok) { perBersih(); perDaftar(); forget('dash'); }
       }).catch(function (e) { $('perKirim').disabled = false; toast(errMsg(e), true); });
     };
     if ($('perKeluar')) $('perKeluar').onclick = function () { tbToken(null); perMasuk('perBody', bukaPerintah); };
+    window.perBersih = function () { PER_EDIT = null; $('perIsi').value = ''; $('perTgt').value = ''; $('perUntuk').querySelectorAll('.agt').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); info(); $('perKirim').textContent = '📣 Kirim perintah'; if ($('perBatalEdit')) $('perBatalEdit').remove(); };
+    window.perIsiUntukEdit = function (p) {
+      PER_EDIT = p.id; $('perIsi').value = p.isi; $('perTgt').value = p.tIso || '';
+      $('perUntuk').querySelectorAll('.agt').forEach(function (x) { x.setAttribute('aria-pressed', String(p.untukList.length ? p.untukList.indexOf(x.dataset.n) >= 0 : x.dataset.n === 'Semua')); }); info();
+      $('perKirim').textContent = '💾 Simpan perubahan';
+      if (!$('perBatalEdit')) { var b = el('button', 'btn-line', 'Batal edit'); b.type = 'button'; b.id = 'perBatalEdit'; b.onclick = perBersih; $('perKirim').parentNode.insertBefore(b, $('perKirim')); }
+      $('perIsi').focus(); $('perBody').scrollTop = 0;
+    };
     perDaftar();
   }
   function perDaftar() {
     tbPakai('perintahku', {}).then(function (j) {
-      var L = (j && j.data) || [];
+      var L = (j && j.data) || []; PER_LIST = L;
       $('perList').innerHTML = L.length ? '<h3 style="margin:16px 0 0;font-size:16px">Perintah terakhir</h3>' + L.slice(0, 8).map(function (p) {
         var total = p.selesai.length + p.belum.length;
         return '<div class="perl"><small>' + esc(p.waktu) + ' · untuk ' + esc(p.untuk) + (p.tenggat ? ' · ⏰ ' + esc(p.tenggat) : '') + '</small><b>' + esc(p.isi) + '</b>' +
-          '<small style="margin-top:6px">👀 ' + p.dibaca.length + ' dibaca · ✅ ' + p.selesai.length + (total ? '/' + total : '') + ' selesai' + (p.belum.length ? ' · belum: ' + esc(p.belum.join(', ')) : ' · semua beres 🎉') + '</small></div>';
+          '<small style="margin-top:6px">👀 ' + p.dibaca.length + ' dibaca · ✅ ' + p.selesai.length + (total ? '/' + total : '') + ' selesai' + (p.belum.length ? ' · belum: ' + esc(p.belum.join(', ')) : ' · semua beres 🎉') + (p.diubah ? ' · ✏️ diubah' : '') + '</small>' +
+          '<div style="display:flex;gap:14px;margin-top:4px"><button class="link" type="button" data-pedit="' + esc(p.id) + '" style="padding:4px 0;color:var(--rose);font-weight:600">✏️ Edit</button><button class="link" type="button" data-phapus="' + esc(p.id) + '" style="padding:4px 0">🗑️ Hapus</button></div></div>';
       }).join('') : '<p class="mu">Belum ada perintah 30 hari terakhir.</p>';
+      $('perList').querySelectorAll('[data-pedit]').forEach(function (b) { b.onclick = function () { var p = PER_LIST.filter(function (x) { return x.id === b.dataset.pedit; })[0]; if (p && window.perIsiUntukEdit) perIsiUntukEdit(p); }; });
+      $('perList').querySelectorAll('[data-phapus]').forEach(function (b) { b.onclick = function () {
+        if (!confirm('Hapus perintah ini? Kalau sudah diumumkan di grup, pembatalannya ikut diumumkan di pengingat berikutnya.')) return;
+        tbPakai('perintahHapus', { id: b.dataset.phapus }).then(function (j) { toast(j.pesan, !j.ok); if (j.ok) { if (PER_EDIT === b.dataset.phapus && window.perBersih) perBersih(); perDaftar(); forget('dash'); } }).catch(function (e) { toast(errMsg(e), true); }); }; });
     }).catch(function () { $('perList').innerHTML = ''; });
   }
 
   var SY_AUTH = null, SY_NAMA = [];
   function timCard(t) {
-    SY_AUTH = t && t.kirim && Number(t.kirim.exp) > Date.now() ? t.kirim : null; SY_NAMA = (t && t.nama) || [];
+    SY_AUTH = t && t.kirim && Number(t.kirim.exp) > Date.now() ? t.kirim : null; SY_NAMA = (t && t.nama) || []; SY_ALASAN = (t && t.kirimAlasan) || '';
     var row = function (bg, icon, small, title, sub) {
       return '<div class="row"><span class="ic" style="background:' + bg + '">' + icon + '</span><span class="t"><small>' + esc(small) + '</small><b>' + esc(title) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span></div>';
     };
