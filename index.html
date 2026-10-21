@@ -632,13 +632,11 @@
     </section>
 
     <section id="v-harian" class="page" hidden>
-      <div class="jseg" role="tablist" aria-label="Jadwal"><button type="button" class="on" aria-current="true">Jadwal harian</button><button type="button" data-jseg="agenda">Agenda &amp; dinas</button></div>
       <div class="hdr" style="justify-content:flex-end;min-height:0;margin-bottom:-8px"><h1 class="sr">Jadwal harian</h1><button class="round" type="button" data-bell aria-label="Notifikasi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></button></div>
       <div id="hBody" class="stack"><p class="center-msg">Memuat…</p></div>
     </section>
 
     <section id="v-agenda" class="page" hidden>
-      <div class="jseg" role="tablist" aria-label="Jadwal"><button type="button" data-jseg="harian">Jadwal harian</button><button type="button" class="on" aria-current="true">Agenda &amp; dinas</button></div>
       <div class="hdr">
         <div class="ttl"><h1 class="big-title">Agenda &amp; dinas</h1><span>Rapat, dinas, dan operasional</span></div>
         <button class="round dark" type="button" id="agOpen" aria-label="Tambah agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -1319,7 +1317,7 @@
     var side = $('sideNav'), dock = $('dock');
     side.innerHTML = ''; dock.innerHTML = '';
     // Menu samping (PC): semua menu + Tambah cepat. Navigasi bawah (HP): Beranda, Konten, ＋, Jadwal, Tim Arabelle, Keuangan.
-    var dockKeys = owner ? ['dasbor', 'konten', '+', 'harian', 'tim', 'uang'] : keys;
+    var dockKeys = owner ? ['dasbor', 'konten', '+', 'harian', 'tim'] : keys;   // 5 tombol, ＋ di tengah. Keuangan & Catatan lewat Beranda / menu samping
     if (owner) { var qb = el('button', 'nav-btn', I.plus + '<span>Tambah cepat</span>'); qb.type = 'button'; qb.onclick = openQuick; side.appendChild(qb); }
     keys.forEach(function (k) {
       var a = el('button', 'nav-btn', VIEWS[k].icon + '<span>' + VIEWS[k].label + '</span>');
@@ -1334,7 +1332,6 @@
       m.onclick = function () { if (quick) openQuick(); else go(k); };
       dock.appendChild(m);
     });
-    document.querySelectorAll('[data-jseg]').forEach(function (b) { b.onclick = function () { go(b.dataset.jseg); }; });
     if ($('timRefresh')) $('timRefresh').onclick = function () { forget('dash'); loadTim(true); };
     if (keys.length < 4) dock.style.justifyContent = 'space-evenly';
     go(owner ? 'dasbor' : 'konten');
@@ -1614,10 +1611,18 @@
   var TB_API = 'https://script.google.com/macros/s/AKfycbxglVQKBvsnks_7C_XnrLXEx0GiIoZFT4xjSTDQ74YPVP_sAA-DaVlJdG_6Tvnx1Gk/exec';
   var TB_KEY = 'ss_tb_token';
   function tbToken(v) { try { if (v === null) localStorage.removeItem(TB_KEY); else if (v) localStorage.setItem(TB_KEY, v); return localStorage.getItem(TB_KEY) || ''; } catch (e) { return ''; } }
-  function tbCall(api, d) {
-    return fetch(TB_API + '?app=1&api=' + api + '&d=' + encodeURIComponent(JSON.stringify(d || {})), { redirect: 'follow' })
-      .then(function (r) { return r.json(); }, function () { throw new Error('Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
-      .then(function (j) { if (j && j.sesi) { tbToken(null); throw new Error('Sesi ThinKerBelle habis, masuk lagi ya.'); } return j; });
+  function tbCall(api, d, ulang) {
+    return fetch(TB_API + '?app=1&api=' + api + '&d=' + encodeURIComponent(JSON.stringify(d || {})) + '&_=' + Date.now(), { redirect: 'follow', cache: 'no-store' })
+      .then(function (r) { return r.text(); }, function () { throw new Error('Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
+      .then(function (tx) {
+        var j = null; try { j = JSON.parse(tx); } catch (e) {}
+        if (!j) {   // Google kadang membalas halaman HTML (server sibuk / versi ThinKerBelle belum terbaru) → coba sekali lagi
+          if (!ulang) return new Promise(function (ok) { setTimeout(ok, 1500); }).then(function () { return tbCall(api, d, true); });
+          throw new Error('ThinKerBelle belum menjawab dengan benar. Coba lagi sebentar. Kalau terus muncul: deploy versi terbaru ThinKerBelle (Kelola deployment → Versi baru).');
+        }
+        if (j.sesi) { tbToken(null); throw new Error('Sesi ThinKerBelle habis, muat ulang Beranda ya.'); }
+        return j;
+      });
   }
   function tbPakai(api, d) {
     if (SY_AUTH) return tbCall('sy' + api.charAt(0).toUpperCase() + api.slice(1), Object.assign({ sy: SY_AUTH }, d || {}));
@@ -1945,7 +1950,7 @@
         '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span></div>';
     }).join('') : '<p class="empty">Belum ada agenda yang akan datang.</p>'));
     ac.querySelector('.link').onclick = function () { go('agenda'); };
-    taruh(right, ac, 'agenda', '📅 Agenda akan datang', up.length ? String(up.length) : '');
+    void ac;   // agenda & dinas sekarang ada di tab Jadwal (menyatu dengan jadwal harian), beranda jadi lebih ringkas
 
     right.querySelectorAll('[data-go]').forEach(function (b) {
       b.onclick = function () { if (b.dataset.go === 'report') { st.kTab = 'report'; go('konten'); } else go(b.dataset.go); };
@@ -2765,7 +2770,29 @@
     return ar;
   }
 
-  function renderDay() {
+  // Jadwal harian + agenda & dinas dalam satu halaman
+  function renderDay() { renderDayAsli(); agendaDiJadwal(); }
+  function agendaDiJadwal() {
+    var box = $('hBody'); if (!box || st.view !== 'harian') return;
+    var lama = $('jAgenda'); if (lama) lama.remove();
+    var wadah = el('div', 'card'); wadah.id = 'jAgenda'; box.appendChild(wadah);
+    if (!st.agenda) { wadah.innerHTML = '<p class="mu">Memuat agenda &amp; dinas…</p>';
+      call('listAgenda').then(function (a) { st.agenda = a; mark('agenda', a); if (st.view === 'harian') agendaDiJadwal(); }).catch(function () { wadah.innerHTML = '<p class="mu">Agenda belum bisa dimuat.</p>'; }); return; }
+    var dari = (st.day && st.day.date) || st.hDate || st.boot.today, semua = st.agenda.filter(function (a) { return a.date > dari; }), later = agendaDiJadwal.penuh ? semua : semua.slice(0, 5), lastD = '';
+    wadah.innerHTML = '<div class="sec"><h3>Agenda &amp; dinas berikutnya</h3><button class="link" type="button" id="jAgBaru">＋ Agenda / dinas</button></div>' +
+      '<p class="mu" style="margin:-4px 0 6px;font-size:13px">Agenda & dinas di tanggal terpilih sudah masuk garis waktu di atas.</p>' + (later.length ? later.map(function (a) {
+      var grp = a.date !== lastD ? '<div class="group">' + esc(dayLabel(a.date)) + '</div>' : '', milik = !/^TB/.test(String(a.id || '')); lastD = a.date;
+      return grp + '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(a.time || 'Sepanjang hari') + ' · ' + esc(a.tag || 'Agenda') + '</small><b>' + esc(a.title) + '</b>' + (a.note ? '<span>' + esc(a.note) + '</span>' : '') + '</span>' +
+        (milik ? '<span class="acts2"><button class="link" type="button" data-jedit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-jdel="' + esc(a.id) + '" aria-label="Hapus">×</button></span>' : '') + '</div>';
+    }).join('') + (semua.length > 5 ? '<button class="link" type="button" id="jAgAll" style="margin-top:8px;color:var(--rose);font-weight:600">' + (agendaDiJadwal.penuh ? 'Ringkas' : 'Lihat semua (' + semua.length + ')') + '</button>' : '') : '<p class="empty">Belum ada agenda atau dinas berikutnya.</p>');
+    if ($('jAgAll')) $('jAgAll').onclick = function () { agendaDiJadwal.penuh = !agendaDiJadwal.penuh; agendaDiJadwal(); };
+    var segar = function () { forget('dash'); forget('day:' + st.hDate); st.day = null; loadDay(); };
+    $('jAgBaru').onclick = function () { openAgendaDlg(null, segar); };
+    wadah.querySelectorAll('[data-jedit]').forEach(function (b) { b.onclick = function () { var a = st.agenda.filter(function (x) { return x.id === b.dataset.jedit; })[0]; if (a) openAgendaDlg(a, segar); }; });
+    wadah.querySelectorAll('[data-jdel]').forEach(function (b) { b.onclick = function () { armDelete(b, async function () { b.disabled = true;
+      try { st.agenda = await call('deleteAgenda', b.dataset.jdel); segar(); toast('Agenda dihapus'); } catch (e) { b.disabled = false; fail(e); } }); }; });
+  }
+  function renderDayAsli() {
     var box = $('hBody'), day = st.day, isToday = day.date === st.boot.today;
     var targets = day.items.filter(function (x) { return x.type === 'Target'; });
     var sched = day.items.filter(function (x) { return x.type === 'Jadwal'; });
