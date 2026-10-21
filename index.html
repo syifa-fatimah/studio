@@ -243,6 +243,8 @@
   .kinlap .lp.kosong { background: var(--surface); border: 1px dashed var(--line); color: var(--muted); }
   .perl { background: var(--pink-soft); border-radius: 16px; padding: 12px 14px; margin-top: 10px; font-size: 14px; }
   .perl small { display: block; color: var(--muted); font-size: 12.5px; }
+  .perl .bls { background: var(--surface); border-radius: 12px; padding: 7px 10px; margin-top: 6px; font-size: 13.5px; }
+  .apimg { width: 100%; max-height: 320px; object-fit: cover; border-radius: 16px; background: var(--pink-soft); display: block; margin: 8px 0; }
   .barrow .top { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
   .cols { display: flex; align-items: flex-end; gap: 12px; height: 150px; padding: 10px 0 0; }
   .col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; min-width: 0; }
@@ -690,6 +692,16 @@
       <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="dlg-body" id="kinBody"></div>
+  </div>
+</dialog>
+
+<dialog id="apDlg" aria-labelledby="apTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div><h2 id="apTitle">Approval konten</h2><p id="apSub">Konten tim berstatus Review</p></div>
+      <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dlg-body" id="apBody"></div>
   </div>
 </dialog>
 
@@ -1637,6 +1649,39 @@
     $('rapBody').querySelectorAll('[data-rap]').forEach(function (b) { b.onclick = function () { bukaRapor(Number(b.dataset.rap)); }; });
   }
   var PER_EDIT = null, PER_LIST = [];
+  // ---------- Approval konten dari Syifa Studio (dengan pratinjau foto) ----------
+  var AP = [];
+  function bukaApproval() {
+    if (!$('apDlg').open) $('apDlg').showModal();
+    if (!SY_AUTH) { $('apBody').innerHTML = '<p class="empty">Approval dari Syifa Studio butuh izin otomatis. Muat ulang Beranda, lalu coba lagi.</p>'; return; }
+    $('apBody').innerHTML = '<p class="center-msg">Memuat konten…</p>';
+    tbPakai('approval', {}).then(function (j) { if (!j.ok) throw new Error(j.pesan); AP = j.data || []; tampilApproval(); }).catch(function (e) { $('apBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
+  }
+  function tampilApproval() {
+    $('apSub').textContent = AP.length ? AP.length + ' konten menunggu' : 'Tidak ada yang menunggu';
+    if (!AP.length) { $('apBody').innerHTML = '<p class="empty">🎉 Tidak ada konten yang menunggu approval.</p>'; return; }
+    $('apBody').innerHTML = AP.map(function (a, i) {
+      return '<div class="card" style="padding-bottom:14px"><div class="sec"><h3>' + esc(a.topik) + '</h3><span class="chip">' + esc(a.plat) + '</span></div>' +
+        '<p class="mu" style="margin:-4px 0 0;font-size:13px">📅 ' + esc(a.tgl) + (a.jam ? ' ' + esc(a.jam) : '') + ' · 👤 ' + esc(a.pic) + '</p>' +
+        (a.file ? '<img class="apimg" id="apimg' + i + '" alt="Pratinjau konten">' : '') +
+        '<div class="perl" style="white-space:pre-line">' + (a.teks ? esc(a.teks) : '<span class="mu">(caption kosong)</span>') + '</div>' +
+        (a.file ? '<a href="' + esc(a.file) + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:13px;font-weight:600;color:var(--rose)">🖼️ Buka file konten</a>' : '') +
+        (a.catatan ? '<p class="mu" style="font-size:13px">💬 Sebelumnya: ' + esc(a.catatan) + '</p>' : '') +
+        '<label class="lbl" style="margin-top:10px">Catatan (wajib kalau minta revisi)<textarea class="in" id="apc' + i + '" rows="2"></textarea></label>' +
+        '<div class="dlg-actions"><button class="btn-line" type="button" data-ap="' + i + '" data-k="revisi">✏️ Revisi</button><button class="btn" type="button" data-ap="' + i + '" data-k="approve">✅ Approve</button></div></div>';
+    }).join('');
+    AP.forEach(function (a, i) { if (!a.file) return; tbPakai('pratinjau', { link: a.file }).then(function (j) { var im = $('apimg' + i); if (!im) return; if (j.ok && j.data) im.src = j.data; else im.remove(); }).catch(function () { var im = $('apimg' + i); if (im) im.remove(); }); });
+    $('apBody').querySelectorAll('[data-ap]').forEach(function (b) {
+      b.onclick = function () {
+        var i = Number(b.dataset.ap), a = AP[i], cat = $('apc' + i).value.trim();
+        if (b.dataset.k === 'revisi' && !cat) return toast('Tulis catatan revisinya dulu ya', true);
+        b.disabled = true;
+        tbPakai('approve', { tab: a.tab, baris: a.baris, keputusan: b.dataset.k, catatan: cat }).then(function (j) {
+          toast(j.pesan, !j.ok); if (j.ok) { AP.splice(i, 1); tampilApproval(); } else b.disabled = false;
+        }).catch(function (e) { b.disabled = false; toast(errMsg(e), true); });
+      };
+    });
+  }
   function perForm(me) {
     var nama = me.tim || []; PER_EDIT = null;
     $('perBody').innerHTML =
@@ -1695,9 +1740,13 @@
         var total = p.selesai.length + p.belum.length;
         return '<div class="perl"><small>' + esc(p.waktu) + ' · untuk ' + esc(p.untuk) + (p.tenggat ? ' · ⏰ ' + esc(p.tenggat) : '') + '</small><b>' + esc(p.isi) + '</b>' +
           '<small style="margin-top:6px">👀 ' + p.dibaca.length + ' dibaca · ✅ ' + p.selesai.length + (total ? '/' + total : '') + ' selesai' + (p.belum.length ? ' · belum: ' + esc(p.belum.join(', ')) : ' · semua beres 🎉') + (p.diubah ? ' · ✏️ diubah' : '') + '</small>' +
-          '<div style="display:flex;gap:14px;margin-top:4px"><button class="link" type="button" data-pedit="' + esc(p.id) + '" style="padding:4px 0;color:var(--rose);font-weight:600">✏️ Edit</button><button class="link" type="button" data-phapus="' + esc(p.id) + '" style="padding:4px 0">🗑️ Hapus</button></div></div>';
+          (p.balasan || []).map(function (b) { return '<div class="bls"><b>' + esc(b.dari) + '</b> ' + esc(b.isi) + '<small style="display:block">' + esc(b.waktu) + '</small></div>'; }).join('') +
+          '<div style="display:flex;gap:14px;margin-top:4px"><button class="link" type="button" data-pedit="' + esc(p.id) + '" style="padding:4px 0;color:var(--rose);font-weight:600">✏️ Edit</button><button class="link" type="button" data-pbalas="' + esc(p.id) + '" style="padding:4px 0">💬 Balas</button><button class="link" type="button" data-phapus="' + esc(p.id) + '" style="padding:4px 0">🗑️ Hapus</button></div></div>';
       }).join('') : '<p class="mu">Belum ada perintah 30 hari terakhir.</p>';
       $('perList').querySelectorAll('[data-pedit]').forEach(function (b) { b.onclick = function () { var p = PER_LIST.filter(function (x) { return x.id === b.dataset.pedit; })[0]; if (p && window.perIsiUntukEdit) perIsiUntukEdit(p); }; });
+      $('perList').querySelectorAll('[data-pbalas]').forEach(function (b) { b.onclick = function () {
+        var t = prompt('Tulis balasan untuk perintah ini:'); if (!t || !t.trim()) return;
+        tbPakai('perintahBalas', { id: b.dataset.pbalas, teks: t.trim() }).then(function (j) { toast(j.pesan, !j.ok); if (j.ok) perDaftar(); }).catch(function (e) { toast(errMsg(e), true); }); }; });
       $('perList').querySelectorAll('[data-phapus]').forEach(function (b) { b.onclick = function () {
         if (!confirm('Hapus perintah ini? Kalau sudah diumumkan di grup, pembatalannya ikut diumumkan di pengingat berikutnya.')) return;
         tbPakai('perintahHapus', { id: b.dataset.phapus }).then(function (j) { toast(j.pesan, !j.ok); if (j.ok) { if (PER_EDIT === b.dataset.phapus && window.perBersih) perBersih(); perDaftar(); forget('dash'); } }).catch(function (e) { toast(errMsg(e), true); }); }; });
@@ -1710,7 +1759,7 @@
     var row = function (bg, icon, small, title, sub) {
       return '<div class="row"><span class="ic" style="background:' + bg + '">' + icon + '</span><span class="t"><small>' + esc(small) + '</small><b>' + esc(title) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span></div>';
     };
-    var h = '<div class="sec"><h3>Tim Arabelle</h3><span style="display:flex;gap:14px">' + '<button class="link" type="button" data-perintah>📣 Perintah</button><button class="link" type="button" data-rapor>📑 Rapor</button>' + (t.kinerja && !t.kinerja.error ? '<button class="link" type="button" data-kinerja>Kinerja tim</button>' : '<span class="mu">dari ThinKerBelle</span>') + '</span></div>';
+    var h = '<div class="sec"><h3>Tim Arabelle</h3><span style="display:flex;gap:14px">' + '<button class="link" type="button" data-perintah>📣 Perintah</button><button class="link" type="button" data-approval>👀 Approval</button><button class="link" type="button" data-rapor>📑 Rapor</button>' + (t.kinerja && !t.kinerja.error ? '<button class="link" type="button" data-kinerja>Kinerja tim</button>' : '<span class="mu">dari ThinKerBelle</span>') + '</span></div>';
     if (t.error) return el('div', 'card', h + '<p class="empty">Belum bisa membaca data tim: ' + esc(t.error) + '</p>');
     h += row('var(--t-mint)', I.list, 'Laporan hari ini', t.lapor + ' dari ' + t.wajib + ' sudah lapor', t.belum.length ? 'Belum: ' + t.belum.join(', ') : 'Semua sudah lapor 🎉');
     h += row('var(--t-sky)', I.cal, 'Posting tim hari ini', t.tayang + ' dari ' + t.post + ' sudah tayang', '');
@@ -1718,7 +1767,7 @@
     (t.agenda || []).slice(0, 3).forEach(function (a) { h += row('var(--t-lilac)', I.clock, dayLabel(a.date), a.text, a.tim ? '👥 ' + a.tim : ''); });
     (t.perintah || []).forEach(function (p) { h += row('var(--t-peach)', I.note, 'Perintahmu ke ' + (p.untuk || 'tim'), '📣 ' + p.isi, '👀 ' + p.dibaca + ' dibaca · ✅ ' + p.selesai + ' selesai'); });
     (t.catatan || []).forEach(function (c) { h += row('var(--t-butter)', I.note, 'Catatan tim dari ' + c.dari, '📌 ' + c.isi, ''); });
-    var c = el('div', 'card', h), kb = c.querySelector('[data-kinerja]'), pb = c.querySelector('[data-perintah]'); if (kb) kb.onclick = function () { bukaKinerja(t); }; if (pb) pb.onclick = bukaPerintah; var rb = c.querySelector('[data-rapor]'); if (rb) rb.onclick = function () { bukaRapor(null); };
+    var c = el('div', 'card', h), kb = c.querySelector('[data-kinerja]'), pb = c.querySelector('[data-perintah]'); if (kb) kb.onclick = function () { bukaKinerja(t); }; if (pb) pb.onclick = bukaPerintah; var rb = c.querySelector('[data-rapor]'); if (rb) rb.onclick = function () { bukaRapor(null); }; var ab = c.querySelector('[data-approval]'); if (ab) ab.onclick = bukaApproval;
     return c;
   }
 
