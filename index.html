@@ -296,7 +296,7 @@
   .rp { position: relative; display: block; }
   .rp span { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-weight: 600; color: var(--muted); }
   .rp .in { padding-left: 46px; font-size: 22px; font-weight: 600; min-height: 60px; }
-  .note-add { display: flex; gap: 10px; }
+  .note-add { display: flex; gap: 10px; flex-wrap: wrap; }
   .note-add .in { flex: 1; width: auto; }
   .notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   @media (min-width: 900px) { .notes { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); } }
@@ -616,6 +616,7 @@
       <div class="hdr"><div class="ttl"><h1 class="big-title">Catatan</h1><span>Ide, pengingat, dan hal penting</span></div></div>
       <div class="note-add">
         <input class="in" id="ntText" maxlength="500" placeholder="Tulis catatan baru…" aria-label="Catatan baru">
+        <input class="in" id="ntDate" type="date" aria-label="Tanggal (opsional)" title="Tanggal (opsional)" style="flex:0 0 auto;width:auto;max-width:170px">
         <button class="btn" id="ntAdd" type="button">Tambah</button>
       </div>
       <div class="notes" id="ntList"><p class="empty">Memuat…</p></div>
@@ -797,6 +798,7 @@
     <div class="dlg-head"><div><h2 id="ndTitle">Ubah catatan</h2></div><button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="dlg-body">
       <label class="lbl">Catatan<textarea class="in" id="ndText" rows="5" maxlength="500"></textarea></label>
+      <label class="lbl">Tanggal (opsional)<input class="in" id="ndDate" type="date"></label>
       <div class="dlg-actions"><button class="btn-line" type="button" data-close>Batal</button><button class="btn" type="button" id="ndSave">Simpan</button></div>
     </div>
   </div>
@@ -2887,7 +2889,7 @@
     box.className = 'ntl';
     box.innerHTML = list.map(function (n) {
       var tx = n.text.replace(/#atin|#tim/ig, '').replace(/[ \t]{2,}/g, ' ').trim(), baris = tx.split('\n'), judul = baris.shift(), isi = baris.join('\n').trim();
-      var d = n.date ? parseDate(n.date) : null, tags = [];
+      var d = n.tgl ? parseDate(n.tgl) : null, tags = [];
       if (/#atin/i.test(n.text)) tags.push('Dibagikan ke Atin'); if (/#tim/i.test(n.text)) tags.push('Dibagikan ke tim');
       return '<div class="ntr"><div class="ntd">' + (d ? '<span>' + BULAN_SHORT[d.getMonth()] + '</span><b>' + d.getDate() + '</b>' : '') + '</div><div class="ntn"><i style="--nc:' + esc(n.color) + '"></i></div>' +
         '<div class="ntb"><div class="nth"><b class="ntt">' + esc(judul) + '</b><span class="ntp">' +
@@ -2897,7 +2899,7 @@
         '<small>' + esc(n.by || 'Syifa') + (tags.length ? ' · ' + esc(tags.join(' · ')) : ' · Pribadi') + '</small>' + (isi ? '<p>' + esc(isi) + '</p>' : '') + '</div></div>';
     }).join('') + '<div class="ntend"></div>';
     box.querySelectorAll('[data-edit]').forEach(function (b) {
-      b.onclick = function () { var n = list.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (!n) return; noteEdit = n; $('ndText').value = n.text; $('noteDlg').showModal(); };
+      b.onclick = function () { var n = list.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (!n) return; noteEdit = n; $('ndText').value = n.text; $('ndDate').value = n.tgl || ''; $('noteDlg').showModal(); };
     });
     box.querySelectorAll('[data-share]').forEach(function (b) {
       b.onclick = async function () {
@@ -2905,7 +2907,7 @@
         var tag = '#' + b.dataset.share, re = new RegExp('\\s*' + tag, 'ig'), on = re.test(n.text);
         var teks = on ? n.text.replace(new RegExp('\\s*' + tag, 'ig'), '').trim() : (n.text.trim() + ' ' + tag);
         st.busy = true; b.disabled = true;
-        try { renderNotes(await call('updateNote', n.id, teks.slice(0, 500))); forget('dash'); toast(on ? 'Berhenti dibagikan' : (b.dataset.share === 'atin' ? 'Dibagikan ke Atin' : 'Dibagikan ke tim')); }
+        try { renderNotes(await call('updateNote', n.id, teks.slice(0, 500), n.tgl || '')); forget('dash'); toast(on ? 'Berhenti dibagikan' : (b.dataset.share === 'atin' ? 'Dibagikan ke Atin' : 'Dibagikan ke tim')); }
         catch (e) { b.disabled = false; fail(e); }
         finally { st.busy = false; }
       };
@@ -2926,7 +2928,7 @@
     var text = $('ndText').value.trim();
     if (!text) { toast('Catatan masih kosong', true); return; }
     st.busy = true; $('ndSave').disabled = true;
-    try { renderNotes(await call('updateNote', noteEdit.id, text)); forget('dash'); $('noteDlg').close(); toast('Catatan diperbarui'); }
+    try { renderNotes(await call('updateNote', noteEdit.id, text, $('ndDate').value)); forget('dash'); $('noteDlg').close(); toast('Catatan diperbarui'); }
     catch (e) { fail(e); }
     finally { st.busy = false; $('ndSave').disabled = false; }
   }
@@ -2936,7 +2938,7 @@
     var text = $('ntText').value.trim();
     if (!text) { $('ntText').focus(); return; }
     st.busy = true; $('ntAdd').disabled = true;
-    try { renderNotes(await call('addNote', text)); $('ntText').value = ''; forget('dash'); toast('Catatan ditambahkan'); }
+    try { renderNotes(await call('addNote', text, $('ntDate').value)); $('ntText').value = ''; $('ntDate').value = ''; forget('dash'); toast('Catatan ditambahkan'); }
     catch (e) { fail(e); }
     finally { st.busy = false; $('ntAdd').disabled = false; }
   }
