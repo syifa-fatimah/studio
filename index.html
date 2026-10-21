@@ -233,6 +233,26 @@
   .bar span { display: block; height: 100%; background: var(--rose); border-radius: 8px; }
   .barrow { padding: 8px 0; }
   .kinlap { margin-top: 6px; border-top: 1px dashed var(--line); padding-top: 8px; }
+  .pagi { background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 16px 16px 14px; margin: 14px 0 4px; box-shadow: 0 10px 26px rgba(190,43,102,.08); }
+  .pagi .pg-top b { display: block; font-size: 16px; } .pagi .pg-top span { display: block; font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+  .pagi .pg-angka { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+  .pagi .pg-angka div { background: var(--pink-soft); border-radius: 16px; padding: 10px 8px; text-align: center; }
+  .pagi .pg-angka b { display: block; font-size: 20px; } .pagi .pg-angka small { font-size: 11.5px; color: var(--muted); }
+  .pagi .pg-aksi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .pagi .pg-aksi button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; min-height: 44px; font: 600 13px var(--font); color: var(--ink); cursor: pointer; }
+  .pagi .pg-aksi button:active { transform: scale(.96); }
+  .jseg { display: flex; gap: 6px; background: var(--pink-soft); border-radius: 999px; padding: 5px; margin: 0 0 14px; }
+  .jseg button { flex: 1; border: 0; background: none; border-radius: 999px; min-height: 42px; font: 600 14px var(--font); color: var(--muted); cursor: pointer; }
+  .jseg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 4px 12px rgba(190,43,102,.12); }
+  .pagi .pg-it { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px dashed var(--line); }
+  .pagi .pg-it:first-of-type { border-top: 0; }
+  .pg-it > i { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 12px; background: var(--pink-soft); display: flex; align-items: center; justify-content: center; font-size: 16px; font-style: normal; }
+  .pg-it > i.av { border-radius: 50%; background: var(--rose); color: #fff; font-weight: 700; font-size: 14px; }
+  .pg-it > i.tg { flex: 0 0 auto; width: auto; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--rose); white-space: nowrap; }
+  .pg-it em.jm { font-style: normal; font-weight: 500; color: var(--muted); }
+  .pg-it p { margin: 0; flex: 1; min-width: 0; } .pg-it b { display: block; font-size: 14.5px; } .pg-it small { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+  .card .pg-it { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px dashed var(--line); } .card .sec + .pg-it { border-top: 0; }
+  .pagi .pg-aksi.pg-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   details.lipat { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; margin: 0 0 12px; overflow: hidden; }
   details.lipat summary { list-style: none; display: flex; align-items: center; gap: 8px; padding: 16px 18px; min-height: 58px; cursor: pointer; }
   details.lipat summary::-webkit-details-marker { display: none; }
@@ -612,16 +632,24 @@
     </section>
 
     <section id="v-harian" class="page" hidden>
+      <div class="jseg" role="tablist" aria-label="Jadwal"><button type="button" class="on" aria-current="true">Jadwal harian</button><button type="button" data-jseg="agenda">Agenda &amp; dinas</button></div>
       <div class="hdr" style="justify-content:flex-end;min-height:0;margin-bottom:-8px"><h1 class="sr">Jadwal harian</h1><button class="round" type="button" data-bell aria-label="Notifikasi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></button></div>
       <div id="hBody" class="stack"><p class="center-msg">Memuat…</p></div>
     </section>
 
     <section id="v-agenda" class="page" hidden>
+      <div class="jseg" role="tablist" aria-label="Jadwal"><button type="button" data-jseg="harian">Jadwal harian</button><button type="button" class="on" aria-current="true">Agenda &amp; dinas</button></div>
       <div class="hdr">
         <div class="ttl"><h1 class="big-title">Agenda &amp; dinas</h1><span>Rapat, dinas, dan operasional</span></div>
         <button class="round dark" type="button" id="agOpen" aria-label="Tambah agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
       </div>
       <div id="agBody" class="stack"><p class="center-msg">Memuat agenda…</p></div>
+    </section>
+
+    <section id="v-tim" class="page" hidden>
+      <div class="hdr"><div class="ttl"><h1 class="big-title">Tim Arabelle</h1><span>Perintah, approval, laporan &amp; rapor tim</span></div>
+        <button class="round" type="button" id="timRefresh" aria-label="Muat ulang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button></div>
+      <div id="tBody" class="stack"><p class="center-msg">Memuat…</p></div>
     </section>
 
     <section id="v-uang" class="page" hidden>
@@ -982,12 +1010,13 @@
   var VIEWS = {
     dasbor: { label: 'Beranda', icon: I.home },
     konten: { label: 'Kalender konten', icon: I.cal },
-    harian: { label: 'Jadwal harian', icon: I.list },
+    harian: { label: 'Jadwal', icon: I.list },
     agenda: { label: 'Agenda & dinas', icon: I.clock },
+    tim: { label: 'Tim Arabelle', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4.2 4.3 1.8 4.9 4.8"/></svg>' },
     uang: { label: 'Keuangan', icon: I.wallet },
     catatan: { label: 'Catatan', icon: I.note }
   };
-  var ALL_VIEWS = ['dasbor', 'konten', 'harian', 'agenda', 'uang', 'catatan'];
+  var ALL_VIEWS = ['dasbor', 'konten', 'harian', 'agenda', 'tim', 'uang', 'catatan'];
 
   var hasGAS = typeof google !== 'undefined' && google.script && google.script.run;
   var hasAPI = /^https:\/\/script\.google\.com\/.+\/exec$/.test(API_URL);
@@ -1285,29 +1314,28 @@
     document.querySelectorAll('[data-demo]').forEach(function (x) { x.hidden = live; });
     $('sideRole').textContent = b.user.name + (owner ? ' · Owner' : ' · Tim konten');
     $('kSub').textContent = b.owner + ' · Instagram × TikTok';
-    var keys = owner ? ALL_VIEWS : ['konten', 'harian'];
+    var keys = owner ? ['dasbor', 'konten', 'harian', 'tim', 'uang', 'catatan'] : ['konten', 'harian'];
     $('appScreen').classList.add('has-nav');
     var side = $('sideNav'), dock = $('dock');
     side.innerHTML = ''; dock.innerHTML = '';
-    // Menu samping (PC): semua menu. Navigasi bawah (HP): 5 tombol, + di tengah; Catatan lewat + dan Beranda.
-    var dockKeys = owner ? ['dasbor', 'konten', 'agenda', 'harian', 'uang'] : keys;
+    // Menu samping (PC): semua menu + Tambah cepat. Navigasi bawah (HP): Beranda, Konten, ＋, Jadwal, Tim Arabelle, Keuangan.
+    var dockKeys = owner ? ['dasbor', 'konten', '+', 'harian', 'tim', 'uang'] : keys;
+    if (owner) { var qb = el('button', 'nav-btn', I.plus + '<span>Tambah cepat</span>'); qb.type = 'button'; qb.onclick = openQuick; side.appendChild(qb); }
     keys.forEach(function (k) {
-      var quick = k === 'agenda';   // menu Agenda & dinas digantikan Tambah cepat
-      var icon = quick ? I.plus : VIEWS[k].icon, label = quick ? 'Tambah cepat' : VIEWS[k].label;
-      var a = el('button', 'nav-btn', icon + '<span>' + label + '</span>');
-      a.type = 'button'; if (!quick) a.dataset.view = k; a.onclick = function () { if (quick) openQuick(); else go(k); };
+      var a = el('button', 'nav-btn', VIEWS[k].icon + '<span>' + VIEWS[k].label + '</span>');
+      a.type = 'button'; a.dataset.view = k; a.onclick = function () { go(k); };
       side.appendChild(a);
     });
-    if (owner) { var agb = el('button', 'nav-btn', VIEWS.agenda.icon + '<span>' + VIEWS.agenda.label + '</span>'); agb.type = 'button'; agb.dataset.view = 'agenda';
-      agb.onclick = function () { go('agenda'); }; side.insertBefore(agb, side.children[3] || null); }
     dockKeys.forEach(function (k) {
-      var quick = k === 'agenda';
+      var quick = k === '+';
       var icon = quick ? I.plus : VIEWS[k].icon, label = quick ? 'Tambah cepat' : VIEWS[k].label;
       var m = el('button', quick ? 'dock-plus' : '', icon);
       m.type = 'button'; if (!quick) m.dataset.view = k; m.setAttribute('aria-label', label); m.title = label;
       m.onclick = function () { if (quick) openQuick(); else go(k); };
       dock.appendChild(m);
     });
+    document.querySelectorAll('[data-jseg]').forEach(function (b) { b.onclick = function () { go(b.dataset.jseg); }; });
+    if ($('timRefresh')) $('timRefresh').onclick = function () { forget('dash'); loadTim(true); };
     if (keys.length < 4) dock.style.justifyContent = 'space-evenly';
     go(owner ? 'dasbor' : 'konten');
     if (owner) setTimeout(prefetch, 1500);
@@ -1429,10 +1457,10 @@
     st.view = view;
     ALL_VIEWS.forEach(function (k) { $('v-' + k).hidden = k !== view; });
     document.querySelectorAll('[data-view]').forEach(function (x) {
-      if (x.dataset.view === view) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current');
+      if (x.dataset.view === view || (view === 'agenda' && x.dataset.view === 'harian')) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current');
     });
     window.scrollTo(0, 0);
-    ({ dasbor: loadDash, konten: loadKonten, harian: loadDay, agenda: loadAgenda, uang: loadFinance, catatan: loadNotes })[view]();
+    ({ dasbor: loadDash, konten: loadKonten, harian: loadDay, agenda: loadAgenda, tim: loadTim, uang: loadFinance, catatan: loadNotes })[view]();
   }
 
   /** Garis waktu: rows = [{start,end,title,sub,chip,done,kind,x,onOpen}] */
@@ -1761,6 +1789,66 @@
   }
 
   var SY_AUTH = null, SY_NAMA = [];
+  // Kartu "Pagi ini": kondisi tim dalam 1 baris + 3 tombol cepat (perintah, approval, kinerja)
+  // Beranda: cukup yang dikerjakan tim Arabelle hari ini (detail lengkap di tab Tim Arabelle)
+  function hariIniTim(t) {
+    var hr = todayISO(), L = t.laporanTim || {};
+    var kerja = Object.keys(L).map(function (n) { var x = (L[n] || []).filter(function (y) { return y.tgl === hr; })[0]; return x ? { nama: n, x: x } : null; }).filter(Boolean);
+    var ag = (t.agenda || []).filter(function (a) { return a.date === hr; });
+    return { hr: hr, kerja: kerja, ag: ag };
+  }
+  function pagiIni(t) {
+    SY_AUTH = t && t.kirim && Number(t.kirim.exp) > Date.now() ? t.kirim : SY_AUTH; SY_NAMA = (t && t.nama) || SY_NAMA;
+    var h = hariIniTim(t);
+    var isi = '<div class="pg-top"><b>Tim Arabelle hari ini</b><span>' + t.lapor + '/' + t.wajib + ' lapor · ' + t.tayang + '/' + t.post + ' posting tayang' + (t.review ? ' · ' + t.review + ' menunggu approval' : '') + '</span></div>';
+    isi += h.ag.map(function (a) { return '<div class="pg-it"><i>🗓️</i><p><b>' + esc(a.text) + '</b>' + (a.tim ? '<small>👥 ' + esc(a.tim) + '</small>' : '') + '</p></div>'; }).join('');
+    isi += h.kerja.slice(0, 4).map(function (k) { return '<div class="pg-it"><i class="av">' + esc(k.nama.charAt(0)) + '</i><p><b>' + esc(k.nama) + '</b><small>' + esc(k.x.selesai || k.x.sedang || '—') + '</small></p></div>'; }).join('');
+    if (!h.ag.length && !h.kerja.length) isi += '<p class="mu" style="margin:8px 0 0;font-size:14px">Belum ada laporan tim hari ini.</p>';
+    if (t.belum && t.belum.length) isi += '<p class="mu" style="margin:8px 0 0;font-size:13px">Belum lapor: ' + esc(t.belum.join(', ')) + '</p>';
+    isi += '<button class="btn-line" type="button" data-gotim style="width:100%;margin-top:12px">Buka tab Tim Arabelle ›</button>';
+    var c = el('div', 'pagi', isi); c.querySelector('[data-gotim]').onclick = function () { go('tim'); };
+    return c;
+  }
+  // ---------- Tab Tim Arabelle: semua yang berhubungan dengan tim jadi satu ----------
+  async function loadTim(paksa) {
+    var have = st.dash && st.dash.tim;
+    if (have) renderTim(st.dash.tim); else $('tBody').innerHTML = '<p class="center-msg">Memuat…</p>';
+    if (have && !paksa && recent('dash')) return;
+    try { var d = await call('getDashboard'); mark('dash', d); st.dash = d; if (st.view === 'tim') renderTim(d.tim); }
+    catch (e) { if (!have) $('tBody').innerHTML = '<p class="center-msg">' + esc(errMsg(e)) + '</p>'; }
+  }
+  function renderTim(t) {
+    var b = $('tBody'); b.innerHTML = '';
+    if (!t || t.error) { b.innerHTML = '<p class="empty">Belum bisa membaca data tim' + (t && t.error ? ': ' + esc(t.error) : '') + '</p>'; return; }
+    SY_AUTH = t.kirim && Number(t.kirim.exp) > Date.now() ? t.kirim : SY_AUTH; SY_NAMA = t.nama || SY_NAMA; SY_ALASAN = t.kirimAlasan || '';
+    var h = hariIniTim(t);
+    // aksi cepat
+    var aksi = el('div', 'pagi', '<div class="pg-angka"><div><b>' + t.lapor + '/' + t.wajib + '</b><small>lapor hari ini</small></div><div><b>' + t.tayang + '/' + t.post + '</b><small>posting tayang</small></div><div><b>' + (t.review || 0) + '</b><small>menunggu approval</small></div></div>' +
+      '<div class="pg-aksi pg-4"><button type="button" data-a="perintah">📣 Perintah</button><button type="button" data-a="approval">👀 Approval' + (t.review ? ' · ' + t.review : '') + '</button><button type="button" data-a="kinerja">📊 Kinerja</button><button type="button" data-a="rapor">📑 Rapor</button></div>');
+    aksi.querySelector('[data-a="perintah"]').onclick = bukaPerintah; aksi.querySelector('[data-a="approval"]').onclick = bukaApproval;
+    aksi.querySelector('[data-a="kinerja"]').onclick = function () { if (t.kinerja && !t.kinerja.error) bukaKinerja(t); else toast('Data kinerja belum tersedia', true); };
+    aksi.querySelector('[data-a="rapor"]').onclick = function () { bukaRapor(null); };
+    b.appendChild(aksi);
+    // yang dikerjakan hari ini
+    var hk = '<div class="sec"><h3>Dikerjakan hari ini</h3></div>' + h.ag.map(function (a) { return '<div class="pg-it"><i>🗓️</i><p><b>' + esc(a.text) + '</b>' + (a.tim ? '<small>👥 ' + esc(a.tim) + '</small>' : '') + '</p></div>'; }).join('') +
+      h.kerja.map(function (k) { return '<div class="pg-it"><i class="av">' + esc(k.nama.charAt(0)) + '</i><p><b>' + esc(k.nama) + (k.x.jam ? ' <em class="jm">· ' + esc(k.x.jam) + '</em>' : '') + '</b>' +
+        (k.x.selesai ? '<small>✅ ' + esc(k.x.selesai) + '</small>' : '') + (k.x.sedang ? '<small>🛠️ ' + esc(k.x.sedang) + '</small>' : '') + (/^https?:\/\//.test(k.x.link || '') ? '<a href="' + esc(k.x.link) + '" target="_blank" rel="noopener" style="font-size:13px;font-weight:600;color:var(--rose)">🔗 Lihat hasil</a>' : '') + '</p></div>'; }).join('') +
+      (!h.ag.length && !h.kerja.length ? '<p class="mu">Belum ada laporan tim hari ini.</p>' : '') + (t.belum && t.belum.length ? '<p class="mu" style="font-size:13px;margin:8px 0 0">Belum lapor: ' + esc(t.belum.join(', ')) + '</p>' : '');
+    b.appendChild(el('div', 'card', hk));
+    // perintah terakhir
+    var pc = el('div', 'card', '<div class="sec"><h3>Perintah</h3><button class="link" type="button" data-tulis>＋ Tulis perintah</button></div><div id="tPer"><p class="mu">Memuat…</p></div>');
+    pc.querySelector('[data-tulis]').onclick = bukaPerintah; b.appendChild(pc);
+    tbPakai('perintahku', {}).then(function (j) {
+      var L = (j && j.data) || [];
+      $('tPer').innerHTML = L.length ? L.slice(0, 5).map(function (p) { return '<div class="perl"><small>' + esc(p.waktu) + ' · untuk ' + esc(p.untuk) + '</small><b>' + esc(p.isi) + '</b><small style="margin-top:4px">✅ ' + p.selesai.length + ' selesai' + (p.belum.length ? ' · belum: ' + esc(p.belum.join(', ')) : ' · semua beres 🎉') + ((p.balasan || []).length ? ' · 💬 ' + p.balasan.length + ' balasan' : '') + '</small></div>'; }).join('') +
+        (L.length > 5 ? '<button class="link" type="button" id="tPerAll" style="margin-top:8px;color:var(--rose);font-weight:600">Lihat semua &amp; kelola</button>' : '') : '<p class="mu">Belum ada perintah 30 hari terakhir.</p>';
+      if ($('tPerAll')) $('tPerAll').onclick = bukaPerintah;
+    }).catch(function () { $('tPer').innerHTML = '<p class="mu">Perintah belum bisa dimuat.</p>'; });
+    // launching & agenda tim ke depan
+    var up = (t.launch || []).map(function (l) { return { d: l.date, t: '🚀 ' + l.text, s: '' }; }).concat((t.agenda || []).filter(function (a) { return a.date > h.hr; }).map(function (a) { return { d: a.date, t: a.text, s: a.tim ? '👥 ' + a.tim : '' }; }))
+      .sort(function (a, b) { return a.d.localeCompare(b.d); }).slice(0, 6);
+    if (up.length) b.appendChild(el('div', 'card', '<div class="sec"><h3>Akan datang</h3></div>' + up.map(function (x) { return '<div class="pg-it"><i class="tg">' + esc(dayLabel(x.d)) + '</i><p><b>' + esc(x.t) + '</b>' + (x.s ? '<small>' + esc(x.s) + '</small>' : '') + '</p></div>'; }).join('')));
+  }
   function timCard(t) {
     SY_AUTH = t && t.kirim && Number(t.kirim.exp) > Date.now() ? t.kirim : null; SY_NAMA = (t && t.nama) || []; SY_ALASAN = (t && t.kirimAlasan) || '';
     var row = function (bg, icon, small, title, sub) {
@@ -1803,6 +1891,7 @@
 
     var hero = el('div', 'hero', '<h2>' + esc(greet()) + '!</h2><p>' + esc(sub) + '</p><span data-logo class="hero-logo"></span>');
     left.appendChild(hero); applyLogo(hero);
+    if (d.tim && !d.tim.error) left.appendChild(pagiIni(d.tim));
 
     left.appendChild(weekStrip(d.week.map(function (w) { return w.date; }), st.dDay, function (ds) {
       var w = d.week.filter(function (x) { return x.date === ds; })[0];
@@ -1857,7 +1946,7 @@
     }).join('') : '<p class="empty">Belum ada agenda yang akan datang.</p>'));
     ac.querySelector('.link').onclick = function () { go('agenda'); };
     taruh(right, ac, 'agenda', '📅 Agenda akan datang', up.length ? String(up.length) : '');
-    if (d.tim) taruh(right, timCard(d.tim), 'tim', '👥 Tim Arabelle', d.tim.error ? '' : d.tim.lapor + '/' + d.tim.wajib + ' lapor');
+
     right.querySelectorAll('[data-go]').forEach(function (b) {
       b.onclick = function () { if (b.dataset.go === 'report') { st.kTab = 'report'; go('konten'); } else go(b.dataset.go); };
     });
