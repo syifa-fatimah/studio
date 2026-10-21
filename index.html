@@ -240,6 +240,7 @@
   .kinlap .lp { background: var(--pink-soft); border-radius: 14px; padding: 10px 12px; margin-top: 8px; font-size: 14px; line-height: 1.45; }
   .kinlap .lp small { display: block; color: var(--muted); font-size: 12.5px; margin-bottom: 2px; }
   .kinlap .lp p { margin: 2px 0 0; white-space: pre-line; }
+  .kinlap .lp.kosong { background: var(--surface); border: 1px dashed var(--line); color: var(--muted); }
   .perl { background: var(--pink-soft); border-radius: 16px; padding: 12px 14px; margin-top: 10px; font-size: 14px; }
   .perl small { display: block; color: var(--muted); font-size: 12.5px; }
   .barrow .top { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
@@ -689,6 +690,16 @@
       <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="dlg-body" id="kinBody"></div>
+  </div>
+</dialog>
+
+<dialog id="rapDlg" aria-labelledby="rapTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div><h2 id="rapTitle">Rapor tim bulanan</h2><p id="rapSub">Kinerja seluruh tim Arabelle</p></div>
+      <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dlg-body" id="rapBody"></div>
   </div>
 </dialog>
 
@@ -1517,11 +1528,10 @@
       '<div class="kpi" style="background:var(--t-sky)"><small>Anggota</small><b>' + r.orang.length + '</b><span class="dl mu">dinilai</span></div></div>';
     h += r.orang.map(function (o) {
       return '<div class="card" style="padding-bottom:14px"><div class="sec"><h3>' + esc(o.nama) + '</h3><span class="chip" style="background:' + warna(o) + '">' + o.skor + ' · ' + o.label + '</span></div>' +
-        bar('Laporan harian', o.lapor, o.wajib, o.lapor + ' / ' + o.wajib + ' hari') +
         (o.post ? bar('Posting tayang', o.tayang, o.post, o.tayang + ' / ' + o.post) : '<div class="barrow"><div class="top"><span>Posting tayang</span><b class="mu">tidak ada jadwal</b></div></div>') +
         '<div class="barrow"><div class="top"><span>Rata-rata progres</span><b>' + (o.progres === null ? '–' : o.progres + '%') + '</b></div></div>' +
         (o.izin ? '<div class="barrow"><div class="top"><span>Izin / sakit / cuti</span><b>' + o.izin + ' hari</b></div></div>' : '') + lapKinerja(o, r, t) + '</div>';
-    }).join('') + '<p class="mu">Skor = laporan harian 60% + posting tayang 40% (kalau tidak ada jadwal posting, skor = laporan harian). Hari kerja Senin–Sabtu, dikurangi hari izin.</p>';
+    }).join('') + '<p class="mu">Skor = kelengkapan laporan harian 60% + posting tayang 40% (kalau tidak ada jadwal posting, skor = laporan harian). Hari kerja Senin–Sabtu, dikurangi hari izin.</p>';
     $('kinBody').innerHTML = h;
     $('kinBody').querySelectorAll('[data-p]').forEach(function (b) { b.onclick = function () { kinPeriode = b.dataset.p; bukaKinerja(t); }; });
     $('kinBody').querySelectorAll('[data-lapbuka]').forEach(function (b) { b.onclick = function () { var y = $('kinBody').scrollTop; kinBuka[b.dataset.lapbuka] = !kinBuka[b.dataset.lapbuka]; bukaKinerja(t); $('kinBody').scrollTop = y; }; });
@@ -1529,19 +1539,27 @@
   }
   // isi laporan harian anggota (yang dikerjakan) langsung di kartu namanya
   var kinBuka = {};
+  // Laporan harian per hari kerja (Senin–Sabtu) di periode terpilih: isi laporan & hasilnya, atau "tidak lapor"
   function lapKinerja(o, r, t) {
-    var semua = (t && t.laporanTim && t.laporanTim[o.nama]) || o.laporan || [];
-    var L = semua.filter(function (x) { return !r || (x.tgl >= r.dari && x.tgl <= r.sampai); });
-    if (!L.length) return '<div class="kinlap"><div class="kinjudul">📝 Laporan &amp; hasil kerja</div><span class="mu" style="font-size:13px">Belum ada laporan di periode ini.</span></div>';
+    var judul = '<div class="kinjudul">📝 Laporan harian</div>';
+    if (!t || !t.laporanTim) return '<div class="kinlap">' + judul + '<span class="mu" style="font-size:13px">⚠️ Isi laporan belum terkirim dari server. Pasang Sinkron.gs terbaru di Apps Script Syifa Studio, lalu Deploy → New version.</span></div>';
+    var semua = t.laporanTim[o.nama] || [], per = {};
+    semua.forEach(function (x) { (per[x.tgl] = per[x.tgl] || []).push(x); });
+    var hari = [], d = parseDate(r.sampai), awal = parseDate(r.dari);
+    while (d >= awal) { if (d.getDay() !== 0) hari.push(d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2)); d = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1); }
     var pg = function (x) { var n = Number(x); if (x === '' || isNaN(n)) return ''; return (n > 0 && n <= 1 ? Math.round(n * 100) : Math.round(n)) + '%'; };
-    var satu = function (x) {
-      return '<div class="lp"><small>' + esc(dayLabel(x.tgl)) + (x.jam ? ' · ' + esc(x.jam) : '') + (pg(x.progres) ? ' · ' + pg(x.progres) : '') + (x.status ? ' · ' + esc(x.status) : '') + (/telat/i.test(x.tepat || '') ? ' · ⏰ telat' : '') + '</small>' +
-        (x.selesai ? '<p>✅ ' + esc(x.selesai) + '</p>' : '') + (x.sedang ? '<p>🛠️ ' + esc(x.sedang) + '</p>' : '') +
-        (/^https?:\/\//.test(x.link) ? '<a class="hasil" href="' + esc(x.link) + '" target="_blank" rel="noopener">🔗 Lihat hasil</a>' : '') + '</div>';
+    var satuHari = function (tg) {
+      var L = per[tg];
+      if (!L) return '<div class="lp kosong"><small>' + esc(dayLabel(tg)) + '</small><p>— Tidak ada laporan</p></div>';
+      return L.map(function (x) {
+        return '<div class="lp"><small>' + esc(dayLabel(tg)) + (x.jam ? ' · ' + esc(x.jam) : '') + (pg(x.progres) ? ' · ' + pg(x.progres) : '') + (x.status ? ' · ' + esc(x.status) : '') + (/telat/i.test(x.tepat || '') ? ' · ⏰ telat' : '') + '</small>' +
+          (x.selesai ? '<p>✅ ' + esc(x.selesai) + '</p>' : '') + (x.sedang ? '<p>🛠️ ' + esc(x.sedang) + '</p>' : '') +
+          (/^https?:\/\//.test(x.link) ? '<a class="hasil" href="' + esc(x.link) + '" target="_blank" rel="noopener">🔗 Lihat hasil</a>' : '') + '</div>';
+      }).join('');
     };
-    var penuh = kinBuka[o.nama], tampil = penuh ? L : L.slice(0, 3);
-    return '<div class="kinlap"><div class="kinjudul">📝 Laporan &amp; hasil kerja · ' + L.length + ' laporan</div>' + tampil.map(satu).join('') +
-      (L.length > 3 ? '<button class="link" type="button" data-lapbuka="' + esc(o.nama) + '" style="padding:8px 0 0;color:var(--rose);font-weight:600">' + (penuh ? 'Ringkas' : 'Lihat semua (' + L.length + ')') + '</button>' : '') + '</div>';
+    var penuh = kinBuka[o.nama], tampil = penuh ? hari : hari.slice(0, 6);
+    return '<div class="kinlap">' + judul + tampil.map(satuHari).join('') +
+      (hari.length > 6 ? '<button class="link" type="button" data-lapbuka="' + esc(o.nama) + '" style="padding:8px 0 0;color:var(--rose);font-weight:600">' + (penuh ? 'Ringkas' : 'Lihat semua hari (' + hari.length + ')') + '</button>' : '') + '</div>';
   }
   function todayISO() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
 
@@ -1556,13 +1574,14 @@
   }
   function bukaPerintah() {
     if (!$('perDlg').open) $('perDlg').showModal();
-    var t = tbToken(); if (!t) return perMasuk();
+    var t = tbToken(); if (!t) return perMasuk('perBody', bukaPerintah);
     $('perBody').innerHTML = '<p class="center-msg">Memuat…</p>';
     tbCall('saya', { t: t }).then(function (j) { if (!j.ok) throw new Error(j.pesan); if (!j.data.pimpinan) { $('perBody').innerHTML = '<p class="empty">🔒 Perintah hanya untuk owner, GM &amp; leader.</p>'; return; } perForm(j.data); })
-      .catch(function (e) { if (!tbToken()) perMasuk(); else $('perBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
+      .catch(function (e) { if (!tbToken()) perMasuk('perBody', bukaPerintah); else $('perBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
   }
-  function perMasuk() {
-    $('perBody').innerHTML = '<p class="mu" style="margin:0">Sambungkan sekali ke ThinKerBelle. Kode masuk dikirim ke WA kamu.</p>' +
+  function perMasuk(bid, lanjut) {
+    bid = bid || 'perBody'; lanjut = lanjut || bukaPerintah;
+    $(bid).innerHTML = '<p class="mu" style="margin:0">Sambungkan sekali ke ThinKerBelle. Kode masuk dikirim ke WA kamu.</p>' +
       '<label class="lbl">Nama di ThinKerBelle<select class="in" id="perNama"><option>Memuat…</option></select></label>' +
       '<div class="dlg-actions"><button class="btn" type="button" id="perKode">📲 Kirim kode ke WA</button></div>' +
       '<div id="perOtp" hidden><label class="lbl">Kode 6 digit dari WA<input class="in" id="perOtpIn" inputmode="numeric" maxlength="6" placeholder="••••••" style="letter-spacing:8px;text-align:center;font-size:22px"></label>' +
@@ -1572,7 +1591,44 @@
       $('perNama').innerHTML = n.map(function (x) { return '<option' + (x === pilih ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('');
     }).catch(function (e) { toast(errMsg(e), true); });
     $('perKode').onclick = function () { tbCall('kode', { nama: $('perNama').value }).then(function (j) { toast(j.pesan, !j.ok); if (j.ok) { $('perOtp').hidden = false; $('perOtpIn').focus(); } }).catch(function (e) { toast(errMsg(e), true); }); };
-    $('perVerif').onclick = function () { tbCall('verif', { nama: $('perNama').value, kode: $('perOtpIn').value }).then(function (j) { if (!j.ok) return toast(j.pesan, true); tbToken(j.token); toast('Tersambung ke ThinKerBelle ✨'); bukaPerintah(); }).catch(function (e) { toast(errMsg(e), true); }); };
+    $('perVerif').onclick = function () { tbCall('verif', { nama: $('perNama').value, kode: $('perOtpIn').value }).then(function (j) { if (!j.ok) return toast(j.pesan, true); tbToken(j.token); toast('Tersambung ke ThinKerBelle ✨'); lanjut(); }).catch(function (e) { toast(errMsg(e), true); }); };
+  }
+  // ---------- Rapor tim bulanan (khusus owner & leader, data dari ThinKerBelle) ----------
+  var rapIdx = null;
+  function bukaRapor(idx) {
+    if (!$('rapDlg').open) $('rapDlg').showModal();
+    var t = tbToken(); if (!t) return perMasuk('rapBody', function () { bukaRapor(null); });
+    if (idx !== undefined) rapIdx = idx;
+    $('rapBody').innerHTML = '<p class="center-msg">Menyusun rapor…</p>';
+    tbCall('rapor', { t: t, idx: rapIdx }).then(function (j) { if (!j.ok) throw new Error(j.pesan); tampilRapor(j.data); })
+      .catch(function (e) { if (!tbToken()) perMasuk('rapBody', function () { bukaRapor(null); }); else $('rapBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
+  }
+  function tampilRapor(R) {
+    rapIdx = R.idx; $('rapSub').textContent = R.label + ' · ' + R.rentang;
+    var T = R.total, pc = function (a, b) { return b ? Math.round(a / b * 100) + '%' : '–'; };
+    var lf = function (x) { return x == null ? '' : '<span class="dl" style="color:' + (x >= 0 ? '#2F7A55' : 'var(--rose)') + '">' + (x >= 0 ? '▲ ' : '▼ ') + Math.abs(x) + ' poin</span>'; };
+    var warna = function (o) { return o.skor == null ? 'var(--surface)' : o.skor >= 85 ? '#DDF2E6' : o.skor >= 65 ? 'var(--t-peach)' : 'var(--t-pink)'; };
+    var bar = function (lbl, a, b, ket) { return '<div class="barrow"><div class="top"><span>' + lbl + '</span><b>' + (b ? a + ' / ' + b : '–') + (ket ? ' <span class="mu" style="font-weight:500">· ' + ket + '</span>' : '') + '</b></div>' + (b ? '<div class="bar"><span style="width:' + Math.min(100, Math.round(a / b * 100)) + '%"></span></div>' : '') + '</div>'; };
+    var h = '<div style="display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px">' +
+      '<button class="btn-line" type="button" data-rap="' + (R.idx - 1) + '"' + (R.idx <= 0 ? ' disabled' : '') + ' aria-label="Bulan sebelumnya" style="min-width:48px;padding:0 14px">‹</button><b style="text-align:center">' + esc(R.label) + '</b>' +
+      '<button class="btn-line" type="button" data-rap="' + (R.idx + 1) + '"' + (R.idx >= R.n - 1 ? ' disabled' : '') + ' aria-label="Bulan berikutnya" style="min-width:48px;padding:0 14px">›</button></div>';
+    h += '<div class="kpis">' +
+      '<div class="kpi" style="background:var(--t-pink)"><small>Skor rata-rata tim</small><b>' + (T.skor == null ? '–' : T.skor) + '</b>' + lf(R.liftSkor) + '</div>' +
+      '<div class="kpi" style="background:var(--t-lilac)"><small>Laporan masuk</small><b>' + pc(T.lapor, T.wajib) + '</b><span class="dl mu">' + T.lapor + ' dari ' + T.wajib + ' hari · ' + T.tepat + ' tepat waktu</span></div>' +
+      '<div class="kpi" style="background:var(--t-peach)"><small>Posting tayang</small><b>' + pc(T.tayang, T.post) + '</b><span class="dl mu">' + T.tayang + ' dari ' + T.post + ' jadwal</span></div>' +
+      '<div class="kpi" style="background:var(--t-sky)"><small>Jobdesk selesai</small><b>' + pc(T.jobSel, T.job) + '</b><span class="dl mu">' + T.jobTelat + ' telat</span></div>' +
+      '<div class="kpi" style="background:var(--t-mint)"><small>Perintah selesai</small><b>' + pc(T.perSel, T.per) + '</b><span class="dl mu">' + T.perSel + ' dari ' + T.per + '</span></div>' +
+      '<div class="kpi" style="background:var(--t-butter)"><small>Hari izin</small><b>' + T.izin + '</b><span class="dl mu">izin, sakit, cuti</span></div></div>';
+    h += R.orang.map(function (o, i) {
+      return '<div class="card" style="padding-bottom:14px"><div class="sec"><h3>' + (o.skor != null && i < 3 ? ['🥇 ', '🥈 ', '🥉 '][i] : '') + esc(o.nama) + '</h3><span class="chip" style="background:' + warna(o) + '">' + (o.skor == null ? 'Belum ada data' : o.skor + ' · ' + esc(o.label)) + '</span></div>' +
+        (o.lift != null ? '<p class="mu" style="margin:-4px 0 4px;font-size:13px;color:' + (o.lift >= 0 ? '#2F7A55' : 'var(--rose)') + '">' + (o.lift >= 0 ? '▲ ' : '▼ ') + Math.abs(o.lift) + ' poin dari bulan lalu</p>' : '') +
+        bar('📝 Laporan harian', o.lapor, o.wajib, (o.tepat ? o.tepat + ' tepat waktu' : '') + (o.telatLap ? (o.tepat ? ', ' : '') + o.telatLap + ' lewat 21.00' : '')) +
+        bar('📱 Posting tayang', o.tayang, o.post, '') + bar('🚀 Jobdesk launching', o.jobSel, o.job, o.jobTelat ? o.jobTelat + ' telat' : '') + bar('📣 Perintah', o.perSel, o.per, '') +
+        '<div class="barrow"><div class="top"><span>📊 Rata-rata progres</span><b>' + (o.progres == null ? '–' : o.progres + '%') + '</b></div></div>' +
+        (o.izin ? '<div class="barrow"><div class="top"><span>🌴 Izin / sakit / cuti</span><b>' + o.izin + ' hari</b></div></div>' : '') + '</div>';
+    }).join('') + '<p class="mu" style="font-size:13px">Skor = laporan harian 45% + posting tayang 30% + jobdesk 15% + perintah 10% (yang tidak ada datanya tidak dihitung). Dibandingkan dengan bulan lalu sampai tanggal yang sama.</p>';
+    $('rapBody').innerHTML = h;
+    $('rapBody').querySelectorAll('[data-rap]').forEach(function (b) { b.onclick = function () { bukaRapor(Number(b.dataset.rap)); }; });
   }
   function perForm(me) {
     var nama = me.tim || [];
@@ -1598,7 +1654,7 @@
         $('perKirim').disabled = false; toast(j.pesan, !j.ok); if (j.ok) { $('perIsi').value = ''; $('perTgt').value = ''; perDaftar(); forget('dash'); }
       }).catch(function (e) { $('perKirim').disabled = false; toast(errMsg(e), true); });
     };
-    $('perKeluar').onclick = function () { tbToken(null); perMasuk(); };
+    $('perKeluar').onclick = function () { tbToken(null); perMasuk('perBody', bukaPerintah); };
     perDaftar();
   }
   function perDaftar() {
@@ -1616,7 +1672,7 @@
     var row = function (bg, icon, small, title, sub) {
       return '<div class="row"><span class="ic" style="background:' + bg + '">' + icon + '</span><span class="t"><small>' + esc(small) + '</small><b>' + esc(title) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span></div>';
     };
-    var h = '<div class="sec"><h3>Tim Arabelle</h3><span style="display:flex;gap:14px">' + '<button class="link" type="button" data-perintah>📣 Perintah</button>' + (t.kinerja && !t.kinerja.error ? '<button class="link" type="button" data-kinerja>Kinerja tim</button>' : '<span class="mu">dari ThinKerBelle</span>') + '</span></div>';
+    var h = '<div class="sec"><h3>Tim Arabelle</h3><span style="display:flex;gap:14px">' + '<button class="link" type="button" data-perintah>📣 Perintah</button><button class="link" type="button" data-rapor>📑 Rapor</button>' + (t.kinerja && !t.kinerja.error ? '<button class="link" type="button" data-kinerja>Kinerja tim</button>' : '<span class="mu">dari ThinKerBelle</span>') + '</span></div>';
     if (t.error) return el('div', 'card', h + '<p class="empty">Belum bisa membaca data tim: ' + esc(t.error) + '</p>');
     h += row('var(--t-mint)', I.list, 'Laporan hari ini', t.lapor + ' dari ' + t.wajib + ' sudah lapor', t.belum.length ? 'Belum: ' + t.belum.join(', ') : 'Semua sudah lapor 🎉');
     h += row('var(--t-sky)', I.cal, 'Posting tim hari ini', t.tayang + ' dari ' + t.post + ' sudah tayang', '');
@@ -1624,7 +1680,7 @@
     (t.agenda || []).slice(0, 3).forEach(function (a) { h += row('var(--t-lilac)', I.clock, dayLabel(a.date), a.text, a.tim ? '👥 ' + a.tim : ''); });
     (t.perintah || []).forEach(function (p) { h += row('var(--t-peach)', I.note, 'Perintahmu ke ' + (p.untuk || 'tim'), '📣 ' + p.isi, '👀 ' + p.dibaca + ' dibaca · ✅ ' + p.selesai + ' selesai'); });
     (t.catatan || []).forEach(function (c) { h += row('var(--t-butter)', I.note, 'Catatan tim dari ' + c.dari, '📌 ' + c.isi, ''); });
-    var c = el('div', 'card', h), kb = c.querySelector('[data-kinerja]'), pb = c.querySelector('[data-perintah]'); if (kb) kb.onclick = function () { bukaKinerja(t); }; if (pb) pb.onclick = bukaPerintah;
+    var c = el('div', 'card', h), kb = c.querySelector('[data-kinerja]'), pb = c.querySelector('[data-perintah]'); if (kb) kb.onclick = function () { bukaKinerja(t); }; if (pb) pb.onclick = bukaPerintah; var rb = c.querySelector('[data-rapor]'); if (rb) rb.onclick = function () { bukaRapor(null); };
     return c;
   }
 
