@@ -254,6 +254,10 @@
   .card .pg-it { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px dashed var(--line); } .card .sec + .pg-it { border-top: 0; }
   .pagi .pg-aksi.pg-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rc-more { display: block; width: 100%; margin: 4px 0 14px; min-height: 44px; border: 1px dashed var(--line); border-radius: 999px; background: none; color: var(--rose); font: 600 14px var(--font); cursor: pointer; }
+  .lnk-wrap { position: fixed; inset: 0; background: rgba(74,29,51,.35); z-index: 90; display: flex; align-items: flex-end; justify-content: center; }
+  .lnk-sheet { background: var(--surface); width: min(520px, 100%); border-radius: 28px 28px 0 0; padding: 22px 20px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 -10px 30px rgba(190,43,102,.18); }
+  .lnk-sheet b { font-size: 19px; } .lnk-sheet p { margin: 0; font-size: 13px; color: var(--muted); word-break: break-all; }
+  .lnk-sheet .btn { width: 100%; text-decoration: none; justify-content: center; } .lnk-sheet small { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
   details.lipat { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; margin: 0 0 12px; overflow: hidden; }
   details.lipat summary { list-style: none; display: flex; align-items: center; gap: 8px; padding: 16px 18px; min-height: 58px; cursor: pointer; }
   details.lipat summary::-webkit-details-marker { display: none; }
@@ -1585,6 +1589,10 @@
   // isi laporan harian anggota (yang dikerjakan) langsung di kartu namanya
   var kinBuka = {};
   // Laporan harian per hari kerja (Senin–Sabtu) di periode terpilih: isi laporan & hasilnya, atau "tidak lapor"
+  function linkHasil(x, kelas) {
+    var L = (x.links && x.links.length ? x.links : x.link ? [x.link] : []).filter(function (l) { return /^https?:/i.test(l); });
+    return L.map(function (l, i) { return '<a class="' + (kelas || '') + '" href="' + esc(l) + '" target="_blank" rel="noopener" style="' + (kelas ? 'margin-right:6px' : 'font-size:13px;font-weight:600;color:var(--rose);margin-right:10px') + '">🔗 Lihat hasil' + (L.length > 1 ? ' ' + (i + 1) : '') + '</a>'; }).join('');
+  }
   function lapKinerja(o, r, t) {
     var judul = '<div class="kinjudul">📝 Laporan harian</div>';
     if (!t || !t.laporanTim) return '<div class="kinlap">' + judul + '<span class="mu" style="font-size:13px">⚠️ Isi laporan belum terkirim dari server. Pasang Sinkron.gs terbaru di Apps Script Syifa Studio, lalu Deploy → New version.</span></div>';
@@ -1599,7 +1607,7 @@
       return L.map(function (x) {
         return '<div class="lp"><small>' + esc(dayLabel(tg)) + (x.jam ? ' · ' + esc(x.jam) : '') + (pg(x.progres) ? ' · ' + pg(x.progres) : '') + (x.status ? ' · ' + esc(x.status) : '') + (/telat/i.test(x.tepat || '') ? ' · ⏰ telat' : '') + '</small>' +
           (x.selesai ? '<p>✅ ' + esc(x.selesai) + '</p>' : '') + (x.sedang ? '<p>🛠️ ' + esc(x.sedang) + '</p>' : '') +
-          (/^https?:\/\//.test(x.link) ? '<a class="hasil" href="' + esc(x.link) + '" target="_blank" rel="noopener">🔗 Lihat hasil</a>' : '') + '</div>';
+          linkHasil(x, 'hasil') + '</div>';
       }).join('');
     };
     var penuh = kinBuka[o.nama], tampil = penuh ? hari : hari.slice(0, 6);
@@ -1612,6 +1620,65 @@
   var TB_API = 'https://script.google.com/macros/s/AKfycbxglVQKBvsnks_7C_XnrLXEx0GiIoZFT4xjSTDQ74YPVP_sAA-DaVlJdG_6Tvnx1Gk/exec';
   var TB_KEY = 'ss_tb_token';
   function tbToken(v) { try { if (v === null) localStorage.removeItem(TB_KEY); else if (v) localStorage.setItem(TB_KEY, v); return localStorage.getItem(TB_KEY) || ''; } catch (e) { return ''; } }
+var DS_ = '\u002F\u002F';
+function kenaliApp_(u) {
+  var h = ''; try { h = new URL(u).hostname.replace(/^www\./, '').replace(/^m\./, ''); } catch (e) { return null; }
+  var p = String(u);
+  var L = [
+    [/^docs\.google\.com$/, /\/document[/]/, 'Google Docs', 'com.google.android.apps.docs.editors.docs', 'googledocs:'],
+    [/^docs\.google\.com$/, /\/spreadsheets[/]/, 'Google Sheets', 'com.google.android.apps.docs.editors.sheets', 'googlesheets:'],
+    [/^docs\.google\.com$/, /\/presentation[/]/, 'Google Slides', 'com.google.android.apps.docs.editors.slides', 'googleslides:'],
+    [/^(drive|docs)\.google\.com$/, /./, 'Google Drive', 'com.google.android.apps.docs', 'googledrive:'],
+    [/^instagram\.com$/, /./, 'Instagram', 'com.instagram.android', ''],
+    [/^threads\.(net|com)$/, /./, 'Threads', 'com.instagram.barcelona', ''],
+    [/^(vt\.)?tiktok\.com$/, /./, 'TikTok', 'com.zhiliaoapp.musically', ''],
+    [/^(youtube\.com|youtu\.be)$/, /./, 'YouTube', 'com.google.android.youtube', 'youtube:'],
+    [/^canva\.(com|link)$/, /./, 'Canva', 'com.canva.editor', ''],
+    [/^capcut\.com$/, /./, 'CapCut', 'com.lemon.lvoverseas', ''],
+    [/^figma\.com$/, /./, 'Figma', 'com.figma.mirror', ''],
+    [/^(wa\.me|api\.whatsapp\.com|chat\.whatsapp\.com)$/, /./, 'WhatsApp', 'com.whatsapp', ''],
+    [/^(maps\.app\.goo\.gl|maps\.google\.com|goo\.gl)$/, /./, 'Google Maps', 'com.google.android.apps.maps', ''],
+    [/^(shopee\.co\.id|s\.shopee\.co\.id)$/, /./, 'Shopee', 'com.shopee.id', '']
+  ];
+  for (var i = 0; i < L.length; i++) if (L[i][0].test(h) && L[i][1].test(p)) return { nama: L[i][2], pkg: L[i][3], ios: L[i][4] };
+  return null;
+}
+function tautanApp_(u, info) {
+  var android = /android/i.test(navigator.userAgent), ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var tanpa = u.replace(/^https?:[/][/]/, '');
+  if (android) return 'intent:' + DS_ + tanpa + '#Intent;scheme=https;package=' + info.pkg + ';S.browser_fallback_url=' + encodeURIComponent(u) + ';end';
+  if (ios && info.ios) return info.ios + DS_ + (info.ios === 'youtube:' ? tanpa : u);
+  return u;
+}
+function salinTautan_(u, selesai) {
+  var ok = function () { if (selesai) selesai(true); };
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(u).then(ok, function () { cadangan(); }); return; } } catch (e) {}
+  cadangan();
+  function cadangan() { var t = document.createElement('textarea'); t.value = u; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); var r = false; try { r = document.execCommand('copy'); } catch (e) {} t.remove(); if (selesai) selesai(r); }
+}
+
+  function pilihBukaLink(u, info) {
+    var lama = $('lnkSheet'); if (lama) lama.remove();
+    var app = tautanApp_(u, info), beda = app !== u;
+    var w = document.createElement('div'); w.id = 'lnkSheet'; w.className = 'lnk-wrap';
+    w.innerHTML = '<div class="lnk-sheet" role="dialog" aria-label="Buka link"><b>Buka ' + esc(info.nama) + '</b><p>' + esc(u) + '</p>' +
+      (beda ? '<a class="btn" data-langsung="1" href="' + esc(app) + '" target="_blank" rel="noopener">📱 Buka di aplikasi ' + esc(info.nama) + '</a>' : '') +
+      '<a class="btn' + (beda ? ' btn-line' : '') + '" data-langsung="1" href="' + esc(u) + '" target="_blank" rel="noopener">🌐 Buka di browser</a>' +
+      '<button class="btn btn-line" type="button" data-salin>📋 Salin link</button><button class="link" type="button" data-tutup style="margin-top:6px">Batal</button>' +
+      '<small>Kalau tidak langsung terbuka di aplikasi: pilih Salin link, lalu tempel di aplikasinya atau di Chrome/Safari.</small></div>';
+    var tutup = function () { w.remove(); };
+    w.onclick = function (e) { if (e.target === w) tutup(); };
+    w.querySelector('[data-tutup]').onclick = tutup;
+    w.querySelectorAll('a').forEach(function (x) { x.addEventListener('click', function () { setTimeout(tutup, 300); }); });
+    w.querySelector('[data-salin]').onclick = function () { salinTautan_(u, function (ok) { tutup(); toast(ok ? '📋 Link disalin' : 'Tekan lama link untuk menyalin', !ok); }); };
+    document.body.appendChild(w);
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]'); if (!a || a.dataset.langsung) return;
+    var u = a.href; if (!/^https?:/i.test(u)) return;
+    var info = kenaliApp_(u); if (!info) return;
+    e.preventDefault(); e.stopPropagation(); pilihBukaLink(u, info);
+  }, true);
   function tbCall(api, d, ulang) {
     return fetch(TB_API + '?app=1&api=' + api + '&d=' + encodeURIComponent(JSON.stringify(d || {})) + '&_=' + Date.now(), { redirect: 'follow', cache: 'no-store' })
       .then(function (r) { return r.text(); }, function () { throw new Error('Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
@@ -1838,7 +1905,7 @@
     // yang dikerjakan hari ini
     var hk = '<div class="sec"><h3>Dikerjakan hari ini</h3></div>' + h.ag.map(function (a) { return '<div class="pg-it"><i>🗓️</i><p><b>' + esc(a.text) + '</b>' + (a.tim ? '<small>👥 ' + esc(a.tim) + '</small>' : '') + '</p></div>'; }).join('') +
       h.kerja.map(function (k) { return '<div class="pg-it"><i class="av">' + esc(k.nama.charAt(0)) + '</i><p><b>' + esc(k.nama) + (k.x.jam ? ' <em class="jm">· ' + esc(k.x.jam) + '</em>' : '') + '</b>' +
-        (k.x.selesai ? '<small>✅ ' + esc(k.x.selesai) + '</small>' : '') + (k.x.sedang ? '<small>🛠️ ' + esc(k.x.sedang) + '</small>' : '') + (/^https?:\/\//.test(k.x.link || '') ? '<a href="' + esc(k.x.link) + '" target="_blank" rel="noopener" style="font-size:13px;font-weight:600;color:var(--rose)">🔗 Lihat hasil</a>' : '') + '</p></div>'; }).join('') +
+        (k.x.selesai ? '<small>✅ ' + esc(k.x.selesai) + '</small>' : '') + (k.x.sedang ? '<small>🛠️ ' + esc(k.x.sedang) + '</small>' : '') + linkHasil(k.x, '') + '</p></div>'; }).join('') +
       (!h.ag.length && !h.kerja.length ? '<p class="mu">Belum ada laporan tim hari ini.</p>' : '') + (t.belum && t.belum.length ? '<p class="mu" style="font-size:13px;margin:8px 0 0">Belum lapor: ' + esc(t.belum.join(', ')) + '</p>' : '');
     b.appendChild(el('div', 'card', hk));
     // perintah terakhir
