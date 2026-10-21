@@ -232,6 +232,16 @@
   .bar { height: 8px; border-radius: 8px; background: var(--pink-soft); overflow: hidden; margin-top: 6px; }
   .bar span { display: block; height: 100%; background: var(--rose); border-radius: 8px; }
   .barrow { padding: 8px 0; }
+  .kinlap { margin-top: 6px; border-top: 1px dashed var(--line); padding-top: 8px; }
+  .kinjudul { font-size: 14px; font-weight: 600; color: var(--rose); padding: 6px 0 2px; }
+  .kinlap .hasil { display: inline-block; margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--rose); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; text-decoration: none; }
+  .kinlap summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--rose); list-style: none; padding: 6px 0; }
+  .kinlap summary::-webkit-details-marker { display: none; }
+  .kinlap .lp { background: var(--pink-soft); border-radius: 14px; padding: 10px 12px; margin-top: 8px; font-size: 14px; line-height: 1.45; }
+  .kinlap .lp small { display: block; color: var(--muted); font-size: 12.5px; margin-bottom: 2px; }
+  .kinlap .lp p { margin: 2px 0 0; white-space: pre-line; }
+  .perl { background: var(--pink-soft); border-radius: 16px; padding: 12px 14px; margin-top: 10px; font-size: 14px; }
+  .perl small { display: block; color: var(--muted); font-size: 12.5px; }
   .barrow .top { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
   .cols { display: flex; align-items: flex-end; gap: 12px; height: 150px; padding: 10px 0 0; }
   .col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; min-width: 0; }
@@ -679,6 +689,16 @@
       <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="dlg-body" id="kinBody"></div>
+  </div>
+</dialog>
+
+<dialog id="perDlg" aria-labelledby="perTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div><h2 id="perTitle">Kirim perintah</h2><p>Ke tim Arabelle lewat ThinKerBelle &amp; WA</p></div>
+      <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dlg-body" id="perBody"></div>
   </div>
 </dialog>
 
@@ -1500,17 +1520,103 @@
         bar('Laporan harian', o.lapor, o.wajib, o.lapor + ' / ' + o.wajib + ' hari') +
         (o.post ? bar('Posting tayang', o.tayang, o.post, o.tayang + ' / ' + o.post) : '<div class="barrow"><div class="top"><span>Posting tayang</span><b class="mu">tidak ada jadwal</b></div></div>') +
         '<div class="barrow"><div class="top"><span>Rata-rata progres</span><b>' + (o.progres === null ? '–' : o.progres + '%') + '</b></div></div>' +
-        (o.izin ? '<div class="barrow"><div class="top"><span>Izin / sakit / cuti</span><b>' + o.izin + ' hari</b></div></div>' : '') + '</div>';
+        (o.izin ? '<div class="barrow"><div class="top"><span>Izin / sakit / cuti</span><b>' + o.izin + ' hari</b></div></div>' : '') + lapKinerja(o, r, t) + '</div>';
     }).join('') + '<p class="mu">Skor = laporan harian 60% + posting tayang 40% (kalau tidak ada jadwal posting, skor = laporan harian). Hari kerja Senin–Sabtu, dikurangi hari izin.</p>';
     $('kinBody').innerHTML = h;
     $('kinBody').querySelectorAll('[data-p]').forEach(function (b) { b.onclick = function () { kinPeriode = b.dataset.p; bukaKinerja(t); }; });
+    $('kinBody').querySelectorAll('[data-lapbuka]').forEach(function (b) { b.onclick = function () { var y = $('kinBody').scrollTop; kinBuka[b.dataset.lapbuka] = !kinBuka[b.dataset.lapbuka]; bukaKinerja(t); $('kinBody').scrollTop = y; }; });
     if (!$('kinDlg').open) $('kinDlg').showModal();
   }
+  // isi laporan harian anggota (yang dikerjakan) langsung di kartu namanya
+  var kinBuka = {};
+  function lapKinerja(o, r, t) {
+    var semua = (t && t.laporanTim && t.laporanTim[o.nama]) || o.laporan || [];
+    var L = semua.filter(function (x) { return !r || (x.tgl >= r.dari && x.tgl <= r.sampai); });
+    if (!L.length) return '<div class="kinlap"><div class="kinjudul">📝 Laporan &amp; hasil kerja</div><span class="mu" style="font-size:13px">Belum ada laporan di periode ini.</span></div>';
+    var pg = function (x) { var n = Number(x); if (x === '' || isNaN(n)) return ''; return (n > 0 && n <= 1 ? Math.round(n * 100) : Math.round(n)) + '%'; };
+    var satu = function (x) {
+      return '<div class="lp"><small>' + esc(dayLabel(x.tgl)) + (x.jam ? ' · ' + esc(x.jam) : '') + (pg(x.progres) ? ' · ' + pg(x.progres) : '') + (x.status ? ' · ' + esc(x.status) : '') + (/telat/i.test(x.tepat || '') ? ' · ⏰ telat' : '') + '</small>' +
+        (x.selesai ? '<p>✅ ' + esc(x.selesai) + '</p>' : '') + (x.sedang ? '<p>🛠️ ' + esc(x.sedang) + '</p>' : '') +
+        (/^https?:\/\//.test(x.link) ? '<a class="hasil" href="' + esc(x.link) + '" target="_blank" rel="noopener">🔗 Lihat hasil</a>' : '') + '</div>';
+    };
+    var penuh = kinBuka[o.nama], tampil = penuh ? L : L.slice(0, 3);
+    return '<div class="kinlap"><div class="kinjudul">📝 Laporan &amp; hasil kerja · ' + L.length + ' laporan</div>' + tampil.map(satu).join('') +
+      (L.length > 3 ? '<button class="link" type="button" data-lapbuka="' + esc(o.nama) + '" style="padding:8px 0 0;color:var(--rose);font-weight:600">' + (penuh ? 'Ringkas' : 'Lihat semua (' + L.length + ')') + '</button>' : '') + '</div>';
+  }
+  function todayISO() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+
+  // ---------- Perintah ke tim (langsung ke ThinKerBelle, masuk pakai kode WA sekali) ----------
+  var TB_API = 'https://script.google.com/macros/s/AKfycbxglVQKBvsnks_7C_XnrLXEx0GiIoZFT4xjSTDQ74YPVP_sAA-DaVlJdG_6Tvnx1Gk/exec';
+  var TB_KEY = 'ss_tb_token';
+  function tbToken(v) { try { if (v === null) localStorage.removeItem(TB_KEY); else if (v) localStorage.setItem(TB_KEY, v); return localStorage.getItem(TB_KEY) || ''; } catch (e) { return ''; } }
+  function tbCall(api, d) {
+    return fetch(TB_API + '?app=1&api=' + api + '&d=' + encodeURIComponent(JSON.stringify(d || {})), { redirect: 'follow' })
+      .then(function (r) { return r.json(); }, function () { throw new Error('Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
+      .then(function (j) { if (j && j.sesi) { tbToken(null); throw new Error('Sesi ThinKerBelle habis, masuk lagi ya.'); } return j; });
+  }
+  function bukaPerintah() {
+    if (!$('perDlg').open) $('perDlg').showModal();
+    var t = tbToken(); if (!t) return perMasuk();
+    $('perBody').innerHTML = '<p class="center-msg">Memuat…</p>';
+    tbCall('saya', { t: t }).then(function (j) { if (!j.ok) throw new Error(j.pesan); if (!j.data.pimpinan) { $('perBody').innerHTML = '<p class="empty">🔒 Perintah hanya untuk owner, GM &amp; leader.</p>'; return; } perForm(j.data); })
+      .catch(function (e) { if (!tbToken()) perMasuk(); else $('perBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
+  }
+  function perMasuk() {
+    $('perBody').innerHTML = '<p class="mu" style="margin:0">Sambungkan sekali ke ThinKerBelle. Kode masuk dikirim ke WA kamu.</p>' +
+      '<label class="lbl">Nama di ThinKerBelle<select class="in" id="perNama"><option>Memuat…</option></select></label>' +
+      '<div class="dlg-actions"><button class="btn" type="button" id="perKode">📲 Kirim kode ke WA</button></div>' +
+      '<div id="perOtp" hidden><label class="lbl">Kode 6 digit dari WA<input class="in" id="perOtpIn" inputmode="numeric" maxlength="6" placeholder="••••••" style="letter-spacing:8px;text-align:center;font-size:22px"></label>' +
+      '<div class="dlg-actions"><button class="btn" type="button" id="perVerif">Masuk</button></div></div>';
+    tbCall('nama').then(function (j) {
+      var n = (j && j.data) || [], pilih = n.filter(function (x) { return /syifa/i.test(x); })[0] || n[0] || '';
+      $('perNama').innerHTML = n.map(function (x) { return '<option' + (x === pilih ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('');
+    }).catch(function (e) { toast(errMsg(e), true); });
+    $('perKode').onclick = function () { tbCall('kode', { nama: $('perNama').value }).then(function (j) { toast(j.pesan, !j.ok); if (j.ok) { $('perOtp').hidden = false; $('perOtpIn').focus(); } }).catch(function (e) { toast(errMsg(e), true); }); };
+    $('perVerif').onclick = function () { tbCall('verif', { nama: $('perNama').value, kode: $('perOtpIn').value }).then(function (j) { if (!j.ok) return toast(j.pesan, true); tbToken(j.token); toast('Tersambung ke ThinKerBelle ✨'); bukaPerintah(); }).catch(function (e) { toast(errMsg(e), true); }); };
+  }
+  function perForm(me) {
+    var nama = me.tim || [];
+    $('perBody').innerHTML = '<div class="lbl">Untuk<div id="perUntuk" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px">' + ['Semua'].concat(nama).map(function (n) {
+        return '<button type="button" class="agt" data-n="' + esc(n) + '" aria-pressed="' + (n === 'Semua') + '">' + esc(n) + '</button>'; }).join('') + '</div></div>' +
+      '<label class="lbl">Isi perintah<textarea class="in" id="perIsi" rows="4" maxlength="1500" placeholder="Tolong siapkan 2 opsi lokasi photoshoot Bandung"></textarea></label>' +
+      '<label class="lbl">Tenggat (opsional)<input class="in" id="perTgt" maxlength="60" placeholder="Kamis 23 Okt"></label>' +
+      '<p class="mu" style="margin:0;font-size:13px">📲 Perintah langsung tampil di app ThinKerBelle tim, lalu diumumkan sekali di grup WA bersama pengingat terdekat (pagi, sore, atau malam).</p>' +
+      '<div class="dlg-actions"><button class="btn" type="button" id="perKirim">📣 Kirim perintah</button></div><div id="perList"><p class="mu">Memuat perintah sebelumnya…</p></div>' +
+      '<button class="link" type="button" id="perKeluar" style="margin-top:6px">Putuskan sambungan ThinKerBelle di HP ini</button>';
+    $('perUntuk').querySelectorAll('.agt').forEach(function (b) {
+      b.onclick = function () {
+        var on = b.getAttribute('aria-pressed') !== 'true';
+        if (b.dataset.n === 'Semua') $('perUntuk').querySelectorAll('.agt').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        else { b.setAttribute('aria-pressed', String(on)); var lain = $('perUntuk').querySelectorAll('.agt[aria-pressed="true"]:not([data-n="Semua"])').length; $('perUntuk').querySelector('[data-n="Semua"]').setAttribute('aria-pressed', String(!lain)); }
+      };
+    });
+    $('perKirim').onclick = function () {
+      var isi = $('perIsi').value.trim(); if (!isi) return toast('Tulis isi perintahnya dulu ya', true);
+      var untuk = Array.prototype.slice.call($('perUntuk').querySelectorAll('.agt[aria-pressed="true"]')).map(function (b) { return b.dataset.n; }).filter(function (n) { return n !== 'Semua'; });
+      $('perKirim').disabled = true;
+      tbCall('perintah', { t: tbToken(), isi: isi, tenggat: $('perTgt').value.trim(), untuk: untuk }).then(function (j) {
+        $('perKirim').disabled = false; toast(j.pesan, !j.ok); if (j.ok) { $('perIsi').value = ''; $('perTgt').value = ''; perDaftar(); forget('dash'); }
+      }).catch(function (e) { $('perKirim').disabled = false; toast(errMsg(e), true); });
+    };
+    $('perKeluar').onclick = function () { tbToken(null); perMasuk(); };
+    perDaftar();
+  }
+  function perDaftar() {
+    tbCall('perintahku', { t: tbToken() }).then(function (j) {
+      var L = (j && j.data) || [];
+      $('perList').innerHTML = L.length ? '<h3 style="margin:16px 0 0;font-size:16px">Perintah terakhir</h3>' + L.slice(0, 8).map(function (p) {
+        var total = p.selesai.length + p.belum.length;
+        return '<div class="perl"><small>' + esc(p.waktu) + ' · untuk ' + esc(p.untuk) + (p.tenggat ? ' · ⏰ ' + esc(p.tenggat) : '') + '</small><b>' + esc(p.isi) + '</b>' +
+          '<small style="margin-top:6px">👀 ' + p.dibaca.length + ' dibaca · ✅ ' + p.selesai.length + (total ? '/' + total : '') + ' selesai' + (p.belum.length ? ' · belum: ' + esc(p.belum.join(', ')) : ' · semua beres 🎉') + '</small></div>';
+      }).join('') : '<p class="mu">Belum ada perintah 30 hari terakhir.</p>';
+    }).catch(function () { $('perList').innerHTML = ''; });
+  }
+
   function timCard(t) {
     var row = function (bg, icon, small, title, sub) {
       return '<div class="row"><span class="ic" style="background:' + bg + '">' + icon + '</span><span class="t"><small>' + esc(small) + '</small><b>' + esc(title) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span></div>';
     };
-    var h = '<div class="sec"><h3>Tim Arabelle</h3>' + (t.kinerja && !t.kinerja.error ? '<button class="link" type="button" data-kinerja>Kinerja tim</button>' : '<span class="mu">dari ThinKerBelle</span>') + '</div>';
+    var h = '<div class="sec"><h3>Tim Arabelle</h3><span style="display:flex;gap:14px">' + '<button class="link" type="button" data-perintah>📣 Perintah</button>' + (t.kinerja && !t.kinerja.error ? '<button class="link" type="button" data-kinerja>Kinerja tim</button>' : '<span class="mu">dari ThinKerBelle</span>') + '</span></div>';
     if (t.error) return el('div', 'card', h + '<p class="empty">Belum bisa membaca data tim: ' + esc(t.error) + '</p>');
     h += row('var(--t-mint)', I.list, 'Laporan hari ini', t.lapor + ' dari ' + t.wajib + ' sudah lapor', t.belum.length ? 'Belum: ' + t.belum.join(', ') : 'Semua sudah lapor 🎉');
     h += row('var(--t-sky)', I.cal, 'Posting tim hari ini', t.tayang + ' dari ' + t.post + ' sudah tayang', '');
@@ -1518,7 +1624,7 @@
     (t.agenda || []).slice(0, 3).forEach(function (a) { h += row('var(--t-lilac)', I.clock, dayLabel(a.date), a.text, a.tim ? '👥 ' + a.tim : ''); });
     (t.perintah || []).forEach(function (p) { h += row('var(--t-peach)', I.note, 'Perintahmu ke ' + (p.untuk || 'tim'), '📣 ' + p.isi, '👀 ' + p.dibaca + ' dibaca · ✅ ' + p.selesai + ' selesai'); });
     (t.catatan || []).forEach(function (c) { h += row('var(--t-butter)', I.note, 'Catatan tim dari ' + c.dari, '📌 ' + c.isi, ''); });
-    var c = el('div', 'card', h), kb = c.querySelector('[data-kinerja]'); if (kb) kb.onclick = function () { bukaKinerja(t); };
+    var c = el('div', 'card', h), kb = c.querySelector('[data-kinerja]'), pb = c.querySelector('[data-perintah]'); if (kb) kb.onclick = function () { bukaKinerja(t); }; if (pb) pb.onclick = bukaPerintah;
     return c;
   }
 
