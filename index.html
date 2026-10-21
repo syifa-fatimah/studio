@@ -253,6 +253,7 @@
   .pg-it p { margin: 0; flex: 1; min-width: 0; } .pg-it b { display: block; font-size: 14.5px; } .pg-it small { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
   .card .pg-it { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px dashed var(--line); } .card .sec + .pg-it { border-top: 0; }
   .pagi .pg-aksi.pg-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rc-more { display: block; width: 100%; margin: 4px 0 14px; min-height: 44px; border: 1px dashed var(--line); border-radius: 999px; background: none; color: var(--rose); font: 600 14px var(--font); cursor: pointer; }
   details.lipat { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; margin: 0 0 12px; overflow: hidden; }
   details.lipat summary { list-style: none; display: flex; align-items: center; gap: 8px; padding: 16px 18px; min-height: 58px; cursor: pointer; }
   details.lipat summary::-webkit-details-marker { display: none; }
@@ -1920,7 +1921,23 @@
         onOpen: function () { go('harian'); } });
     });
     dayRows.sort(function (a, b) { return (a.start || '99').localeCompare(b.start || '99'); });
-    if (dayRows.length) left.appendChild(timeline(dayRows, st.dDay === today));
+    if (dayRows.length) {
+      // Di HP: cukup 3 baris — yang sedang berjalan + 2 berikutnya (kalau belum ada yang berjalan: 3 berikutnya)
+      var tampil = dayRows, sisa = 0;
+      if (window.innerWidth < 760 && !st.rcPenuh && dayRows.length > 3) {
+        var now = nowMin(), akhir = function (r) { return r.end ? toMin(r.end) : (r.start ? toMin(r.start) + 60 : -1); };
+        var mulai = st.dDay === today ? dayRows.findIndex(function (r) { return !r.done && r.start && toMin(r.start) <= now && akhir(r) > now; }) : -1;
+        if (mulai < 0 && st.dDay === today) mulai = dayRows.findIndex(function (r) { return !r.done && (!r.start || toMin(r.start) >= now); });
+        if (mulai < 0) mulai = st.dDay === today ? Math.max(0, dayRows.length - 3) : 0;
+        mulai = Math.min(mulai, dayRows.length - 3);
+        tampil = dayRows.slice(mulai, mulai + 3); sisa = dayRows.length - 3;
+      }
+      left.appendChild(timeline(tampil, st.dDay === today));
+      if (sisa > 0 || st.rcPenuh) {
+        var lb = el('button', 'rc-more', st.rcPenuh ? 'Ringkas' : 'Lihat semua (' + dayRows.length + ') ›'); lb.type = 'button';
+        lb.onclick = function () { st.rcPenuh = !st.rcPenuh; renderDash(); }; left.appendChild(lb);
+      }
+    }
     else left.appendChild(el('p', 'empty', 'Belum ada rencana di hari ini.'));
     if (st.dDay === today) {
       var m = d.moneyToday;
