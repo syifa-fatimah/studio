@@ -253,6 +253,16 @@
   .pg-it p { margin: 0; flex: 1; min-width: 0; } .pg-it b { display: block; font-size: 14.5px; } .pg-it small { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
   .card .pg-it { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px dashed var(--line); } .card .sec + .pg-it { border-top: 0; }
   .pagi .pg-aksi.pg-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pagi .pg-aksi.pg-4 button[data-a="produk"] { grid-column: 1 / -1; }
+  .prd-f { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; }
+  .prd-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (min-width: 700px) { .prd-g { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .prd-k { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: var(--surface); }
+  .prd-k .im { aspect-ratio: 1/1; background: var(--pink-soft); display: grid; place-items: center; font-size: 32px; overflow: hidden; }
+  .prd-k .im img { width: 100%; height: 100%; object-fit: cover; }
+  .prd-k .tx { padding: 10px 12px 12px; font-size: 13px; }
+  .prd-k .tx b { display: block; font-size: 14px; margin-bottom: 4px; }
+  .prd-k .tx small { display: block; color: var(--muted); margin-top: 2px; }
   .rc-more { display: block; width: 100%; margin: 4px 0 14px; min-height: 44px; border: 1px dashed var(--line); border-radius: 999px; background: none; color: var(--rose); font: 600 14px var(--font); cursor: pointer; }
   .lnk-wrap { position: fixed; inset: 0; background: rgba(74,29,51,.35); z-index: 90; display: flex; align-items: flex-end; justify-content: center; }
   .lnk-sheet { background: var(--surface); width: min(520px, 100%); border-radius: 28px 28px 0 0; padding: 22px 20px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 -10px 30px rgba(190,43,102,.18); }
@@ -750,6 +760,16 @@
       <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="dlg-body" id="rapBody"></div>
+  </div>
+</dialog>
+
+<dialog id="prdDlg" aria-labelledby="prdTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div><h2 id="prdTitle">Produk &amp; sampel</h2><p id="prdSub">Diisi Fina &amp; tim di ThinKerBelle</p></div>
+      <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dlg-body" id="prdBody"></div>
   </div>
 </dialog>
 
@@ -1720,6 +1740,32 @@ function salinTautan_(u, selesai) {
     $('perKode').onclick = function () { tbCall('kode', { nama: $('perNama').value }).then(function (j) { toast(j.pesan, !j.ok); if (j.ok) { $('perOtp').hidden = false; $('perOtpIn').focus(); } }).catch(function (e) { toast(errMsg(e), true); }); };
     $('perVerif').onclick = function () { tbCall('verif', { nama: $('perNama').value, kode: $('perOtpIn').value }).then(function (j) { if (!j.ok) return toast(j.pesan, true); tbToken(j.token); toast('Tersambung ke ThinKerBelle ✨'); lanjut(); }).catch(function (e) { toast(errMsg(e), true); }); };
   }
+  // ---------- Produk & sampel (data dari tab PRODUK ThinKerBelle, hanya lihat) ----------
+  var PRD = null, PRDF = 'Semua';
+  function bukaProdukTim() {
+    if (!$('prdDlg').open) $('prdDlg').showModal();
+    if (!SY_AUTH && !tbToken()) return perMasuk('prdBody', bukaProdukTim);
+    $('prdBody').innerHTML = '<p class="center-msg">Memuat produk…</p>';
+    tbPakai('produk', {}).then(function (j) { if (!j.ok) throw new Error(j.pesan); PRD = j.data || []; tampilProdukTim(); })
+      .catch(function (e) { $('prdBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
+  }
+  function tampilProdukTim() {
+    var ikon = { Sampel: '🧵', Produksi: '🏭', Final: '✅' }, tg = function (iso) { if (!iso) return ''; var d = new Date(iso + 'T00:00:00'); return d.getDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][d.getMonth()]; };
+    var th = function (id, w) { return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + (w || 400); };
+    var a = PRD.filter(function (p) { return PRDF === 'Semua' || p.status === PRDF; });
+    $('prdSub').textContent = PRD.length + ' produk aktif · diisi Fina & tim di ThinKerBelle';
+    var h = '<div class="prd-f">' + ['Semua', 'Sampel', 'Produksi', 'Final'].map(function (s) { var n = s === 'Semua' ? PRD.length : PRD.filter(function (p) { return p.status === s; }).length;
+      return '<button type="button" class="chip' + (PRDF === s ? ' on' : '') + '" data-f="' + s + '" style="border:1px solid var(--line);cursor:pointer' + (PRDF === s ? ';background:var(--fill);color:#fff' : '') + '">' + s + ' ' + n + '</button>'; }).join('') + '</div>';
+    if (!a.length) h += '<p class="empty">' + (PRD.length ? 'Tidak ada produk dengan status ini.' : 'Belum ada produk. Tim menambahkannya lewat ThinKerBelle → Lainnya → Produk & sampel.') + '</p>';
+    else h += '<div class="prd-g">' + a.map(function (p) { var f = (p.fotoId || []).filter(Boolean)[0], link = (p.foto || [])[0];
+      return '<div class="prd-k"><div class="im">' + (f ? '<a href="' + esc(link) + '" target="_blank" rel="noopener" style="display:block;width:100%;height:100%"><img src="' + esc(th(f)) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></a>' : '👗') + '</div>' +
+        '<div class="tx"><b>' + esc(p.nama) + '</b><span class="chip">' + (ikon[p.status] || '') + ' ' + esc(p.status) + '</span>' + (p.kategori ? '<small>' + esc(p.kategori) + '</small>' : '') +
+        (p.warna ? '<small>🎨 ' + esc(p.warna) + '</small>' : '') + (p.ukuran ? '<small>📏 ' + esc(p.ukuran) + '</small>' : '') + (p.ps ? '<small>📸 Photoshoot ' + tg(p.ps) + '</small>' : '') + (p.launch ? '<small>🚀 Launching ' + tg(p.launch) + '</small>' : '') +
+        (p.foto && p.foto.length > 1 ? '<small>🖼️ ' + p.foto.length + ' foto</small>' : '') + (p.catatan ? '<small style="font-style:italic">' + esc(p.catatan) + '</small>' : '') + '</div></div>'; }).join('') + '</div>';
+    $('prdBody').innerHTML = h;
+    $('prdBody').querySelectorAll('[data-f]').forEach(function (b) { b.onclick = function () { PRDF = b.dataset.f; tampilProdukTim(); }; });
+  }
+
   // ---------- Rapor tim bulanan (khusus owner & leader, data dari ThinKerBelle) ----------
   var rapIdx = null;
   function bukaRapor(idx) {
@@ -1898,10 +1944,11 @@ function salinTautan_(u, selesai) {
     var h = hariIniTim(t);
     // aksi cepat
     var aksi = el('div', 'pagi', '<div class="pg-angka"><div><b>' + t.lapor + '/' + t.wajib + '</b><small>lapor hari ini</small></div><div><b>' + t.tayang + '/' + t.post + '</b><small>posting tayang</small></div><div><b>' + (t.review || 0) + '</b><small>menunggu approval</small></div></div>' +
-      '<div class="pg-aksi pg-4"><button type="button" data-a="perintah">📣 Perintah</button><button type="button" data-a="approval">👀 Approval' + (t.review ? ' · ' + t.review : '') + '</button><button type="button" data-a="kinerja">📊 Kinerja</button><button type="button" data-a="rapor">📑 Rapor</button></div>');
+      '<div class="pg-aksi pg-4"><button type="button" data-a="perintah">📣 Perintah</button><button type="button" data-a="approval">👀 Approval' + (t.review ? ' · ' + t.review : '') + '</button><button type="button" data-a="kinerja">📊 Kinerja</button><button type="button" data-a="rapor">📑 Rapor</button><button type="button" data-a="produk">👗 Produk &amp; sampel</button></div>');
     aksi.querySelector('[data-a="perintah"]').onclick = bukaPerintah; aksi.querySelector('[data-a="approval"]').onclick = bukaApproval;
     aksi.querySelector('[data-a="kinerja"]').onclick = function () { if (t.kinerja && !t.kinerja.error) bukaKinerja(t); else toast('Data kinerja belum tersedia', true); };
     aksi.querySelector('[data-a="rapor"]').onclick = function () { bukaRapor(null); };
+    aksi.querySelector('[data-a="produk"]').onclick = function () { bukaProdukTim(); };
     b.appendChild(aksi);
     // yang dikerjakan hari ini
     var hk = '<div class="sec"><h3>Dikerjakan hari ini</h3></div>' + h.ag.map(function (a) { return '<div class="pg-it"><i>🗓️</i><p><b>' + esc(a.text) + '</b>' + (a.tim ? '<small>👥 ' + esc(a.tim) + '</small>' : '') + '</p></div>'; }).join('') +
