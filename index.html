@@ -1757,7 +1757,7 @@ function salinTautan_(u, selesai) {
     var h = '<div class="prd-f">' + ['Semua', 'Sampel', 'Produksi', 'Final'].map(function (s) { var n = s === 'Semua' ? PRD.length : PRD.filter(function (p) { return p.status === s; }).length;
       return '<button type="button" class="chip' + (PRDF === s ? ' on' : '') + '" data-f="' + s + '" style="border:1px solid var(--line);cursor:pointer' + (PRDF === s ? ';background:var(--fill);color:#fff' : '') + '">' + s + ' ' + n + '</button>'; }).join('') + '</div>';
     if (!a.length) h += '<p class="empty">' + (PRD.length ? 'Tidak ada produk dengan status ini.' : 'Belum ada produk. Tim menambahkannya lewat ThinKerBelle → Lainnya → Produk & sampel.') + '</p>';
-    else h += '<div class="prd-g">' + a.map(function (p) { var f = (p.fotoId || []).filter(Boolean)[0], link = (p.foto || [])[0];
+    else h += '<div class="prd-g">' + a.map(function (p) { var f = p.coverId || (p.fotoId || []).filter(Boolean)[0], link = p.cover || (p.foto || [])[0];
       return '<div class="prd-k"><div class="im">' + (f ? '<a href="' + esc(link) + '" target="_blank" rel="noopener" style="display:block;width:100%;height:100%"><img src="' + esc(th(f)) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></a>' : '👗') + '</div>' +
         '<div class="tx"><b>' + esc(p.nama) + '</b><span class="chip">' + (ikon[p.status] || '') + ' ' + esc(p.status) + '</span>' + (p.kategori ? '<small>' + esc(p.kategori) + '</small>' : '') +
         (p.warna ? '<small>🎨 ' + esc(p.warna) + '</small>' : '') + (p.ukuran ? '<small>📏 ' + esc(p.ukuran) + '</small>' : '') + (p.ps ? '<small>📸 Photoshoot ' + tg(p.ps) + '</small>' : '') + (p.launch ? '<small>🚀 Launching ' + tg(p.launch) + '</small>' : '') +
