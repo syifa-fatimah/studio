@@ -258,6 +258,7 @@
   .prd-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   @media (min-width: 700px) { .prd-g { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .prd-k { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: var(--surface); }
+  .prd-g { align-items: start; } .prd-k { width: 100%; display: flex; flex-direction: column; min-width: 0; } .prd-k .im { width: 100%; } .prd-k .tx b { overflow-wrap: anywhere; }
   .prd-k .im { aspect-ratio: 1/1; background: var(--pink-soft); display: grid; place-items: center; font-size: 32px; overflow: hidden; }
   .prd-k .im img { width: 100%; height: 100%; object-fit: cover; }
   .prd-k .tx { padding: 10px 12px 12px; font-size: 13px; }
@@ -1740,8 +1741,24 @@ function salinTautan_(u, selesai) {
     $('perKode').onclick = function () { tbCall('kode', { nama: $('perNama').value }).then(function (j) { toast(j.pesan, !j.ok); if (j.ok) { $('perOtp').hidden = false; $('perOtpIn').focus(); } }).catch(function (e) { toast(errMsg(e), true); }); };
     $('perVerif').onclick = function () { tbCall('verif', { nama: $('perNama').value, kode: $('perOtpIn').value }).then(function (j) { if (!j.ok) return toast(j.pesan, true); tbToken(j.token); toast('Tersambung ke ThinKerBelle ✨'); lanjut(); }).catch(function (e) { toast(errMsg(e), true); }); };
   }
-  // ---------- Produk & sampel (data dari tab PRODUK ThinKerBelle, hanya lihat) ----------
-  var PRD = null, PRDF = 'Semua';
+  // ---------- Produk & sampel (data tab PRODUK ThinKerBelle: lihat, ubah, tambah, foto) ----------
+  var PRD = null, PRDF = 'Semua', PRDQ = '', PRD_FOTO = null, PRD_COVER = null;
+  var PRD_IKON = { Sampel: '✂️', Produksi: '🛠️', Final: '✅', Arsip: '📦' };
+  function prdTh(id, w) { return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + (w || 400); }
+  function prdTg(iso) { if (!iso) return ''; var d = new Date(iso + 'T00:00:00'); return d.getDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][d.getMonth()] + ' ' + d.getFullYear(); }
+  // simpan ke ThinKerBelle lewat POST (foto tidak muat lewat link biasa)
+  function tbTulis(fn, args) {
+    var body = SY_AUTH ? { rpc: 'tkb', fn: 'sy' + fn, sy: SY_AUTH, args: args } : { rpc: 'tkb', fn: 'api' + fn, args: [tbToken()].concat(args) };
+    return fetch(TB_API, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.text(); }, function () { throw new Error('Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
+      .then(function (t) { var j = null; try { j = JSON.parse(t); } catch (e) {} if (!j) throw new Error('ThinKerBelle belum menjawab dengan benar. Coba lagi sebentar.');
+        if (!j.ok) throw new Error(j.pesan || 'Gagal menyimpan'); if (j.data && j.data.ok === false) throw new Error(j.data.pesan || 'Gagal menyimpan'); return j.data; });
+  }
+  function prdKecil(file, maks, mutu) {
+    return new Promise(function (ok, gagal) { var rd = new FileReader(); rd.onerror = gagal; rd.onload = function () { var im = new Image(); im.onerror = gagal; im.onload = function () {
+      var s = Math.min(1, maks / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); var u = c.toDataURL('image/jpeg', mutu); ok({ data: u.split(',')[1], mime: 'image/jpeg', url: u }); }; im.src = rd.result; }; rd.readAsDataURL(file); });
+  }
   function bukaProdukTim() {
     if (!$('prdDlg').open) $('prdDlg').showModal();
     if (!SY_AUTH && !tbToken()) return perMasuk('prdBody', bukaProdukTim);
@@ -1750,20 +1767,75 @@ function salinTautan_(u, selesai) {
       .catch(function (e) { $('prdBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
   }
   function tampilProdukTim() {
-    var ikon = { Sampel: '🧵', Produksi: '🏭', Final: '✅' }, tg = function (iso) { if (!iso) return ''; var d = new Date(iso + 'T00:00:00'); return d.getDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][d.getMonth()]; };
-    var th = function (id, w) { return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + (w || 400); };
-    var a = PRD.filter(function (p) { return PRDF === 'Semua' || p.status === PRDF; });
-    $('prdSub').textContent = PRD.length + ' produk aktif · diisi Fina & tim di ThinKerBelle';
-    var h = '<div class="prd-f">' + ['Semua', 'Sampel', 'Produksi', 'Final'].map(function (s) { var n = s === 'Semua' ? PRD.length : PRD.filter(function (p) { return p.status === s; }).length;
-      return '<button type="button" class="chip' + (PRDF === s ? ' on' : '') + '" data-f="' + s + '" style="border:1px solid var(--line);cursor:pointer' + (PRDF === s ? ';background:var(--fill);color:#fff' : '') + '">' + s + ' ' + n + '</button>'; }).join('') + '</div>';
-    if (!a.length) h += '<p class="empty">' + (PRD.length ? 'Tidak ada produk dengan status ini.' : 'Belum ada produk. Tim menambahkannya lewat ThinKerBelle → Lainnya → Produk & sampel.') + '</p>';
-    else h += '<div class="prd-g">' + a.map(function (p) { var f = p.coverId || (p.fotoId || []).filter(Boolean)[0], link = p.cover || (p.foto || [])[0];
-      return '<div class="prd-k"><div class="im">' + (f ? '<a href="' + esc(link) + '" target="_blank" rel="noopener" style="display:block;width:100%;height:100%"><img src="' + esc(th(f)) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></a>' : '👗') + '</div>' +
-        '<div class="tx"><b>' + esc(p.nama) + '</b><span class="chip">' + (ikon[p.status] || '') + ' ' + esc(p.status) + '</span>' + (p.kategori ? '<small>' + esc(p.kategori) + '</small>' : '') +
-        (p.warna ? '<small>🎨 ' + esc(p.warna) + '</small>' : '') + (p.ukuran ? '<small>📏 ' + esc(p.ukuran) + '</small>' : '') + (p.ps ? '<small>📸 Photoshoot ' + tg(p.ps) + '</small>' : '') + (p.launch ? '<small>🚀 Launching ' + tg(p.launch) + '</small>' : '') +
-        (p.foto && p.foto.length > 1 ? '<small>🖼️ ' + p.foto.length + ' foto</small>' : '') + (p.catatan ? '<small style="font-style:italic">' + esc(p.catatan) + '</small>' : '') + '</div></div>'; }).join('') + '</div>';
+    var q = PRDQ.trim().toLowerCase();
+    var a = PRD.map(function (p, i) { return { p: p, i: i }; }).filter(function (x) { var p = x.p;
+      return (PRDF === 'Semua' || p.status === PRDF) && (!q || [p.nama, p.kategori, p.warna, p.catatan].join(' ').toLowerCase().indexOf(q) >= 0); });
+    $('prdTitle').textContent = 'Produk & sampel';
+    $('prdSub').textContent = PRD.length + ' produk aktif · launching terbaru di atas';
+    var h = '<div style="display:flex;gap:8px;margin-bottom:10px"><input class="in" id="prdCari" placeholder="Cari nama, kategori, warna…" value="' + esc(PRDQ) + '"><button class="btn btn-sm" type="button" id="prdBaru" style="flex:none">+ Produk</button></div>' +
+      '<div class="prd-f">' + ['Semua', 'Sampel', 'Produksi', 'Final'].map(function (s) { var n = s === 'Semua' ? PRD.length : PRD.filter(function (p) { return p.status === s; }).length;
+      return '<button type="button" class="chip" data-f="' + s + '" style="border:1px solid var(--line);cursor:pointer' + (PRDF === s ? ';background:var(--fill);color:#fff' : '') + '">' + s + ' ' + n + '</button>'; }).join('') + '</div>';
+    if (!a.length) h += '<p class="empty">' + (PRD.length ? 'Tidak ada produk yang cocok.' : 'Belum ada produk. Ketuk + Produk untuk menambah.') + '</p>';
+    else h += '<div class="prd-g">' + a.map(function (x) { var p = x.p, f = p.coverId || (p.fotoId || []).filter(Boolean)[0];
+      return '<button type="button" class="prd-k" data-i="' + x.i + '" style="text-align:left;padding:0;cursor:pointer;font:inherit;color:inherit"><div class="im">' + (f ? '<img src="' + esc(prdTh(f)) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '👗') + '</div>' +
+        '<div class="tx"><b>' + esc(p.nama) + '</b><span class="chip">' + (PRD_IKON[p.status] || '') + ' ' + esc(p.status) + '</span>' + (p.kategori ? '<small>' + esc(p.kategori) + '</small>' : '') +
+        (p.ps ? '<small>📸 ' + prdTg(p.ps) + '</small>' : '') + (p.launch ? '<small>🚀 ' + prdTg(p.launch) + '</small>' : '') + '</div></button>'; }).join('') + '</div>';
     $('prdBody').innerHTML = h;
     $('prdBody').querySelectorAll('[data-f]').forEach(function (b) { b.onclick = function () { PRDF = b.dataset.f; tampilProdukTim(); }; });
+    $('prdBody').querySelectorAll('[data-i]').forEach(function (b) { b.onclick = function () { detailProdukTim(Number(b.dataset.i)); }; });
+    $('prdBaru').onclick = function () { formProdukTim(null); };
+    var c = $('prdCari'); c.oninput = function () { PRDQ = c.value; var pos = c.selectionStart; tampilProdukTim(); var c2 = $('prdCari'); c2.focus(); c2.setSelectionRange(pos, pos); };
+  }
+  function detailProdukTim(i) {
+    var p = PRD[i]; if (!p) return; var cov = p.coverId || (p.fotoId || []).filter(Boolean)[0];
+    $('prdTitle').textContent = p.nama; $('prdSub').textContent = (PRD_IKON[p.status] || '') + ' ' + p.status + (p.kategori ? ' · ' + p.kategori : '');
+    var baris = function (k, v) { return v ? '<div style="padding:10px 0;border-top:1px solid var(--line)"><small class="mu">' + k + '</small><div style="white-space:pre-line">' + esc(v) + '</div></div>' : ''; };
+    var h = '<button type="button" class="link" id="prdKembali">‹ Semua produk</button>' +
+      (cov ? '<a href="' + esc(p.cover || (p.foto || [])[0] || '#') + '" target="_blank" rel="noopener"><img src="' + esc(prdTh(cov, 900)) + '" alt="Foto cover" referrerpolicy="no-referrer" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:20px;border:1px solid var(--line);display:block;margin:6px 0 12px"></a>' : '');
+    if ((p.foto || []).length) h += '<small class="mu">Foto sampel · ketuk ⭐ untuk jadikan cover</small><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 12px">' + p.foto.map(function (u, j) {
+      var id = (p.fotoId || [])[j]; return '<div style="position:relative"><a href="' + esc(u) + '" target="_blank" rel="noopener">' + (id ? '<img src="' + esc(prdTh(id)) + '" alt="Foto ' + (j + 1) + '" loading="lazy" referrerpolicy="no-referrer" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;display:block;' + (p.cover === u ? 'outline:3px solid var(--fill);outline-offset:-3px' : '') + '">' : '<span class="chip">Foto ' + (j + 1) + '</span>') + '</a>' +
+        (p.cover === u ? '' : '<button type="button" data-cv="' + j + '" style="position:absolute;left:4px;right:4px;bottom:4px;border:0;border-radius:999px;padding:4px;font-size:11px;font-weight:600;background:rgba(255,255,255,.9);color:var(--fill)">⭐ Cover</button>') + '</div>'; }).join('') + '</div>';
+    h += '<div>' + baris('Warna / varian', p.warna) + baris('Ukuran', p.ukuran) + baris('Rencana photoshoot', prdTg(p.ps)) + baris('Rencana launching', prdTg(p.launch)) + baris('Catatan', p.catatan) + '</div>' +
+      (p.diubah ? '<p class="mu" style="font-size:12px">Terakhir diubah ' + esc(p.diubah) + '</p>' : '') +
+      '<button class="btn" type="button" id="prdUbah" style="width:100%;margin-top:12px">✏️ Ubah / tambah foto</button>';
+    $('prdBody').innerHTML = h;
+    $('prdKembali').onclick = tampilProdukTim; $('prdUbah').onclick = function () { formProdukTim(i); };
+    $('prdBody').querySelectorAll('[data-cv]').forEach(function (b) { b.onclick = function () { var j = Number(b.dataset.cv); b.disabled = true;
+      tbTulis('CoverProduk', [p.id, p.foto[j]]).then(function (r) { p.cover = p.foto[j]; p.coverId = (p.fotoId || [])[j]; toast((r && r.pesan) || 'Cover diganti'); detailProdukTim(i); })
+        .catch(function (e) { b.disabled = false; toast(errMsg(e), true); }); }; });
+  }
+  function formProdukTim(i) {
+    var p = i == null ? null : PRD[i], v = function (k) { return esc(p ? (p[k] || '') : ''); }; PRD_FOTO = null; PRD_COVER = null;
+    $('prdTitle').textContent = p ? 'Ubah produk' : 'Produk / sampel baru'; $('prdSub').textContent = 'Tersimpan di tab PRODUK · langsung tampil di ThinKerBelle';
+    var h = '<button type="button" class="link" id="prdBatal">‹ ' + (p ? 'Kembali' : 'Semua produk') + '</button><div style="display:flex;flex-direction:column;gap:12px">' +
+      '<label class="lbl">Nama produk<input class="in" id="fp1" value="' + v('nama') + '" placeholder="Contoh: Mahligai Set Keluarga"></label>' +
+      '<div class="lbl">Status<div class="prd-f" id="fpS" style="flex-wrap:wrap">' + ['Sampel', 'Produksi', 'Final', 'Arsip'].map(function (s) { var on = (p ? p.status : 'Sampel') === s;
+        return '<button type="button" class="chip" data-s="' + s + '" style="border:1px solid var(--line);cursor:pointer' + (on ? ';background:var(--fill);color:#fff' : '') + '">' + PRD_IKON[s] + ' ' + s + '</button>'; }).join('') + '</div></div>' +
+      '<label class="lbl">Kategori<input class="in" id="fp2" value="' + v('kategori') + '" placeholder="Family set, Scarf, Gamis"></label>' +
+      '<label class="lbl">Warna / varian<textarea class="in" id="fp3" rows="2" placeholder="Sage, Dusty pink, Navy">' + v('warna') + '</textarea></label>' +
+      '<label class="lbl">Ukuran<input class="in" id="fp4" value="' + v('ukuran') + '"></label>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="lbl">Rencana photoshoot<input class="in" type="date" id="fp5" value="' + v('ps') + '"></label><label class="lbl">Rencana launching<input class="in" type="date" id="fp6" value="' + v('launch') + '"></label></div>' +
+      '<label class="lbl">Foto cover ' + (p && p.cover ? '(sudah ada · pilih untuk mengganti)' : '(foto utama)') + '<input class="in" type="file" accept="image/*" id="fpCov"></label>' +
+      '<input class="in" id="fp9" placeholder="atau tempel link foto cover (Google Drive)">' +
+      '<label class="lbl">Tambah foto sampel<input class="in" type="file" accept="image/*" id="fpFoto"></label>' +
+      '<input class="in" id="fp8" placeholder="atau tempel link foto sampel (Google Drive)">' +
+      '<label class="lbl">Catatan<textarea class="in" id="fp7" rows="3">' + v('catatan') + '</textarea></label>' +
+      '<button class="btn" type="button" id="fpSimpan">' + (p ? 'Simpan perubahan' : 'Simpan produk') + '</button></div>';
+    $('prdBody').innerHTML = h;
+    $('prdBatal').onclick = function () { if (p) detailProdukTim(i); else tampilProdukTim(); };
+    $('fpS').querySelectorAll('[data-s]').forEach(function (b) { b.onclick = function () { $('fpS').querySelectorAll('[data-s]').forEach(function (y) { y.style.background = ''; y.style.color = ''; y.removeAttribute('data-on'); }); b.style.background = 'var(--fill)'; b.style.color = '#fff'; b.setAttribute('data-on', '1'); }; });
+    var st = $('fpS').querySelector('[data-s="' + (p ? p.status : 'Sampel') + '"]'); if (st) st.setAttribute('data-on', '1');
+    $('fpCov').onchange = function (e) { var f = e.target.files[0]; if (f) prdKecil(f, 1600, .8).then(function (x) { PRD_COVER = x; toast('Foto cover siap'); }); };
+    $('fpFoto').onchange = function (e) { var f = e.target.files[0]; if (f) prdKecil(f, 1400, .72).then(function (x) { PRD_FOTO = x; toast('Foto sampel siap'); }); };
+    $('fpSimpan').onclick = function () {
+      var g = function (id) { return $(id).value.trim(); }; if (!g('fp1')) return toast('Isi nama produknya dulu ya', true);
+      var on = $('fpS').querySelector('[data-on]'), b = $('fpSimpan');
+      var d = { id: p ? p.id : '', nama: g('fp1'), status: on ? on.dataset.s : 'Sampel', kategori: g('fp2'), warna: g('fp3'), ukuran: g('fp4'), ps: g('fp5'), launch: g('fp6'), catatan: g('fp7'),
+        linkFoto: g('fp8'), coverLink: g('fp9'), foto: PRD_FOTO ? { data: PRD_FOTO.data, mime: PRD_FOTO.mime } : null, cover: PRD_COVER ? { data: PRD_COVER.data, mime: PRD_COVER.mime } : null };
+      b.disabled = true; b.textContent = PRD_FOTO || PRD_COVER ? 'Mengunggah foto…' : 'Menyimpan…';
+      tbTulis('SimpanProduk', [d]).then(function (r) { toast((r && r.pesan) || 'Tersimpan'); return tbPakai('produk', {}).then(function (j) { if (j.ok) PRD = j.data || []; var k = PRD.findIndex(function (x) { return x.id === (r && r.id); }); if (k >= 0) detailProdukTim(k); else tampilProdukTim(); }); })
+        .catch(function (e) { b.disabled = false; b.textContent = p ? 'Simpan perubahan' : 'Simpan produk'; toast(errMsg(e), true); });
+    };
   }
 
   // ---------- Rapor tim bulanan (khusus owner & leader, data dari ThinKerBelle) ----------
