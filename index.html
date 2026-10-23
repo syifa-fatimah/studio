@@ -253,7 +253,6 @@
   .pg-it p { margin: 0; flex: 1; min-width: 0; } .pg-it b { display: block; font-size: 14.5px; } .pg-it small { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
   .card .pg-it { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px dashed var(--line); } .card .sec + .pg-it { border-top: 0; }
   .pagi .pg-aksi.pg-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .pagi .pg-aksi.pg-4 button[data-a="produk"] { grid-column: 1 / -1; }
   .prd-f { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; }
   .prd-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   @media (min-width: 700px) { .prd-g { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -761,6 +760,16 @@
       <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="dlg-body" id="rapBody"></div>
+  </div>
+</dialog>
+
+<dialog id="rvDlg" aria-labelledby="rvTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div><h2 id="rvTitle">Review foto</h2><p id="rvSub">Hasil edit dari tim</p></div>
+      <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dlg-body" id="rvBody"></div>
   </div>
 </dialog>
 
@@ -1838,6 +1847,45 @@ function salinTautan_(u, selesai) {
     };
   }
 
+  // ---------- Review foto hasil edit (dari ThinKerBelle): setujui → folder Final, atau minta revisi ----------
+  var RVS = null, RVSF = 'Menunggu';
+  function bukaReviewFoto() {
+    if (!$('rvDlg').open) $('rvDlg').showModal();
+    if (!SY_AUTH && !tbToken()) return perMasuk('rvBody', bukaReviewFoto);
+    $('rvBody').innerHTML = '<p class="center-msg">Memuat foto…</p>';
+    tbPakai('review', {}).then(function (j) { if (!j.ok) throw new Error(j.pesan); RVS = j.data || { list: [] }; tampilReviewFoto(); })
+      .catch(function (e) { $('rvBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
+  }
+  function tampilReviewFoto() {
+    var L = RVS.list || [], n = function (s) { return L.filter(function (x) { return x.status === s; }).length; };
+    $('rvTitle').textContent = 'Review foto'; $('rvSub').textContent = n('Menunggu') + ' menunggu · hasil edit dari tim';
+    var h = '<div class="prd-f">' + ['Menunggu', 'Revisi', 'Disetujui'].map(function (s) { return '<button type="button" class="chip" data-f="' + s + '" style="border:1px solid var(--line);cursor:pointer' + (RVSF === s ? ';background:var(--fill);color:#fff' : '') + '">' + s + ' ' + n(s) + '</button>'; }).join('') + '</div>';
+    var a = L.map(function (x, i) { return { x: x, i: i }; }).filter(function (o) { return o.x.status === RVSF; });
+    if (!a.length) h += '<p class="empty">' + (RVSF === 'Menunggu' ? 'Tidak ada foto yang menunggu review.' : 'Belum ada.') + '</p>';
+    else h += '<div class="prd-g">' + a.map(function (o) { var x = o.x;
+      return '<button type="button" class="prd-k" data-i="' + o.i + '" style="text-align:left;padding:0;cursor:pointer;font:inherit;color:inherit"><div class="im">' + (x.fotoId ? '<img src="' + esc(prdTh(x.fotoId)) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '📷') + '</div>' +
+        '<div class="tx"><b>' + esc(x.produk || 'Foto') + (x.warna ? ' · ' + esc(x.warna) : '') + '</b><small>' + esc(x.jenis) + ' · ' + esc(x.oleh) + (x.revisi ? ' · rev ' + x.revisi : '') + '</small>' + (x.catatan ? '<small style="font-style:italic">"' + esc(x.catatan.slice(0, 70)) + '"</small>' : '') + '</div></button>'; }).join('') + '</div>';
+    $('rvBody').innerHTML = h;
+    $('rvBody').querySelectorAll('[data-f]').forEach(function (b) { b.onclick = function () { RVSF = b.dataset.f; tampilReviewFoto(); }; });
+    $('rvBody').querySelectorAll('[data-i]').forEach(function (b) { b.onclick = function () { detailReviewFoto(Number(b.dataset.i)); }; });
+  }
+  function detailReviewFoto(i) {
+    var x = RVS.list[i]; if (!x) return;
+    $('rvTitle').textContent = (x.produk || 'Foto') + (x.warna ? ' · ' + x.warna : ''); $('rvSub').textContent = x.jenis + ' · dari ' + x.oleh + ' · ' + x.waktu + (x.revisi ? ' · revisi ke-' + x.revisi : '');
+    var h = '<button type="button" class="link" id="rvKembali">‹ Semua foto</button>' +
+      (x.fotoId ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener"><img src="' + esc(prdTh(x.fotoId, 1400)) + '" alt="Foto" referrerpolicy="no-referrer" style="width:100%;border-radius:18px;border:1px solid var(--line);display:block;margin:6px 0 12px"></a>' : '<a class="chip" href="' + esc(x.link) + '" target="_blank" rel="noopener">Buka foto</a>') +
+      (x.ps ? '<p class="mu">📸 ' + esc(x.ps) + '</p>' : '') + (x.catatan ? '<p class="mu">💬 Catatan sebelumnya: ' + esc(x.catatan) + '</p>' : '');
+    if (x.status !== 'Disetujui') h += '<div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"><button class="btn" type="button" id="rvSetuju">✅ Setujui · masuk folder Final</button>' +
+      '<label class="lbl">Catatan revisi<textarea class="in" id="rvCat" rows="3" placeholder="Contoh: crop lebih rapat, warna kulit lebih hangat"></textarea></label><button class="btn-line" type="button" id="rvRevisi">✏️ Minta revisi</button></div>';
+    else h += '<p class="mu">✅ Disetujui ' + esc(x.reviewer === 'Syifa' ? 'Umi Syifa' : x.reviewer) + ' · ' + esc(x.waktuReview) + '</p>';
+    $('rvBody').innerHTML = h; $('rvKembali').onclick = tampilReviewFoto;
+    var putus = function (kep) { var c = $('rvCat') ? $('rvCat').value.trim() : ''; if (kep === 'revisi' && !c) return toast('Tulis catatan revisinya dulu ya', true);
+      $('rvSetuju').disabled = true; $('rvRevisi').disabled = true;
+      tbTulis('ReviewPutus', [x.id, kep, c]).then(function (r) { toast((r && r.pesan) || 'Tersimpan'); x.status = kep === 'setuju' ? 'Disetujui' : 'Revisi'; x.catatan = c; tampilReviewFoto(); })
+        .catch(function (e) { $('rvSetuju').disabled = false; $('rvRevisi').disabled = false; toast(errMsg(e), true); }); };
+    if ($('rvSetuju')) { $('rvSetuju').onclick = function () { putus('setuju'); }; $('rvRevisi').onclick = function () { putus('revisi'); }; }
+  }
+
   // ---------- Rapor tim bulanan (khusus owner & leader, data dari ThinKerBelle) ----------
   var rapIdx = null;
   function bukaRapor(idx) {
@@ -2016,11 +2064,12 @@ function salinTautan_(u, selesai) {
     var h = hariIniTim(t);
     // aksi cepat
     var aksi = el('div', 'pagi', '<div class="pg-angka"><div><b>' + t.lapor + '/' + t.wajib + '</b><small>lapor hari ini</small></div><div><b>' + t.tayang + '/' + t.post + '</b><small>posting tayang</small></div><div><b>' + (t.review || 0) + '</b><small>menunggu approval</small></div></div>' +
-      '<div class="pg-aksi pg-4"><button type="button" data-a="perintah">📣 Perintah</button><button type="button" data-a="approval">👀 Approval' + (t.review ? ' · ' + t.review : '') + '</button><button type="button" data-a="kinerja">📊 Kinerja</button><button type="button" data-a="rapor">📑 Rapor</button><button type="button" data-a="produk">👗 Produk &amp; sampel</button></div>');
+      '<div class="pg-aksi pg-4"><button type="button" data-a="perintah">📣 Perintah</button><button type="button" data-a="approval">👀 Approval' + (t.review ? ' · ' + t.review : '') + '</button><button type="button" data-a="kinerja">📊 Kinerja</button><button type="button" data-a="rapor">📑 Rapor</button><button type="button" data-a="review">📸 Review foto' + (t.reviewFoto ? ' · ' + t.reviewFoto : '') + '</button><button type="button" data-a="produk">👗 Produk &amp; sampel</button></div>');
     aksi.querySelector('[data-a="perintah"]').onclick = bukaPerintah; aksi.querySelector('[data-a="approval"]').onclick = bukaApproval;
     aksi.querySelector('[data-a="kinerja"]').onclick = function () { if (t.kinerja && !t.kinerja.error) bukaKinerja(t); else toast('Data kinerja belum tersedia', true); };
     aksi.querySelector('[data-a="rapor"]').onclick = function () { bukaRapor(null); };
     aksi.querySelector('[data-a="produk"]').onclick = function () { bukaProdukTim(); };
+    aksi.querySelector('[data-a="review"]').onclick = function () { bukaReviewFoto(); };
     b.appendChild(aksi);
     // yang dikerjakan hari ini
     var hk = '<div class="sec"><h3>Dikerjakan hari ini</h3></div>' + h.ag.map(function (a) { return '<div class="pg-it"><i>🗓️</i><p><b>' + esc(a.text) + '</b>' + (a.tim ? '<small>👥 ' + esc(a.tim) + '</small>' : '') + '</p></div>'; }).join('') +
