@@ -575,6 +575,55 @@
   #toast.error { background: var(--danger); }
   @media (min-width: 900px) { #toast { bottom: 32px; } }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  /* ---------- Review foto halaman penuh (tampilan 2026.11.06-1) ---------- */
+  .rv-hdr { position: sticky; top: 0; z-index: 4; background: var(--bg); padding: 8px 0 10px; }
+  .rv-hdr .ttl b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rvhal { display: flex; flex-direction: column; gap: 14px; }
+  .rvhal[hidden] { display: none; }
+  .rv-pita { border-radius: 16px; padding: 10px 14px; background: var(--t-mint); font-size: 13px; color: var(--muted); display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+  .rv-pita.err { background: #FFE1E1; color: #8A1F1F; }
+  .rv-tab { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; margin-bottom: 14px; }
+  .rv-tab button { flex: 1; border: 0; background: none; border-radius: 999px; min-height: 44px; font: 600 14px var(--font); color: var(--muted); cursor: pointer; }
+  .rv-tab button[aria-selected="true"] { background: var(--fill); color: #fff; }
+  .rv-tab i { font-style: normal; opacity: .85; }
+  .rv-g { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  @media (min-width: 700px) { .rv-g { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1200px) { .rv-g { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .rv-k { display: flex; flex-direction: column; width: 100%; min-width: 0; text-align: left; padding: 0; border: 1px solid var(--line); border-radius: 24px; overflow: hidden; background: var(--surface); font: inherit; color: inherit; cursor: pointer; box-shadow: 0 6px 20px rgba(190, 43, 102, .06); }
+  .rv-im { position: relative; aspect-ratio: 4 / 3; background: var(--t-pink); display: grid; place-items: center; overflow: hidden; }
+  .rv-im img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rv-ik { font-size: 42px; }
+  .rv-lc { position: absolute; top: 10px; left: 10px; background: rgba(74, 29, 51, .74); color: #fff; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 4px 10px; }
+  .rv-tx { padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .rv-tx b { font-size: 16px; overflow-wrap: anywhere; }
+  .rv-tx small, .rv-ln small { color: var(--muted); font-size: 13px; }
+  .rv-ln { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  .rv-st { border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; background: #FFF1C9; color: #7A5600; }
+  .rv-st.Revisi { background: #FFE1E1; color: #8A1F1F; }
+  .rv-st.Disetujui { background: #DDF5E4; color: #1D6B36; }
+  .rv-bar { display: flex; height: 6px; border-radius: 999px; overflow: hidden; background: var(--line); }
+  .rv-bar i { background: #3BAA5C; } .rv-bar em { background: #E05A5A; }
+  .rv-sk { cursor: default; }
+  .rv-sk .rv-im, .rv-sk b, .rv-sk small { background: linear-gradient(90deg, var(--t-mint), var(--t-pink), var(--t-mint)); background-size: 200% 100%; animation: rvSk 1.2s infinite linear; }
+  .rv-sk b { height: 16px; width: 60%; border-radius: 8px; } .rv-sk small { height: 12px; width: 40%; border-radius: 6px; }
+  @keyframes rvSk { to { background-position: -200% 0; } }
+  .rv-ring { padding-bottom: 12px; }
+  .rv-fg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  @media (min-width: 700px) { .rv-fg { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+  .rv-fg button { position: relative; aspect-ratio: 1 / 1; border: 0; padding: 0; border-radius: 12px; overflow: hidden; background: var(--t-pink); cursor: pointer; display: grid; place-items: center; }
+  .rv-fg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rv-fg .rv-ik { font-size: 24px; }
+  .rv-tn { position: absolute; right: 6px; top: 6px; background: var(--fill); color: #fff; font-size: 11px; font-weight: 600; border-radius: 999px; padding: 2px 7px; }
+  .rv-satu { display: block; width: 100%; border: 0; padding: 0; background: var(--t-pink); border-radius: 18px; overflow: hidden; cursor: zoom-in; }
+  .rv-satu img { width: 100%; display: block; }
+  .rv-aksi { display: flex; flex-direction: column; gap: 10px; }
+  .rv-pv { position: fixed; inset: 0; z-index: 95; background: #120810; display: flex; flex-direction: column; color: #fff; outline: none; }
+  .rv-pv .pv-top, .rv-pv .pv-bwh { display: flex; align-items: center; gap: 10px; padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; }
+  .rv-pv .pv-bwh { padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px)); justify-content: center; flex-wrap: wrap; }
+  .rv-pv .pv-st { flex: 1; overflow: hidden; display: grid; place-items: center; touch-action: none; }
+  .rv-pv img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .15s; user-select: none; -webkit-user-select: none; }
+  .rv-pv button, .rv-pv a { background: rgba(255, 255, 255, .14); color: #fff; border: 0; border-radius: 999px; min-height: 44px; min-width: 44px; padding: 0 14px; font: 600 14px var(--font); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+  .rv-pv .pv-n { flex: 1; text-align: center; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -660,9 +709,16 @@
     </section>
 
     <section id="v-tim" class="page" hidden>
-      <div class="hdr"><div class="ttl"><h1 class="big-title">Tim Arabelle</h1><span>Perintah, approval, laporan &amp; rapor tim</span></div>
+      <div class="hdr" id="timHdr"><div class="ttl"><h1 class="big-title">Tim Arabelle</h1><span>Perintah, approval, laporan &amp; rapor tim</span></div>
         <button class="round" type="button" id="timRefresh" aria-label="Muat ulang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button></div>
       <div id="tBody" class="stack"><p class="center-msg">Memuat…</p></div>
+      <div id="rvHal" class="rvhal" hidden>
+        <div class="hdr rv-hdr"><button class="round" type="button" id="rvBack" aria-label="Kembali"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <div class="ttl"><b id="rvJudul">Review foto</b><span id="rvSub">Hasil edit dari tim</span></div>
+          <button class="round" type="button" id="rvSegar" aria-label="Muat ulang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button></div>
+        <div id="rvPita" class="rv-pita" hidden></div>
+        <div id="rvIsi"></div>
+      </div>
     </section>
 
     <section id="v-uang" class="page" hidden>
@@ -760,16 +816,6 @@
       <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="dlg-body" id="rapBody"></div>
-  </div>
-</dialog>
-
-<dialog id="rvDlg" aria-labelledby="rvTitle">
-  <div class="dlg">
-    <div class="dlg-head">
-      <div><h2 id="rvTitle">Review foto</h2><p id="rvSub">Hasil edit dari tim</p></div>
-      <button class="round" type="button" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    </div>
-    <div class="dlg-body" id="rvBody"></div>
   </div>
 </dialog>
 
@@ -1025,6 +1071,7 @@
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
   var APP_VERSION = '2026.10.20-20';  // samakan dengan APP_VERSION di Code.gs
+  var TAMPILAN = '2026.11.06-1';  // nomor tampilan GitHub saja (APP_VERSION tetap = server)
 
   var I = {
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1227,6 +1274,14 @@
     catch (e) { return Promise.resolve(fallback()); }
   }
 
+  // Batas waktu panggilan (tampilan 2026.11.06-1): tidak ada lagi "Memuat…" tanpa akhir. Panggilan lain ke server Syifa tetap tanpa batas.
+  var TB_BATAS = 40000, TB_TULIS_BATAS = 90000, CALL_BATAS = { getBoot: 45000, getDashboard: 45000 };
+  function ambilBatas(url, opt, ms) {
+    if (!ms || typeof AbortController === 'undefined') return fetch(url, opt);
+    var ac = new AbortController(), t = setTimeout(function () { ac.abort(); }, ms);
+    return fetch(url, Object.assign({}, opt, { signal: ac.signal })).then(function (r) { clearTimeout(t); return r; }, function (e) {
+      clearTimeout(t); if (ac.signal.aborted) { var x = new Error('Server belum menjawab dalam ' + Math.round(ms / 1000) + ' detik. Coba lagi sebentar.'); x.batas = true; throw x; } throw e; });
+  }
   // ====== Pemanggil server ======
   function call(fn) {
     var args = Array.prototype.slice.call(arguments, 1);
@@ -1238,10 +1293,10 @@
         else reject(new Error(msg));
       };
       if (!hasGAS && hasAPI) {
-        fetch(API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, args: args }) })
+        ambilBatas(API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, args: args }) }, CALL_BATAS[fn] || 0)
           .then(function (r) { return r.json(); })
           .then(function (j) { if (j && j.ok) resolve(j.data); else onFail(new Error((j && j.error) || 'Terjadi kesalahan.')); },
-                function () { onFail(new Error('Koneksi gagal. Cek internet lalu coba lagi.')); });
+                function (e) { onFail(new Error(e && e.batas ? e.message : 'Koneksi gagal. Cek internet lalu coba lagi.')); });
         return;
       }
       if (!hasGAS) {
@@ -1256,7 +1311,7 @@
   // ====== Layar ======
   function showOnly(id) { ['bootScreen', 'blockedScreen', 'appScreen'].forEach(function (x) { $(x).hidden = x !== id; }); }
   function closeDialogs() { document.querySelectorAll('dialog').forEach(function (d) { if (d.open) d.close(); }); }
-  function showBlocked() { keyStore.del(); try { localStorage.removeItem('ss_boot_v1'); } catch (e) {} st.boot = null; closeDialogs(); showOnly('blockedScreen'); }
+  function showBlocked() { keyStore.del(); bersihkanSimpanan(true); st.boot = null; closeDialogs(); showOnly('blockedScreen'); }
 
   var intro = { ready: false, done: false, entered: false };
   var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
@@ -1288,9 +1343,17 @@
   function enterOnce() { if (intro.entered || !intro.done || !st.boot) return; intro.entered = true; enterApp(); }
 
   // Data pembukaan terakhir disimpan di HP supaya app langsung tampil, lalu diperbarui diam-diam.
-  var BOOT_CACHE = 'ss_boot_v1';
+  // Tampilan 2026.11.06-1: kunci baru ss_boot_v2. Ringkasan uang (moneyToday, selisih kas mingguan) dan izin tulis (tim.kirim)
+  // TIDAK disimpan di HP, hanya di memori. Simpanan lama ss_boot_v1 (yang masih berisi keduanya) dihapus setiap app dibuka.
+  var BOOT_CACHE = 'ss_boot_v2', BOOT_LAMA = ['ss_boot_v1'];
+  function bersihkanSimpanan(semua) { BOOT_LAMA.concat(semua ? [BOOT_CACHE, 'ss_rv_v1'] : []).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} }); }
+  function bootAman(b) {
+    var c = JSON.parse(JSON.stringify(b || {})), d = c.initial && c.initial.dash;
+    if (d) { delete d.moneyToday; if (d.weekly) { delete d.weekly.netLast; delete d.weekly.netPrev; } if (d.tim && typeof d.tim === 'object') delete d.tim.kirim; }
+    return c;
+  }
   function bootSig() { var t = String(token || ''); return t.length + ':' + t.slice(0, 3) + t.slice(-3); }
-  function saveBoot(b) { try { localStorage.setItem(BOOT_CACHE, JSON.stringify({ sig: bootSig(), at: Date.now(), boot: b })); } catch (e) {} }
+  function saveBoot(b) { try { localStorage.setItem(BOOT_CACHE, JSON.stringify({ sig: bootSig(), at: Date.now(), boot: bootAman(b) })); } catch (e) {} }
   function loadBoot() {
     try {
       var c = JSON.parse(localStorage.getItem(BOOT_CACHE) || 'null');
@@ -1312,6 +1375,7 @@
 
   async function start() {
     applyLogo();
+    bersihkanSimpanan(false);
     if (!isKey(token) && live) { showBlocked(); return; }
     var box = $('bootScreen');
     box.addEventListener('click', enterOnce);
@@ -1368,6 +1432,7 @@
       dock.appendChild(m);
     });
     if ($('timRefresh')) $('timRefresh').onclick = function () { forget('dash'); loadTim(true); };
+    $('rvBack').onclick = rvKembali; $('rvSegar').onclick = function () { RV.isi = {}; RV.tanda = {}; rvMuat(); if (RV.lv.length) rvRender(); };
     if (keys.length < 4) dock.style.justifyContent = 'space-evenly';
     go(owner ? 'dasbor' : 'konten');
     if (owner) setTimeout(prefetch, 1500);
@@ -1378,8 +1443,8 @@
   /** Bandingkan versi app (GitHub) dengan versi server (Apps Script). */
   function checkVersion() {
     var sv = st.boot.serverVersion || '';
-    $('verTxt').textContent = 'Versi ' + APP_VERSION;
-    $('verMob').textContent = 'Syifa Studio · versi ' + APP_VERSION;
+    $('verTxt').textContent = 'Versi ' + APP_VERSION + ' · tampilan ' + TAMPILAN;
+    $('verMob').textContent = 'Syifa Studio · versi ' + APP_VERSION + ' · tampilan ' + TAMPILAN;
     if (!hasAPI || !sv || sv === APP_VERSION) return;
     if (sv > APP_VERSION) {
       $('updText').innerHTML = '<b>Versi baru tersedia</b>Ketuk Perbarui untuk memakai versi terbaru.';
@@ -1486,6 +1551,7 @@
   }
 
   function go(view) {
+    if (RV.buka) rvTutup(true);
     st.view = view;
     ALL_VIEWS.forEach(function (k) { $('v-' + k).hidden = k !== view; });
     document.querySelectorAll('[data-view]').forEach(function (x) {
@@ -1711,8 +1777,8 @@ function salinTautan_(u, selesai) {
     e.preventDefault(); e.stopPropagation(); var w = window.open(tuju, '_blank'); if (!w) location.href = u;
   }, true);
   function tbCall(api, d, ulang) {
-    return fetch(TB_API + '?app=1&api=' + api + '&d=' + encodeURIComponent(JSON.stringify(d || {})) + '&_=' + Date.now(), { redirect: 'follow', cache: 'no-store' })
-      .then(function (r) { return r.text(); }, function () { throw new Error('Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
+    return ambilBatas(TB_API + '?app=1&api=' + api + '&d=' + encodeURIComponent(JSON.stringify(d || {})) + '&_=' + Date.now(), { redirect: 'follow', cache: 'no-store' }, TB_BATAS)
+      .then(function (r) { return r.text(); }, function (e) { throw new Error(e && e.batas ? e.message : 'Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
       .then(function (tx) {
         var j = null; try { j = JSON.parse(tx); } catch (e) {}
         if (!j) {   // Google kadang membalas halaman HTML (server sibuk / versi ThinKerBelle belum terbaru) → coba sekali lagi
@@ -1758,8 +1824,8 @@ function salinTautan_(u, selesai) {
   // simpan ke ThinKerBelle lewat POST (foto tidak muat lewat link biasa)
   function tbTulis(fn, args) {
     var body = SY_AUTH ? { rpc: 'tkb', fn: 'sy' + fn, sy: SY_AUTH, args: args } : { rpc: 'tkb', fn: 'api' + fn, args: [tbToken()].concat(args) };
-    return fetch(TB_API, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
-      .then(function (r) { return r.text(); }, function () { throw new Error('Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
+    return ambilBatas(TB_API, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, TB_TULIS_BATAS)
+      .then(function (r) { return r.text(); }, function (e) { throw new Error(e && e.batas ? e.message : 'Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
       .then(function (t) { var j = null; try { j = JSON.parse(t); } catch (e) {} if (!j) throw new Error('ThinKerBelle belum menjawab dengan benar. Coba lagi sebentar.');
         if (!j.ok) throw new Error(j.pesan || 'Gagal menyimpan'); if (j.data && j.data.ok === false) throw new Error(j.data.pesan || 'Gagal menyimpan'); return j.data; });
   }
@@ -1847,44 +1913,340 @@ function salinTautan_(u, selesai) {
     };
   }
 
-  // ---------- Review foto hasil edit (dari ThinKerBelle): setujui → folder Final, atau minta revisi ----------
-  var RVS = null, RVSF = 'Menunggu';
+  // ---------- Review foto: HALAMAN PENUH dengan tampilan per seri (tampilan 2026.11.06-1) ----------
+  // Data dari ThinKerBelle lewat izin Syifa: syReviewV2 (daftar + seri), syFolder (isi folder), syTanda (jumlah tanda & komentar).
+  // Keputusan per folder: ReviewPutusKelompok. Kalau server menjawab perluYakin (folder terakhir → Foto Final), app bertanya dulu lalu kirim ulang dengan { yakin: true }.
+  // Navigasi: #tim/review → seri → folder → penampil. Tombol/gestur kembali HP mundur satu tingkat (popstate), posisi gulir halaman Tim dikembalikan.
+  var RV = { data: null, dariHP: 0, f: 'Menunggu', lv: [], isi: {}, tanda: {}, gulir: 0, buka: false, jalan: 0, pv: null };
+  var RV_CACHE = 'ss_rv_v1';
+  function rvSimpan(d) {
+    try {
+      var L = (d.list || []).map(function (x) { var y = Object.assign({}, x); delete y.riwayat; delete y.pesan; return y; });
+      localStorage.setItem(RV_CACHE, JSON.stringify({ sig: bootSig(), at: Date.now(), d: { list: L, seri: d.seri || null, boleh: !!d.boleh, v2pakai: !!d.v2pakai } }));
+    } catch (e) {}
+  }
+  function rvAmbil() {
+    try { var c = JSON.parse(localStorage.getItem(RV_CACHE) || 'null'); if (!c || c.sig !== bootSig() || Date.now() - c.at > 7 * 86400000 || !c.d || !c.d.list) return null; RV.dariHP = c.at; return c.d; }
+    catch (e) { return null; }
+  }
+  // Gambar tidak pernah tampil rusak: lh3 =wN → drive.google.com/thumbnail → ikon
+  function rvSrc(id, w, tahap) { var e = encodeURIComponent(id); return tahap ? 'https://drive.google.com/thumbnail?id=' + e + '&sz=w' + w : 'https://lh3.googleusercontent.com/d/' + e + '=w' + w; }
+  function rvImg(id, w) { return '<img data-rvid="' + esc(id) + '" data-w="' + w + '" src="' + esc(rvSrc(id, w, 0)) + '" alt="" loading="lazy" referrerpolicy="no-referrer">'; }
+  function rvGagal(im) {
+    var t = Number(im.dataset.t || 0) + 1; im.dataset.t = t;
+    if (t === 1) { im.src = rvSrc(im.dataset.rvid, im.dataset.w, 1); return; }
+    var s = document.createElement('span'); s.className = 'rv-ik'; s.textContent = '🖼️'; s.title = 'Gambar belum bisa ditampilkan'; im.replaceWith(s);
+  }
+  function rvPasangGbr(root) { root.querySelectorAll('img[data-rvid]').forEach(function (im) { if (im._rv) return; im._rv = 1; im.onerror = function () { rvGagal(im); }; }); }
+  var RV_IKON = { folder: '📁', dokumen: '📄', video: '🎬', gambar: '🖼️' };
+
+  // ---------- data ----------
+  function rvKelompok(d) {
+    if (d.seri && d.seri.length) return d.seri;
+    var peta = {}, out = [];
+    (d.list || []).forEach(function (x) {
+      var k = x.seri || x.id, g = peta[k];
+      if (!g) { g = peta[k] = { id: k, v2: !!x.seri, nama: x.produk || 'Foto', jenis: x.jenis, oleh: x.oleh, waktu: x.waktu, warna: [], cnt: { Disetujui: 0, Revisi: 0, Menunggu: 0 } }; out.push(g); }
+      g.warna.push(x.id); g.cnt[g.cnt[x.status] !== undefined ? x.status : 'Menunggu']++;
+    });
+    out.forEach(function (g) { g.status = g.cnt.Revisi ? 'Revisi' : g.cnt.Menunggu ? 'Menunggu' : 'Disetujui'; });
+    return out;
+  }
+  function rvCariG(id) { return rvKelompok(RV.data || { list: [] }).filter(function (g) { return g.id === id; })[0] || null; }
+  function rvInduk(g) {
+    var L = (RV.data && RV.data.list) || [], id = g.induk || g.id;
+    return L.filter(function (x) { return x.id === id; })[0] || L.filter(function (x) { return (g.warna || []).indexOf(x.id) >= 0; })[0] || null;
+  }
+  function rvBaris(g) { var L = (RV.data && RV.data.list) || []; return L.filter(function (x) { return (g.warna || []).indexOf(x.id) >= 0 || x.id === g.id; }); }
+  // seri V2 bersampul dari REVIEW FOLDER; baris lama: sampul folder / gambar tunggal. fotoId sebuah FOLDER tidak pernah dipakai sebagai gambar.
+  function rvSampul(g, x) {
+    if (g.v2 && g.folderId) return g.sampul || '';
+    if (!x) return '';
+    if (x.sampul) return x.sampul;
+    return x.jl === 'gambar' && x.fotoId ? x.fotoId : '';
+  }
+  function rvFolderSeri(g) { return g.v2 && g.folderId && SY_AUTH ? g.folderId : ''; }
+  function rvStFolder(g, fid, banyak) {
+    var L = (RV.data && RV.data.list) || [];
+    if (banyak) { var a = L.filter(function (y) { return y.seri === g.id && y.id !== g.id && y.folderId === fid; })[0]; if (a) return a; }
+    return rvInduk(g) || {};
+  }
+
+  // ---------- halaman & riwayat navigasi ----------
+  function rvTampilHal(on) { $('timHdr').hidden = on; $('tBody').hidden = on; $('rvHal').hidden = !on; }
   function bukaReviewFoto() {
-    if (!$('rvDlg').open) $('rvDlg').showModal();
-    if (!SY_AUTH && !tbToken()) return perMasuk('rvBody', bukaReviewFoto);
-    $('rvBody').innerHTML = '<p class="center-msg">Memuat foto…</p>';
-    tbPakai('review', {}).then(function (j) { if (!j.ok) throw new Error(j.pesan); RVS = j.data || { list: [] }; tampilReviewFoto(); })
-      .catch(function (e) { $('rvBody').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; });
+    if (!RV.buka) {
+      RV.gulir = window.scrollY || 0;
+      if (st.view !== 'tim') go('tim');
+      RV.buka = true; RV.lv = []; RV.f = 'Menunggu';
+      try { history.pushState({ rv: 1, lv: 0 }, '', '#tim/review'); } catch (e) {}
+    }
+    rvTampilHal(true); window.scrollTo(0, 0);
+    if (!RV.data) RV.data = rvAmbil();
+    rvRender(); rvMuat();
   }
-  function tampilReviewFoto() {
-    var L = RVS.list || [], n = function (s) { return L.filter(function (x) { return x.status === s; }).length; };
-    $('rvTitle').textContent = 'Review foto'; $('rvSub').textContent = n('Menunggu') + ' menunggu · hasil edit dari tim';
-    var h = '<div class="prd-f">' + ['Menunggu', 'Revisi', 'Disetujui'].map(function (s) { return '<button type="button" class="chip" data-f="' + s + '" style="border:1px solid var(--line);cursor:pointer' + (RVSF === s ? ';background:var(--fill);color:#fff' : '') + '">' + s + ' ' + n(s) + '</button>'; }).join('') + '</div>';
-    var a = L.map(function (x, i) { return { x: x, i: i }; }).filter(function (o) { return o.x.status === RVSF; });
-    if (!a.length) h += '<p class="empty">' + (RVSF === 'Menunggu' ? 'Tidak ada foto yang menunggu review.' : 'Belum ada.') + '</p>';
-    else h += '<div class="prd-g">' + a.map(function (o) { var x = o.x;
-      return '<button type="button" class="prd-k" data-i="' + o.i + '" style="text-align:left;padding:0;cursor:pointer;font:inherit;color:inherit"><div class="im">' + (x.fotoId ? '<img src="' + esc(prdTh(x.fotoId)) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '📷') + '</div>' +
-        '<div class="tx"><b>' + esc(x.produk || 'Foto') + (x.warna ? ' · ' + esc(x.warna) : '') + '</b><small>' + esc(x.jenis) + ' · ' + esc(x.oleh) + (x.revisi ? ' · rev ' + x.revisi : '') + '</small>' + (x.catatan ? '<small style="font-style:italic">"' + esc(x.catatan.slice(0, 70)) + '"</small>' : '') + '</div></button>'; }).join('') + '</div>';
-    $('rvBody').innerHTML = h;
-    $('rvBody').querySelectorAll('[data-f]').forEach(function (b) { b.onclick = function () { RVSF = b.dataset.f; tampilReviewFoto(); }; });
-    $('rvBody').querySelectorAll('[data-i]').forEach(function (b) { b.onclick = function () { detailReviewFoto(Number(b.dataset.i)); }; });
+  function rvTutup(diam) {
+    if (!RV.buka) return;
+    RV.buka = false; RV.lv = []; rvTutupPv(true); rvTampilHal(false);
+    if (!diam) { var y = RV.gulir; requestAnimationFrame(function () { window.scrollTo(0, y); }); }
   }
-  function detailReviewFoto(i) {
-    var x = RVS.list[i]; if (!x) return;
-    $('rvTitle').textContent = (x.produk || 'Foto') + (x.warna ? ' · ' + x.warna : ''); $('rvSub').textContent = x.jenis + ' · dari ' + x.oleh + ' · ' + x.waktu + (x.revisi ? ' · revisi ke-' + x.revisi : '');
-    var h = '<button type="button" class="link" id="rvKembali">‹ Semua foto</button>' +
-      (x.fotoId ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener"><img src="' + esc(prdTh(x.fotoId, 1400)) + '" alt="Foto" referrerpolicy="no-referrer" style="width:100%;border-radius:18px;border:1px solid var(--line);display:block;margin:6px 0 12px"></a>' : '<a class="chip" href="' + esc(x.link) + '" target="_blank" rel="noopener">Buka foto</a>') +
-      (x.ps ? '<p class="mu">📸 ' + esc(x.ps) + '</p>' : '') + (x.catatan ? '<p class="mu">💬 Catatan sebelumnya: ' + esc(x.catatan) + '</p>' : '');
-    if (x.status !== 'Disetujui') h += '<div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"><button class="btn" type="button" id="rvSetuju">✅ Setujui · masuk folder Final</button>' +
-      '<label class="lbl">Catatan revisi<textarea class="in" id="rvCat" rows="3" placeholder="Contoh: crop lebih rapat, warna kulit lebih hangat"></textarea></label><button class="btn-line" type="button" id="rvRevisi">✏️ Minta revisi</button></div>';
-    else h += '<p class="mu">✅ Disetujui ' + esc(x.reviewer === 'Syifa' ? 'Umi Syifa' : x.reviewer) + ' · ' + esc(x.waktuReview) + '</p>';
-    $('rvBody').innerHTML = h; $('rvKembali').onclick = tampilReviewFoto;
-    var putus = function (kep) { var c = $('rvCat') ? $('rvCat').value.trim() : ''; if (kep === 'revisi' && !c) return toast('Tulis catatan revisinya dulu ya', true);
-      $('rvSetuju').disabled = true; $('rvRevisi').disabled = true;
-      tbTulis('ReviewPutus', [x.id, kep, c]).then(function (r) { toast((r && r.pesan) || 'Tersimpan'); x.status = kep === 'setuju' ? 'Disetujui' : 'Revisi'; x.catatan = c; tampilReviewFoto(); })
-        .catch(function (e) { $('rvSetuju').disabled = false; $('rvRevisi').disabled = false; toast(errMsg(e), true); }); };
-    if ($('rvSetuju')) { $('rvSetuju').onclick = function () { putus('setuju'); }; $('rvRevisi').onclick = function () { putus('revisi'); }; }
+  function rvMasuk(lv) {
+    RV.lv.push(lv);
+    var h = '#tim/review' + RV.lv.map(function (x) { return '/' + encodeURIComponent(x.k === 'folder' ? x.fid : x.id); }).join('');
+    try { history.pushState({ rv: 1, lv: RV.lv.length }, '', h); } catch (e) {}
+    window.scrollTo(0, 0); rvRender();
   }
+  function rvKembali() { try { history.back(); } catch (e) { rvTutup(); } }
+  window.addEventListener('popstate', function (e) {
+    var s = e.state;
+    if (RV.pv) { rvTutupPv(true); return; }
+    if (!RV.buka) return;
+    if (!s || !s.rv) { rvTutup(); return; }
+    RV.lv = RV.lv.slice(0, s.lv || 0); rvRender();
+  });
+
+  // ---------- muat ----------
+  function rvPita(teks, salah) {
+    var p = $('rvPita'); if (!teks) { p.hidden = true; return; }
+    p.hidden = false; p.className = 'rv-pita' + (salah ? ' err' : '');
+    p.innerHTML = '<span>' + esc(teks) + '</span>' + (salah ? '<button class="link" type="button" id="rvUlang" style="padding:0;color:inherit;font-weight:600">Coba lagi</button>' : '');
+    if (salah) $('rvUlang').onclick = function () { rvMuat(); };
+  }
+  function rvJam(ms) { var d = new Date(ms); return ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2); }
+  async function rvIzin() {
+    try { var d = await call('getDashboard'); mark('dash', d); st.dash = d; var t = d && d.tim; if (t && t.kirim && Number(t.kirim.exp) > Date.now()) { SY_AUTH = t.kirim; SY_NAMA = t.nama || SY_NAMA; } } catch (e) {}
+  }
+  async function rvMuat() {
+    var jalan = ++RV.jalan;
+    rvPita(RV.data ? (RV.dariHP ? 'Data tersimpan di HP (' + rvJam(RV.dariHP) + ') · memperbarui…' : 'Memperbarui…') : '');
+    try {
+      if (!SY_AUTH || Number(SY_AUTH.exp) <= Date.now()) { SY_AUTH = null; await rvIzin(); }
+      var j;
+      if (SY_AUTH) j = await tbPakai('reviewV2', {});
+      else if (tbToken()) j = await tbPakai('review', {});
+      else { if (jalan === RV.jalan) { rvPita(''); if (!RV.lv.length) perMasuk('rvIsi', function () { rvMuat(); }); } return; }
+      if (!j || !j.ok) throw new Error((j && j.pesan) || 'Review foto belum bisa dimuat.');
+      if (jalan !== RV.jalan) return;
+      RV.data = j.data || { list: [] }; RV.dariHP = 0; rvSimpan(RV.data); rvPita(''); rvRender();
+    } catch (e) {
+      if (jalan !== RV.jalan) return;
+      rvPita(errMsg(e), true); if (!RV.data) $('rvIsi').innerHTML = '<p class="empty">Belum ada data review di HP ini.</p>';
+    }
+  }
+  function rvKerangka(n) { var k = ''; for (var i = 0; i < (n || 4); i++) k += '<div class="rv-k rv-sk" aria-hidden="true"><span class="rv-im"></span><span class="rv-tx"><b></b><small></small></span></div>'; return '<div class="rv-g">' + k + '</div>'; }
+
+  // ---------- tampilan ----------
+  function rvRender() {
+    if (!RV.buka) return;
+    var top = RV.lv[RV.lv.length - 1];
+    if (!top) return rvDaftar();
+    if (!RV.data) { $('rvIsi').innerHTML = rvKerangka(2); return; }
+    if (top.k === 'seri') return rvSeri(top.id);
+    if (top.k === 'folder') return rvFolder(top.id, top.fid);
+  }
+  function rvStatus(s) { return '<span class="rv-st ' + esc(s || 'Menunggu') + '">' + esc(s || 'Menunggu') + '</span>'; }
+  function rvDaftar() {
+    $('rvJudul').textContent = 'Review foto';
+    var b = $('rvIsi');
+    if (!RV.data) { $('rvSub').textContent = 'Hasil edit dari tim'; b.innerHTML = rvKerangka(4); return; }
+    var G = rvKelompok(RV.data), n = function (s) { return G.filter(function (g) { return g.status === s; }).length; };
+    $('rvSub').textContent = n('Menunggu') + ' menunggu · ' + n('Revisi') + ' revisi';
+    var h = '<div class="rv-tab" role="tablist">' + ['Menunggu', 'Revisi', 'Disetujui'].map(function (s) {
+      return '<button type="button" role="tab" aria-selected="' + (RV.f === s) + '" data-f="' + s + '">' + s + ' <i>' + n(s) + '</i></button>'; }).join('') + '</div>';
+    var a = G.filter(function (g) { return g.status === RV.f; });
+    h += a.length ? '<div class="rv-g">' + a.map(rvKartu).join('') + '</div>' : '<p class="empty">' + (RV.f === 'Menunggu' ? 'Tidak ada yang menunggu review. 🎉' : 'Belum ada.') + '</p>';
+    b.innerHTML = h; rvPasangGbr(b);
+    b.querySelectorAll('[data-f]').forEach(function (x) { x.onclick = function () { RV.f = x.dataset.f; rvDaftar(); }; });
+    b.querySelectorAll('[data-g]').forEach(function (x) { x.onclick = function () { rvMasuk({ k: 'seri', id: x.dataset.g }); }; });
+  }
+  function rvKartu(g) {
+    var x = rvInduk(g) || {}, sp = rvSampul(g, x), c = g.cnt || {}, tot = (c.Disetujui || 0) + (c.Revisi || 0) + (c.Menunggu || 0);
+    var nF = g.nFolder || 0, nFoto = g.v2 && g.folderId ? (g.foto || 0) : (x.nFoto || (x.jl === 'gambar' ? 1 : 0));
+    var bar = tot > 1 ? '<span class="rv-bar" title="' + (c.Disetujui || 0) + ' disetujui · ' + (c.Revisi || 0) + ' revisi"><i style="width:' + Math.round(100 * (c.Disetujui || 0) / tot) + '%"></i><em style="width:' + Math.round(100 * (c.Revisi || 0) / tot) + '%"></em></span>' : '';
+    var info = [g.jenis || x.jenis, x.oleh || g.oleh, x.waktu || g.waktu].filter(Boolean).join(' · ');
+    return '<button type="button" class="rv-k" data-g="' + esc(g.id) + '"><span class="rv-im">' + (sp ? rvImg(sp, 600) : '<span class="rv-ik">' + (RV_IKON[x.jl] || '📷') + '</span>') +
+      (nF > 1 ? '<span class="rv-lc">' + nF + ' folder</span>' : '') + '</span><span class="rv-tx"><b>' + esc(g.nama || x.produk || 'Foto') + (!g.v2 && x.warna ? ' · ' + esc(x.warna) : '') + '</b>' +
+      (info ? '<small>' + esc(info) + '</small>' : '') + '<span class="rv-ln">' + rvStatus(g.status) + (nFoto ? '<small>' + nFoto + ' foto</small>' : '') + (tot > 1 ? '<small>' + (c.Disetujui || 0) + '/' + tot + ' disetujui</small>' : '') + '</span>' + bar + '</span></button>';
+  }
+  function rvKepala(g, x) {
+    $('rvJudul').textContent = g.nama || x.produk || 'Foto';
+    $('rvSub').textContent = [g.jenis || x.jenis, x.oleh ? 'dari ' + x.oleh : '', x.waktu].filter(Boolean).join(' · ');
+  }
+  function rvSeri(id) {
+    var g = rvCariG(id), b = $('rvIsi');
+    if (!g) { b.innerHTML = '<p class="empty">Seri ini tidak ada lagi di daftar (mungkin sudah diarsipkan).</p>'; return; }
+    var x = rvInduk(g) || {}; rvKepala(g, x);
+    var fid = rvFolderSeri(g);
+    if (!fid) return rvItem(g);
+    var isi = RV.isi[fid];
+    if (!isi) { b.innerHTML = rvKerangka(2); rvIsiFolder(g, fid, false); return; }
+    var grup = isi.grup || [];
+    if (grup.length === 1) return rvFolderIsi(g, grup[0], false);
+    var h = '<div class="card rv-ring"><p class="mu" style="margin:0">' + grup.length + ' folder · ' + (g.foto || 0) + ' foto' + (isi.dibaca ? ' · dibaca ' + esc(isi.dibaca) : '') + '</p>' +
+      '<a class="link" href="' + esc(x.linkSeri || g.link || x.link || '#') + '" target="_blank" rel="noopener" style="color:var(--rose);font-weight:600">Buka di Drive ›</a></div>';
+    if (!grup.length) h += '<p class="empty">' + esc(isi.pesan || 'Isi folder belum terbaca.') + '</p><button class="btn-line" type="button" id="rvBacaUlang">Baca ulang isi folder</button>';
+    else h += '<div class="rv-g">' + grup.map(function (k) {
+      var r = rvStFolder(g, k.id, grup.length > 1), f0 = (k.foto || [])[0];
+      return '<button type="button" class="rv-k" data-fd="' + esc(k.id) + '"><span class="rv-im">' + (f0 ? rvImg(f0.id, 600) : '<span class="rv-ik">📁</span>') + '</span><span class="rv-tx"><b>' + esc(k.nama || 'Folder') + '</b>' +
+        '<span class="rv-ln">' + rvStatus(r.status) + '<small>' + (k.foto || []).length + ' foto</small></span>' + (r.status === 'Revisi' && r.catatan ? '<small style="font-style:italic">"' + esc(r.catatan.slice(0, 80)) + '"</small>' : '') + '</span></button>';
+    }).join('') + '</div>';
+    b.innerHTML = h; rvPasangGbr(b);
+    b.querySelectorAll('[data-fd]').forEach(function (y) { y.onclick = function () { rvMasuk({ k: 'folder', id: g.id, fid: y.dataset.fd }); }; });
+    if ($('rvBacaUlang')) $('rvBacaUlang').onclick = function () { rvIsiFolder(g, fid, true); };
+  }
+  async function rvIsiFolder(g, fid, segar) {
+    try {
+      var r = await tbPakai('folder', { id: fid, segar: !!segar });
+      if (!r || r.ok === false) throw new Error((r && r.pesan) || 'Isi folder belum bisa dibaca.');
+      RV.isi[fid] = r; if (RV.buka) rvRender();
+      if (r.basi && !segar) rvIsiFolder(g, fid, true);
+      else if (r.sibuk || r.status === 'nanti') rvPita('Isi folder sedang dibaca ThinKerBelle. Coba lagi sebentar.', true);
+    } catch (e) { if (!RV.isi[fid] && RV.buka) $('rvIsi').innerHTML = '<p class="empty">' + esc(errMsg(e)) + '</p>'; else toast(errMsg(e), true); }
+  }
+  function rvFolder(id, fid) {
+    var g = rvCariG(id), b = $('rvIsi');
+    if (!g) { b.innerHTML = '<p class="empty">Seri ini tidak ada lagi di daftar.</p>'; return; }
+    var isi = RV.isi[rvFolderSeri(g)], k = isi && (isi.grup || []).filter(function (y) { return y.id === fid; })[0];
+    if (!k) { b.innerHTML = rvKerangka(2); if (rvFolderSeri(g)) rvIsiFolder(g, rvFolderSeri(g), false); return; }
+    rvFolderIsi(g, k, (isi.grup || []).length > 1);
+  }
+  // layar folder: grid thumbnail w300 + keputusan per folder
+  function rvFolderIsi(g, k, banyak) {
+    var b = $('rvIsi'), x = rvInduk(g) || {}, r = rvStFolder(g, k.id, banyak), foto = k.foto || [], tk = RV.tanda[g.id + '|' + k.id];
+    if (banyak) { $('rvJudul').textContent = (g.nama || 'Seri') + ' · ' + (k.nama || 'Folder'); $('rvSub').textContent = [x.oleh ? 'dari ' + x.oleh : '', foto.length + ' foto'].filter(Boolean).join(' · '); }
+    else rvKepala(g, x);
+    var h = '<div class="card rv-ring"><div class="rv-ln">' + rvStatus(r.status) + '<small>' + foto.length + ' foto</small>' + (r.revisi ? '<small>revisi ke-' + r.revisi + '</small>' : '') + '</div>' +
+      (r.status === 'Disetujui' && r.reviewer ? '<p class="mu" style="margin:8px 0 0">✅ Disetujui ' + esc(r.reviewer === 'Syifa' ? 'Umi Syifa' : r.reviewer) + (r.waktuReview ? ' · ' + esc(r.waktuReview) : '') + '</p>' : '') +
+      (r.status === 'Revisi' && r.catatan ? '<p class="mu" style="margin:8px 0 0">💬 ' + esc(r.catatan) + '</p>' : '') +
+      '<div id="rvTandaRing" class="mu" style="margin:6px 0 0;font-size:12.5px">' + rvTandaTeks(tk) + '</div>' +
+      '<a class="link" href="https://drive.google.com/drive/folders/' + encodeURIComponent(k.id) + '" target="_blank" rel="noopener" style="color:var(--rose);font-weight:600">Buka di Drive ›</a></div>';
+    h += foto.length ? '<div class="rv-fg">' + foto.map(function (f, i) { var n = tk && tk.perFoto ? tk.perFoto[f.id] : 0;
+      return '<button type="button" data-pv="' + i + '" aria-label="Lihat foto ' + (i + 1) + '">' + rvImg(f.id, 300) + (n ? '<span class="rv-tn">' + n + '</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="empty">Folder ini kosong atau belum terbaca.</p>';
+    h += rvAksiHtml(r.status);
+    b.innerHTML = h; rvPasangGbr(b);
+    b.querySelectorAll('[data-pv]').forEach(function (y) { y.onclick = function () { rvBukaPv(g, k, Number(y.dataset.pv)); }; });
+    rvPasangAksi(function (kep) { return rvPutusFolder(g, k, kep); });
+    if (!tk) rvMuatTanda(g, k);
+  }
+  function rvTandaTeks(tk) {
+    if (!tk) return '';
+    var T = tk.tanda || [], kom = T.filter(function (t) { return t.jenis === 'komentar'; }), nt = T.length - kom.length;
+    if (!T.length) return 'Belum ada tanda atau komentar di revisi ini.';
+    return (nt ? '📍 ' + nt + ' tanda' : '') + (nt && kom.length ? ' · ' : '') + (kom.length ? '💬 ' + kom.length + ' komentar' : '') +
+      kom.slice(0, 3).map(function (t) { return '<br>“' + esc(String(t.teks || '').slice(0, 120)) + '” <span>– ' + esc(t.oleh) + '</span>'; }).join('');
+  }
+  async function rvMuatTanda(g, k) {
+    try { var r = await tbPakai('tanda', { indukId: g.id, folderId: k.id }); if (!r || r.ok === false) return;
+      RV.tanda[g.id + '|' + k.id] = r; if ($('rvTandaRing')) $('rvTandaRing').innerHTML = rvTandaTeks(r);
+      $('rvIsi').querySelectorAll('[data-pv]').forEach(function (y) { var f = (k.foto || [])[Number(y.dataset.pv)], n = f && r.perFoto ? r.perFoto[f.id] : 0; if (n && !y.querySelector('.rv-tn')) y.insertAdjacentHTML('beforeend', '<span class="rv-tn">' + n + '</span>'); });
+    } catch (e) {}
+  }
+  function rvAksiHtml(status) {
+    if (status === 'Disetujui') return '<div class="rv-aksi"><button class="btn-line" type="button" data-kep="batal">↩️ Batalkan persetujuan</button></div>';
+    return '<div class="rv-aksi"><button class="btn" type="button" data-kep="setuju">✅ Setujui</button>' +
+      '<label class="lbl">Catatan revisi<textarea class="in" id="rvCat" rows="3" placeholder="Contoh: crop lebih rapat, warna kulit lebih hangat"></textarea></label>' +
+      '<button class="btn-line" type="button" data-kep="revisi">✏️ Minta revisi</button></div>';
+  }
+  function rvPasangAksi(fn) { $('rvIsi').querySelectorAll('[data-kep]').forEach(function (y) { y.onclick = function () { fn(y.dataset.kep); }; }); }
+  function rvKunci(on) { $('rvIsi').querySelectorAll('[data-kep]').forEach(function (y) { y.disabled = on; }); }
+  // tanya dua langkah (pakai lembar bawah yang sama dengan "Buka link")
+  function rvTanya(judul, isi, ya) {
+    return new Promise(function (selesai) {
+      var w = document.createElement('div'); w.className = 'lnk-wrap';
+      w.innerHTML = '<div class="lnk-sheet" role="alertdialog" aria-label="' + esc(judul) + '"><b>' + esc(judul) + '</b><p style="word-break:normal;font-size:14px;line-height:1.5">' + esc(isi) + '</p>' +
+        '<button class="btn" type="button" data-ya>' + esc(ya) + '</button><button class="btn btn-line" type="button" data-batal>Batal</button></div>';
+      var tutup = function (v) { w.remove(); selesai(v); };
+      w.onclick = function (e) { if (e.target === w) tutup(false); };
+      w.querySelector('[data-ya]').onclick = function () { tutup(true); }; w.querySelector('[data-batal]').onclick = function () { tutup(false); };
+      document.body.appendChild(w); w.querySelector('[data-batal]').focus();
+    });
+  }
+  // tulis ke ThinKerBelle tanpa melempar galat untuk jawaban { ok:false, perluYakin } (perlu dibaca app)
+  function rvTulis(fn, args) {
+    var body = SY_AUTH ? { rpc: 'tkb', fn: 'sy' + fn, sy: SY_AUTH, args: args } : { rpc: 'tkb', fn: 'api' + fn, args: [tbToken()].concat(args) };
+    return ambilBatas(TB_API, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, TB_BATAS)
+      .then(function (r) { return r.text(); }, function (e) { throw new Error(e && e.batas ? e.message : 'Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
+      .then(function (t) { var j = null; try { j = JSON.parse(t); } catch (e) {} if (!j) throw new Error('ThinKerBelle belum menjawab dengan benar. Coba lagi sebentar.');
+        if (!j.ok) throw new Error(j.pesan || 'Gagal menyimpan'); return j.data; });
+  }
+  async function rvKirimPutus(fn, argsTanpaOpsi, kep) {
+    var cat = $('rvCat') ? $('rvCat').value.trim() : '';
+    if (kep === 'revisi' && !cat) { toast('Tulis catatan revisinya dulu ya', true); if ($('rvCat')) $('rvCat').focus(); return; }
+    if (kep === 'batal' && !(await rvTanya('Batalkan persetujuan?', 'Status kembali ke Menunggu. Folder yang sudah dipindah ke Foto Final tidak ikut dikembalikan otomatis.', 'Ya, batalkan'))) return;
+    rvKunci(true);
+    try {
+      var args = argsTanpaOpsi.concat([kep, cat]), r = await rvTulis(fn, args.concat([{}]));
+      if (r && r.perluYakin) {
+        if (!(await rvTanya('Pindahkan ke Foto Final?', (r.pesan || 'Persetujuan ini memindahkan folder ke ThinKerBelle · Foto Final.') + ' Lanjutkan?', 'Ya, setujui & pindahkan'))) { rvKunci(false); return; }
+        r = await rvTulis(fn, args.concat([{ yakin: true }]));
+      }
+      if (!r || r.ok === false) throw new Error((r && r.pesan) || 'Gagal menyimpan');
+      toast(r.pesan || (kep === 'setuju' ? 'Disetujui ✅' : kep === 'revisi' ? 'Catatan revisi terkirim' : 'Persetujuan dibatalkan'));
+      await rvMuat();
+    } catch (e) { toast(errMsg(e), true); }
+    finally { rvKunci(false); }
+  }
+  function rvPutusFolder(g, k, kep) { return rvKirimPutus('ReviewPutusKelompok', [g.id, k.id], kep); }
+  // baris tanpa folder seri (foto tunggal, dokumen, folder lama): satu blok per baris, keputusan lewat ReviewPutus (+ yakin)
+  function rvItem(g) {
+    var b = $('rvIsi'), R = rvBaris(g);
+    if (!R.length) { b.innerHTML = '<p class="empty">Data foto ini belum lengkap. Muat ulang.</p>'; return; }
+    var x = R[0], sp = rvSampul({}, x), boleh = RV.data.boleh || RV.data.v2pakai || !!SY_AUTH;
+    var h = '<div class="card rv-ring">' + (sp ? '<button type="button" class="rv-satu" data-pv1="1">' + rvImg(sp, 1200) + '</button>' : '<p style="font-size:44px;margin:6px 0">' + (RV_IKON[x.jl] || '📷') + '</p>') +
+      '<div class="rv-ln" style="margin-top:10px">' + rvStatus(x.status) + (x.nFoto ? '<small>' + x.nFoto + ' foto</small>' : '') + (x.revisi ? '<small>revisi ke-' + x.revisi + '</small>' : '') + '</div>' +
+      (x.ps ? '<p class="mu" style="margin:8px 0 0">📸 ' + esc(x.ps) + '</p>' : '') + (x.catatan ? '<p class="mu" style="margin:6px 0 0">💬 ' + esc(x.catatan) + '</p>' : '') +
+      (x.status === 'Disetujui' && x.reviewer ? '<p class="mu" style="margin:6px 0 0">✅ Disetujui ' + esc(x.reviewer === 'Syifa' ? 'Umi Syifa' : x.reviewer) + (x.waktuReview ? ' · ' + esc(x.waktuReview) : '') + '</p>' : '') +
+      (x.link ? '<a class="link" href="' + esc(x.link) + '" target="_blank" rel="noopener" style="color:var(--rose);font-weight:600">Buka di Drive ›</a>' : '') + '</div>';
+    if (R.length > 1) h += '<p class="mu">Seri ini punya ' + R.length + ' baris. Keputusan di bawah untuk baris pertama (' + esc(x.warna || x.id) + ').</p>';
+    if (boleh && x.status !== 'Disetujui') h += rvAksiHtml(x.status);
+    b.innerHTML = h; rvPasangGbr(b);
+    if ($('rvIsi').querySelector('[data-pv1]')) $('rvIsi').querySelector('[data-pv1]').onclick = function () { rvBukaPv(g, { id: '', foto: [{ id: sp, n: x.produk || 'Foto' }] }, 0); };
+    rvPasangAksi(function (kep) { return rvKirimPutus('ReviewPutus', [x.id], kep); });
+  }
+
+  // ---------- penampil: w800 → w1600 saat diperbesar, geser, ketuk dua kali, panah, Esc/kembali ----------
+  function rvBukaPv(g, k, i) {
+    var foto = k.foto || []; if (!foto.length) return;
+    rvTutupPv(true);
+    var w = document.createElement('div'); w.className = 'rv-pv'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-label', 'Penampil foto'); w.tabIndex = -1;
+    w.innerHTML = '<div class="pv-top"><button type="button" data-x aria-label="Tutup">✕</button><span class="pv-n"></span><a data-drive target="_blank" rel="noopener">Drive</a></div>' +
+      '<div class="pv-st"><img alt="" referrerpolicy="no-referrer" draggable="false"></div>' +
+      '<div class="pv-bwh"><button type="button" data-k="-1" aria-label="Sebelumnya">‹</button><button type="button" data-zoom>Perbesar</button>' + (k.id && SY_AUTH ? '<button type="button" data-sampul>⭐ Jadikan sampul</button>' : '') + '<button type="button" data-k="1" aria-label="Berikutnya">›</button></div>';
+    document.body.appendChild(w);
+    var P = RV.pv = { w: w, g: g, k: k, i: i, z: 1, x: 0, y: 0 }, im = w.querySelector('img');
+    var atur = function () { im.style.transform = 'translate(' + P.x + 'px,' + P.y + 'px) scale(' + P.z + ')'; w.querySelector('[data-zoom]').textContent = P.z > 1 ? 'Perkecil' : 'Perbesar'; };
+    var tampil = function () {
+      var f = foto[P.i]; P.z = 1; P.x = P.y = 0; atur(); im.dataset.t = 0;
+      im.onerror = function () { if (im.dataset.t === '0') { im.dataset.t = 1; im.src = rvSrc(f.id, P.z > 1 ? 1600 : 800, 1); } else { im.dataset.t = 2; im.removeAttribute('src'); im.alt = 'Gambar belum bisa ditampilkan'; } };
+      im.src = rvSrc(f.id, 800, 0);
+      w.querySelector('.pv-n').textContent = (P.i + 1) + ' / ' + foto.length + (f.n ? ' · ' + f.n : '');
+      w.querySelector('[data-drive]').href = 'https://drive.google.com/file/d/' + encodeURIComponent(f.id) + '/view';
+      [P.i - 1, P.i + 1].forEach(function (j) { if (foto[j]) { var p = new Image(); p.referrerPolicy = 'no-referrer'; p.src = rvSrc(foto[j].id, 800, 0); } });
+    };
+    var pindah = function (d) { var j = P.i + d; if (j < 0 || j >= foto.length) return; P.i = j; tampil(); };
+    var zoom = function () { P.z = P.z > 1 ? 1 : 2.5; P.x = P.y = 0; if (P.z > 1 && im.dataset.t === '0') im.src = rvSrc(foto[P.i].id, 1600, 0); atur(); };
+    w.querySelector('[data-x]').onclick = rvKembali;
+    w.querySelectorAll('[data-k]').forEach(function (y) { y.onclick = function () { pindah(Number(y.dataset.k)); }; });
+    w.querySelector('[data-zoom]').onclick = zoom;
+    if (w.querySelector('[data-sampul]')) w.querySelector('[data-sampul]').onclick = function () {
+      var btn = this; btn.disabled = true;
+      rvTulis('ReviewSampulPilih', [g.id, foto[P.i].id]).then(function (r) { if (!r || r.ok === false) throw new Error((r && r.pesan) || 'Gagal'); toast(r.pesan || 'Dijadikan sampul'); g.sampul = r.sampul || foto[P.i].id; rvSimpan(RV.data); })
+        .catch(function (e) { toast(errMsg(e), true); }).then(function () { btn.disabled = false; });
+    };
+    // sentuh: geser kiri/kanan untuk pindah foto, seret saat diperbesar, ketuk dua kali untuk perbesar
+    var st0 = null, ketuk = 0;
+    w.querySelector('.pv-st').addEventListener('pointerdown', function (e) { st0 = { x: e.clientX, y: e.clientY, px: P.x, py: P.y }; });
+    w.querySelector('.pv-st').addEventListener('pointermove', function (e) { if (!st0 || P.z === 1) return; P.x = st0.px + e.clientX - st0.x; P.y = st0.py + e.clientY - st0.y; atur(); });
+    w.querySelector('.pv-st').addEventListener('pointerup', function (e) {
+      if (!st0) return; var dx = e.clientX - st0.x, dy = e.clientY - st0.y; st0 = null;
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) { var now = Date.now(); if (now - ketuk < 320) { zoom(); ketuk = 0; } else ketuk = now; return; }
+      if (P.z === 1 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) pindah(dx < 0 ? 1 : -1);
+    });
+    w.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') pindah(-1); else if (e.key === 'ArrowRight') pindah(1); else if (e.key === 'Escape') rvKembali(); });
+    try { history.pushState({ rv: 1, lv: RV.lv.length, pv: 1 }, '', location.hash); } catch (e) {}
+    tampil(); w.focus();
+  }
+  function rvTutupPv() { if (RV.pv) { RV.pv.w.remove(); RV.pv = null; } }
 
   // ---------- Rapor tim bulanan (khusus owner & leader, data dari ThinKerBelle) ----------
   var rapIdx = null;
@@ -2092,7 +2454,7 @@ function salinTautan_(u, selesai) {
     if (up.length) b.appendChild(el('div', 'card', '<div class="sec"><h3>Akan datang</h3></div>' + up.map(function (x) { return '<div class="pg-it"><i class="tg">' + esc(dayLabel(x.d)) + '</i><p><b>' + esc(x.t) + '</b>' + (x.s ? '<small>' + esc(x.s) + '</small>' : '') + '</p></div>'; }).join('')));
   }
   function timCard(t) {
-    SY_AUTH = t && t.kirim && Number(t.kirim.exp) > Date.now() ? t.kirim : null; SY_NAMA = (t && t.nama) || []; SY_ALASAN = (t && t.kirimAlasan) || '';
+    SY_AUTH = t && t.kirim && Number(t.kirim.exp) > Date.now() ? t.kirim : (t && t.kirimAlasan ? null : (SY_AUTH && Number(SY_AUTH.exp) > Date.now() ? SY_AUTH : null)); SY_NAMA = (t && t.nama) || []; SY_ALASAN = (t && t.kirimAlasan) || '';
     var row = function (bg, icon, small, title, sub) {
       return '<div class="row"><span class="ic" style="background:' + bg + '">' + icon + '</span><span class="t"><small>' + esc(small) + '</small><b>' + esc(title) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span></div>';
     };
@@ -2177,7 +2539,7 @@ function salinTautan_(u, selesai) {
     else left.appendChild(el('p', 'empty', 'Belum ada rencana di hari ini.'));
     if (st.dDay === today) {
       var m = d.moneyToday;
-      var mc = el('button', 'ev2', '<div class="rw"><b>💸 Keuangan hari ini · ' + rpSigned(m.in - m.out) + '</b><span class="chip">Keuangan</span></div><span class="sub">Masuk ' + rp(m.in) + ' · Keluar ' + rp(m.out) + (m.count ? ' · ' + m.count + ' transaksi' : '') + '</span>');
+      var mc = !m ? el('button', 'ev2', '<div class="rw"><b>💸 Keuangan hari ini · …</b><span class="chip">Keuangan</span></div><span class="sub">Memperbarui…</span>') : el('button', 'ev2', '<div class="rw"><b>💸 Keuangan hari ini · ' + rpSigned(m.in - m.out) + '</b><span class="chip">Keuangan</span></div><span class="sub">Masuk ' + rp(m.in) + ' · Keluar ' + rp(m.out) + (m.count ? ' · ' + m.count + ' transaksi' : '') + '</span>');
       mc.type = 'button'; mc.onclick = function () { go('uang'); };
       left.appendChild(mc);
     }
@@ -2458,7 +2820,7 @@ function salinTautan_(u, selesai) {
       tile('var(--t-pink)', 'Views', num(w.last.views), pctTxt(w.last.views, w.prev.views)) +
       tile('var(--t-lilac)', 'Interaksi', num(w.last.eng), pctTxt(w.last.eng, w.prev.eng)) +
       tile('var(--t-peach)', 'Agenda', w.agendaLast, 'minggu lalu') +
-      tile('#DDF2E6', 'Selisih kas', (w.netLast < 0 ? '−' : '+') + rp(Math.abs(w.netLast)).replace('Rp ', 'Rp '), pctTxt(w.netLast, w.netPrev)) + '</div>' +
+      tile('#DDF2E6', 'Selisih kas', w.netLast == null ? '…' : (w.netLast < 0 ? '−' : '+') + rp(Math.abs(w.netLast)).replace('Rp ', 'Rp '), w.netLast == null ? 'memperbarui…' : pctTxt(w.netLast, w.netPrev)) + '</div>' +
       '<div class="card"><div class="sec"><h3>⚠️ Perlu perhatian</h3></div>' +
         (w.last.missing ? '<div class="row"><span class="ic">📊</span><span class="t"><b>' + w.last.missing + ' posting belum diisi hasilnya</b><span>Isi supaya report akurat</span></span></div>' : '<p class="empty">Semua beres ✓</p>') + '</div>' +
       '<div class="card"><div class="sec"><h3>🗓️ Minggu ini</h3></div>' +
