@@ -3,6 +3,8 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
+<meta name="syifa-tampilan" content="2026.11.07-1">
+<meta name="syifa-app" content="2026.10.20-20">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syifa Studio</title>
 <meta name="description" content="Kalender konten, jadwal harian, agenda, dan keuangan Syifa Studio.">
@@ -604,6 +606,7 @@
   .rv-bar { display: flex; height: 6px; border-radius: 999px; overflow: hidden; background: var(--line); }
   .rv-bar i { background: #3BAA5C; } .rv-bar em { background: #E05A5A; }
   .rv-sk { cursor: default; }
+  .tim-ket { font-size: 12px; margin: -6px 6px 10px; }
   .rv-sk .rv-im, .rv-sk b, .rv-sk small { background: linear-gradient(90deg, var(--t-mint), var(--t-pink), var(--t-mint)); background-size: 200% 100%; animation: rvSk 1.2s infinite linear; }
   .rv-sk b { height: 16px; width: 60%; border-radius: 8px; } .rv-sk small { height: 12px; width: 40%; border-radius: 6px; }
   @keyframes rvSk { to { background-position: -200% 0; } }
@@ -624,6 +627,11 @@
   .rv-pv img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .15s; user-select: none; -webkit-user-select: none; }
   .rv-pv button, .rv-pv a { background: rgba(255, 255, 255, .14); color: #fff; border: 0; border-radius: 999px; min-height: 44px; min-width: 44px; padding: 0 14px; font: 600 14px var(--font); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
   .rv-pv .pv-n { flex: 1; text-align: center; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* tampilan 2026.11.07-1: ruang bawah lebih lega; saat mengetik di HP nav bawah disembunyikan supaya tombol di bawah isian (mis. Minta revisi) tidak tertutup */
+  @media (max-width: 899px) {
+    .app.has-nav .main { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 120px); }
+    body.mengetik .app.has-nav .dock { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -1070,8 +1078,22 @@
   // Untuk versi GitHub: tempel URL web app Apps Script (yang berakhiran /exec) di bawah ini.
   var API_URL = 'https://script.google.com/macros/s/AKfycbwgEwMBktQj5lsTCb706Hr2xa_VgRM6FGJ5bGoz6b2HDBjf2oA1_9uQZEMVfmcxzDqRkA/exec';
   var KEY_STORE = 'arabelle_key';
-  var APP_VERSION = '2026.10.20-20';  // samakan dengan APP_VERSION di Code.gs
-  var TAMPILAN = '2026.11.06-1';  // nomor tampilan GitHub saja (APP_VERSION tetap = server)
+  // Nomor versi dibaca dari <meta> di <head> (satu sumber; curl bisa membacanya tanpa menjalankan halaman).
+  // syifa-app = APP_VERSION, samakan dengan APP_VERSION di Code.gs · syifa-tampilan = nomor tampilan GitHub (naik setiap index.html berubah).
+  function metaIsi(n) { var m = document.querySelector('meta[name="' + n + '"]'); return m ? String(m.getAttribute('content') || '').trim() : ''; }
+  var APP_VERSION = metaIsi('syifa-app') || '2026.10.20-20';
+  var TAMPILAN = metaIsi('syifa-tampilan');
+  // Bandingkan nomor versi per angka ('2026.10.20-3' < '2026.10.20-20'); hasil -1 / 0 / 1
+  function bandingVersi(a, b) {
+    var x = String(a || '').match(/\d+/g) || [], y = String(b || '').match(/\d+/g) || [];
+    for (var i = 0; i < Math.max(x.length, y.length); i++) { var p = Number(x[i] || 0), q = Number(y[i] || 0); if (p !== q) return p > q ? 1 : -1; }
+    return 0;
+  }
+  // Catatan waktu muat (ketuk teks versi untuk melihat): dasbor tampil, data pembukaan tiba, kartu Tim tiba
+  var UKUR = { t0: (window.performance && performance.now) ? 0 : Date.now() };
+  function ukurTandai(k) { if (UKUR[k] != null) return; var t = (window.performance && performance.now) ? performance.now() : Date.now() - UKUR.t0; UKUR[k] = Math.round(t) / 1000; }
+  function ukurTeks() { var f = function (k) { return UKUR[k] == null ? '–' : String(UKUR[k].toFixed(1)).replace('.', ',') + ' dtk'; };
+    return 'Waktu buka: dasbor ' + f('dasbor') + ' · data ' + f('boot') + ' · kartu Tim ' + f('tim') + (UKUR.dariHP ? ' · dasbor dari simpanan HP' : ''); }
 
   var I = {
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1129,7 +1151,8 @@
 
   var st = {
     boot: null, view: '', busy: false,
-    dash: null, dDay: '',
+    dash: null, dDay: '', dashLama: '',
+    tim: null, timAt: 0, timLama: false, timGagal: '', timServerLama: false,
     kMonth: '', posts: [], postsMonth: '', kTab: 'cal', kDay: '', editing: null, rep: {},
     day: null, hDate: '',
     agenda: null, aDay: '', notes: null,
@@ -1144,7 +1167,10 @@
 
   // ====== Utilitas ======
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function errMsg(e) { return String((e && e.message) || e || 'Terjadi kesalahan.').replace(/^Error:\s*/, ''); }
+  // Pesan teknis ThinKerBelle (PENGATURAN → REVIEW_V2) hanya untuk admin di ThinKerBelle (cekApp); di Syifa diganti kalimat netral.
+  var NETRAL_V2 = 'Tampilan per seri belum tersedia untuk akun ini. Foto tetap bisa ditinjau di sini.';
+  function netralV2(m) { return /REVIEW_V2|PENGATURAN\s*→/.test(String(m || '')) ? NETRAL_V2 : String(m || ''); }
+  function errMsg(e) { return netralV2(String((e && e.message) || e || 'Terjadi kesalahan.').replace(/^Error:\s*/, '')); }
   function parseDate(s) { var p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2] || 1); }
   function iso(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
   function addDays(s, n) { var d = parseDate(s); d.setDate(d.getDate() + n); return iso(d); }
@@ -1275,7 +1301,7 @@
   }
 
   // Batas waktu panggilan (tampilan 2026.11.06-1): tidak ada lagi "Memuat…" tanpa akhir. Panggilan lain ke server Syifa tetap tanpa batas.
-  var TB_BATAS = 40000, TB_TULIS_BATAS = 90000, CALL_BATAS = { getBoot: 45000, getDashboard: 45000 };
+  var TB_BATAS = 40000, TB_TULIS_BATAS = 90000, CALL_BATAS = { getBoot: 45000, getDashboard: 45000, getTimArabelle: 45000 };
   function ambilBatas(url, opt, ms) {
     if (!ms || typeof AbortController === 'undefined') return fetch(url, opt);
     var ac = new AbortController(), t = setTimeout(function () { ac.abort(); }, ms);
@@ -1345,8 +1371,14 @@
   // Data pembukaan terakhir disimpan di HP supaya app langsung tampil, lalu diperbarui diam-diam.
   // Tampilan 2026.11.06-1: kunci baru ss_boot_v2. Ringkasan uang (moneyToday, selisih kas mingguan) dan izin tulis (tim.kirim)
   // TIDAK disimpan di HP, hanya di memori. Simpanan lama ss_boot_v1 (yang masih berisi keduanya) dihapus setiap app dibuka.
-  var BOOT_CACHE = 'ss_boot_v2', BOOT_LAMA = ['ss_boot_v1'];
-  function bersihkanSimpanan(semua) { BOOT_LAMA.concat(semua ? [BOOT_CACHE, 'ss_rv_v1'] : []).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} }); }
+  var BOOT_CACHE = 'ss_boot_v2', BOOT_LAMA = ['ss_boot_v1'], TIM_CACHE = 'ss_tim_v1';
+  function bersihkanSimpanan(semua) { BOOT_LAMA.concat(semua ? [BOOT_CACHE, 'ss_rv_v1', TIM_CACHE] : []).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} }); }
+  // B1 (tampilan 2026.11.07-1): kartu Tim Arabelle disimpan terpisah (ss_tim_v1, maks 3 hari), TANPA izin tulis (kirim).
+  function simpanTim(t) { try { if (!t || t.error || t.tunda) return; var c = JSON.parse(JSON.stringify(t)); delete c.kirim; localStorage.setItem(TIM_CACHE, JSON.stringify({ sig: bootSig(), at: Date.now(), t: c })); } catch (e) {} }
+  function ambilTim() {
+    try { var c = JSON.parse(localStorage.getItem(TIM_CACHE) || 'null'); if (!c || c.sig !== bootSig() || Date.now() - c.at > 3 * 86400000 || !c.t) return null; return c; }
+    catch (e) { return null; }
+  }
   function bootAman(b) {
     var c = JSON.parse(JSON.stringify(b || {})), d = c.initial && c.initial.dash;
     if (d) { delete d.moneyToday; if (d.weekly) { delete d.weekly.netLast; delete d.weekly.netPrev; } if (d.tim && typeof d.tim === 'object') delete d.tim.kirim; }
@@ -1369,7 +1401,15 @@
     if (!sameDay) b.today = today;
     if (ini.posts && (fresh || ini.posts.month === today.slice(0, 7))) { st.posts = ini.posts.items; st.kMonth = st.postsMonth = ini.posts.month; mark('posts:' + ini.posts.month, ini.posts.items); }
     if (ini.day && (fresh || sameDay)) { st.day = ini.day; st.hDate = ini.day.date; mark('day:' + ini.day.date, ini.day); }
-    if (ini.dash && (fresh || sameDay)) { st.dash = ini.dash; st.dDay = ini.dash.today; mark('dash', ini.dash); }
+    if (ini.dash && (fresh || sameDay)) { st.dash = ini.dash; st.dDay = ini.dash.today; st.dashLama = ''; mark('dash', ini.dash); }
+    else if (ini.dash && !st.dash && ini.dash.week) {
+      // B1: simpanan dari hari sebelumnya tetap ditampilkan (dengan pita "memperbarui…"), bukan "Memuat…".
+      // Bagian yang bergantung pada hari ini (fokus, rutinitas, uang) dikosongkan sampai data baru tiba.
+      var lama = ini.dash.today; st.dash = Object.assign({}, ini.dash, { today: today, focus: [], routines: [], moneyToday: null,
+        week: ini.dash.week.filter(function (w) { return w.date >= today; }) });
+      if (!st.dash.week.length) st.dash.week = [{ date: today, posts: [], agenda: [] }];
+      st.dDay = today; st.dashLama = lama;
+    }
     delete b.initial;
   }
 
@@ -1381,11 +1421,20 @@
     box.addEventListener('click', enterOnce);
     box.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterOnce(); } });
     var cached = live ? loadBoot() : null;
-    if (cached) { applyBoot(cached, false); intro.ready = true; }
+    var timHP = live ? ambilTim() : null, timBoot = cached && cached.initial && cached.initial.dash && cached.initial.dash.tim;
+    if (timHP) { st.tim = timHP.t; st.timAt = timHP.at; st.timLama = true; }
+    else if (timBoot && !timBoot.tunda && !timBoot.error) { st.tim = timBoot; st.timAt = 0; st.timLama = true; }   // simpanan 06-1: kartu Tim ada di dalam getBoot
+    if (cached) { applyBoot(cached, false); intro.ready = true; UKUR.dariHP = true; }
     playIntro();
+    // B1: kartu Tim diambil bersamaan dengan getBoot (Owner, atau belum tahu peran). Server lama → "Fungsi tidak dikenal" → kartu ikut getBoot.
+    if (!cached || (cached.user && cached.user.role === 'Owner')) muatTim().catch(function () {});
+    st.bootJalan = true;
     try {
-      var fresh = await call('getBoot');
+      var fresh = await call('getBoot', { tanpaTim: true });
+      st.bootJalan = false; ukurTandai('boot');
       if (live) { keyStore.set(token); if (hasAPI) cleanUrl(); }
+      var timLama = fresh && fresh.initial && fresh.initial.dash && fresh.initial.dash.tim;
+      if (timLama && !timLama.tunda) { st.timServerLama = true; pasangTim(timLama, true); }   // server sebelum B1: kartu Tim sudah di sini
       saveBoot(JSON.parse(JSON.stringify(fresh)));
       applyBoot(fresh, true);
       intro.ready = true;
@@ -1396,6 +1445,7 @@
         checkVersion();
       }
     } catch (e) {
+      st.bootJalan = false;
       if (!$('blockedScreen').hidden) { try { localStorage.removeItem(BOOT_CACHE); } catch (x) {} return; }
       if (cached) { toast('Sedang offline, menampilkan data terakhir', true); return; }
       $('pillTxt').textContent = 'Belum bisa terhubung';
@@ -1432,28 +1482,109 @@
       dock.appendChild(m);
     });
     if ($('timRefresh')) $('timRefresh').onclick = function () { forget('dash'); loadTim(true); };
+    ['verTxt', 'verMob'].forEach(function (x) { if ($(x)) { $(x).style.cursor = 'pointer'; $(x).onclick = function () { toast(ukurTeks()); }; } });
     $('rvBack').onclick = rvKembali; $('rvSegar').onclick = function () { RV.isi = {}; RV.tanda = {}; rvMuat(); if (RV.lv.length) rvRender(); };
     if (keys.length < 4) dock.style.justifyContent = 'space-evenly';
     go(owner ? 'dasbor' : 'konten');
     if (owner) setTimeout(prefetch, 1500);
     initPush();
     checkVersion();
+    cekHasilUpdate();
+    if (!mulaiPembaruan.sudah) mulaiPembaruan();
   }
 
-  /** Bandingkan versi app (GitHub) dengan versi server (Apps Script). */
+  /** Teks versi + satu pita: Ada pembaruan tampilan > Apps Script belum versi terbaru (Owner). */
   function checkVersion() {
-    var sv = st.boot.serverVersion || '';
     $('verTxt').textContent = 'Versi ' + APP_VERSION + ' · tampilan ' + TAMPILAN;
     $('verMob').textContent = 'Syifa Studio · versi ' + APP_VERSION + ' · tampilan ' + TAMPILAN;
-    if (!hasAPI || !sv || sv === APP_VERSION) return;
-    if (sv > APP_VERSION) {
-      $('updText').innerHTML = '<b>Versi baru tersedia</b>Ketuk Perbarui untuk memakai versi terbaru.';
-      $('updBtn').hidden = false;
-    } else if (isOwner()) {
-      $('updText').innerHTML = '<b>Apps Script belum versi terbaru</b>Tempel Code.gs terbaru lalu Deploy → Manage deployments → Edit → New version.';
-      $('updBtn').hidden = true;
-    } else return;
-    $('updBar').hidden = false;
+    pitaVersi();
+  }
+
+  // ===== Pita pembaruan tampilan (2026.11.07-1) =====
+  // Halaman mengambil index.html miliknya sendiri (kueri unik + no-store, ±2 KB awal), membaca <meta name="syifa-tampilan">.
+  // Lebih baru → pita "Ada pembaruan · Perbarui sekarang", hanya saat aman (tidak ada dialog/isian terbuka). Tidak pernah memuat ulang sendiri.
+  var UPD = { n: '', app: '', jalan: false, t: 0, tunggu: null };
+  var UPD_KE = 'ss_upd_ke', UPD_GAGAL = 'ss_upd_gagal';
+  function folderHal() { return location.pathname.replace(/[^/]*$/, ''); }
+  function metaDari(t, n) { var m = String(t || '').match(new RegExp('<meta name="' + n + '" content="([^"]*)"')); return m ? m[1].trim() : ''; }
+  function ambilMetaGitHub() {   // null = tidak terbaca (offline / gagal)
+    if (!/^https?:$/.test(location.protocol)) return Promise.resolve(null);
+    return ambilBatas(folderHal() + 'index.html?cek=' + Date.now(), { cache: 'no-store', headers: { Range: 'bytes=0-2047' } }, 15000)
+      .then(function (r) { return r.ok ? r.text() : ''; })
+      .then(function (t) { var n = metaDari(t, 'syifa-tampilan'); return n ? { tampilan: n, app: metaDari(t, 'syifa-app') } : null; }, function () { return null; });
+  }
+  function gagalBaru() { try { var g = String(localStorage.getItem(UPD_GAGAL) || '').split('|'); return g[0] && Date.now() - Number(g[1] || 0) < 86400000 ? g[0] : ''; } catch (e) { return ''; } }
+  function cekTampilan(paksa) {
+    if (!TAMPILAN || UPD.jalan || (!paksa && Date.now() - UPD.t < 5 * 60000)) return;
+    UPD.jalan = true; UPD.t = Date.now();
+    ambilMetaGitHub().then(function (g) {
+      UPD.jalan = false; if (!g) return;
+      UPD.app = g.app;
+      if (bandingVersi(g.tampilan, TAMPILAN) > 0 && g.tampilan !== gagalBaru()) UPD.n = g.tampilan;
+      tungguAmanUpd();
+    });
+  }
+  function amanUpd() {
+    if (document.querySelector('dialog[open]')) return false;                    // dialog/formulir terbuka
+    if (st.busy) return false;                                                  // sedang menyimpan
+    if ($('rvCat') && $('rvCat').value.trim()) return false;                    // catatan revisi belum dikirim
+    if (document.querySelector('#rvIsi [data-kep]:disabled')) return false;     // keputusan Review sedang dikirim
+    var a = document.activeElement;
+    if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && String(a.value || '').trim()) return false;   // sedang mengetik
+    return true;
+  }
+  function tungguAmanUpd() { clearTimeout(UPD.tunggu); if (UPD.n && !amanUpd()) { UPD.tunggu = setTimeout(tungguAmanUpd, 15000); return; } pitaVersi(); }
+  function pitaVersi() {
+    var bar = $('updBar'), txt = $('updText'), btn = $('updBtn'); if (!bar || !st.boot) return;
+    var sv = st.boot.serverVersion || '';
+    if (UPD.n && amanUpd()) {
+      txt.innerHTML = '<b>Ada pembaruan</b>Tampilan ' + esc(UPD.n) + ' siap dipakai.';
+      btn.textContent = 'Perbarui sekarang'; btn.hidden = false; btn.disabled = false; bar.hidden = false; return;
+    }
+    if (UPD.n) return;   // ada pembaruan tapi belum aman: pita lain tidak ditampilkan dulu
+    if (hasAPI && sv && bandingVersi(sv, APP_VERSION) > 0) {
+      if (UPD.app && bandingVersi(UPD.app, sv) >= 0) { txt.innerHTML = '<b>Versi baru tersedia</b>Ketuk Perbarui untuk memakai versi terbaru.'; btn.textContent = 'Perbarui sekarang'; btn.hidden = false; bar.hidden = false; return; }
+      if (isOwner() && UPD.t) { txt.innerHTML = '<b>Tampilan GitHub belum versi terbaru</b>Server sudah ' + esc(sv) + '. Unggah index.html terbaru ke GitHub.'; btn.hidden = true; bar.hidden = false; return; }
+      bar.hidden = true; return;
+    }
+    if (hasAPI && sv && isOwner() && bandingVersi(sv, APP_VERSION) < 0) {
+      txt.innerHTML = '<b>Apps Script belum versi terbaru</b>Tempel Code.gs terbaru lalu Deploy → Manage deployments → Edit → New version.';
+      btn.hidden = true; bar.hidden = false; return;
+    }
+    bar.hidden = true;
+  }
+  async function perbaruiTampilan() {
+    var b = $('updBtn');
+    if (!amanUpd()) { toast('Simpan atau tutup isian yang masih terbuka dulu, ya', true); return; }
+    b.disabled = true; b.textContent = 'Memeriksa…';
+    var g = await ambilMetaGitHub();
+    if (!g) { b.disabled = false; b.textContent = 'Coba lagi'; toast('Tidak ada koneksi. Sambungkan internet, lalu coba lagi.', true); return; }
+    var tuju = bandingVersi(g.tampilan, TAMPILAN) > 0 ? g.tampilan : (UPD.n || g.tampilan);
+    try { localStorage.setItem(UPD_KE, tuju); } catch (e) {}
+    try { if (window.caches && caches.keys) { var ks = await caches.keys(); await Promise.all(ks.filter(function (k) { return !/onesignal/i.test(k); }).map(function (k) { return caches.delete(k); })); } } catch (e) {}
+    b.textContent = 'Memperbarui…';
+    location.replace(folderHal() + '?v=' + encodeURIComponent(tuju) + '-' + Date.now());
+  }
+  // Sesudah dimuat ulang: nomor sudah naik → selesai; masih lama (iPhone memakai salinan lama) → langkah manual sekali, pita tidak muncul lagi 1 hari
+  function cekHasilUpdate() {
+    var ke = ''; try { ke = localStorage.getItem(UPD_KE) || ''; localStorage.removeItem(UPD_KE); } catch (e) {}
+    if (!ke) return;
+    if (bandingVersi(TAMPILAN, ke) >= 0) { toast('Sudah memakai tampilan terbaru ✨'); return; }
+    try { localStorage.setItem(UPD_GAGAL, ke + '|' + Date.now()); } catch (e) {}
+    var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    $('updText').innerHTML = '<b>Pembaruan belum masuk</b>' + (ios ? 'Geser ke atas dari bawah layar dan tahan, geser kartu Syifa Studio ke atas untuk menutupnya, lalu buka lagi dari ikon.' : 'Tutup Syifa Studio dari daftar app, lalu buka lagi dari ikon.');
+    $('updBtn').hidden = true; $('updBar').hidden = false;
+  }
+  // Saat isian terfokus di HP, nav bawah disembunyikan (di iPhone nav ikut naik ke atas keyboard dan menutupi tombol di bawah isian)
+  function isianKetik(e) { return e && (e.tagName === 'TEXTAREA' || e.tagName === 'SELECT' || (e.tagName === 'INPUT' && !/^(checkbox|radio|button|submit|range|color|file)$/i.test(e.type))); }
+  document.addEventListener('focusin', function (e) { if (isianKetik(e.target)) document.body.classList.add('mengetik'); });
+  document.addEventListener('focusout', function () { setTimeout(function () { if (!isianKetik(document.activeElement)) document.body.classList.remove('mengetik'); }, 120); });
+  function mulaiPembaruan() {
+    mulaiPembaruan.sudah = true;
+    setTimeout(function () { cekTampilan(true); }, 10000);
+    setInterval(function () { cekTampilan(false); }, 30 * 60000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) cekTampilan(false); });
+    document.addEventListener('close', function (e) { if (e.target && e.target.tagName === 'DIALOG' && UPD.n) setTimeout(tungguAmanUpd, 300); }, true);
   }
 
   // =====================================================================
@@ -1648,10 +1779,12 @@
     $('dsDate').textContent = 'Hari ini, ' + shortDate(st.boot.today);
     var have = !!st.dash;
     if (have) renderDash(); else $('dsBody').innerHTML = '<p class="center-msg">Memuat…</p>';
-    if (have && recent('dash')) return;
+    if (isOwner()) muatTim().catch(function () {});
+    if (have && (st.bootJalan || (recent('dash') && !st.dashLama))) return;   // getBoot yang sedang berjalan akan menyegarkan beranda
     try {
-      var d = await call('getDashboard'), changed = mark('dash', d);
-      st.dash = d;
+      var d = await call('getDashboard', { tanpaTim: true }), changed = mark('dash', d) || !!st.dashLama;
+      if (d && d.tim && !d.tim.tunda) { st.timServerLama = true; pasangTim(d.tim, true); }   // server sebelum B1
+      st.dash = d; st.dashLama = '';
       if (!st.dDay) st.dDay = d.today;
       if (st.view === 'dasbor' && (changed || !have)) renderDash();
     } catch (e) { if (!have) $('dsBody').innerHTML = '<p class="center-msg">' + esc(errMsg(e)) + '</p>'; }
@@ -1960,12 +2093,16 @@ function salinTautan_(u, selesai) {
   function rvBaris(g) { var L = (RV.data && RV.data.list) || []; return L.filter(function (x) { return (g.warna || []).indexOf(x.id) >= 0 || x.id === g.id; }); }
   // seri V2 bersampul dari REVIEW FOLDER; baris lama: sampul folder / gambar tunggal. fotoId sebuah FOLDER tidak pernah dipakai sebagai gambar.
   function rvSampul(g, x) {
-    if (g.v2 && g.folderId) return g.sampul || '';
-    if (!x) return '';
+    if (g.v2 && g.folderId && RV.data && RV.data.v2pakai) return g.sampul || '';
+    if (!x) return g.sampul || '';
     if (x.sampul) return x.sampul;
+    if (x.sampulF) return x.sampulF;   // sampul folder yang sudah dibaca ThinKerBelle (ikut syReviewV2, tanpa panggilan tambahan)
+    if (g.sampul) return g.sampul;
     return x.jl === 'gambar' && x.fotoId ? x.fotoId : '';
   }
-  function rvFolderSeri(g) { return g.v2 && g.folderId && SY_AUTH ? g.folderId : ''; }
+  // V2 (per seri) hanya kalau ThinKerBelle membukanya untuk akun ini (v2pakai). Terkunci → tampilan lama per baris (rvItem):
+  // tidak memanggil syFolder/sySampul/syTanda yang pasti ditolak.
+  function rvFolderSeri(g) { return g.v2 && g.folderId && SY_AUTH && RV.data && RV.data.v2pakai ? g.folderId : ''; }
   function rvStFolder(g, fid, banyak) {
     var L = (RV.data && RV.data.list) || [];
     if (banyak) { var a = L.filter(function (y) { return y.seri === g.id && y.id !== g.id && y.folderId === fid; })[0]; if (a) return a; }
@@ -2013,8 +2150,8 @@ function salinTautan_(u, selesai) {
     if (salah) $('rvUlang').onclick = function () { rvMuat(); };
   }
   function rvJam(ms) { var d = new Date(ms); return ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2); }
-  async function rvIzin() {
-    try { var d = await call('getDashboard'); mark('dash', d); st.dash = d; var t = d && d.tim; if (t && t.kirim && Number(t.kirim.exp) > Date.now()) { SY_AUTH = t.kirim; SY_NAMA = t.nama || SY_NAMA; } } catch (e) {}
+  async function rvIzin() {   // B1: izin tulis dari getTimArabelle (bukan seluruh dasbor)
+    try { await muatTim(true); } catch (e) {}
   }
   async function rvMuat() {
     var jalan = ++RV.jalan;
@@ -2177,7 +2314,9 @@ function salinTautan_(u, selesai) {
     try {
       var args = argsTanpaOpsi.concat([kep, cat]), r = await rvTulis(fn, args.concat([{}]));
       if (r && r.perluYakin) {
-        if (!(await rvTanya('Pindahkan ke Foto Final?', (r.pesan || 'Persetujuan ini memindahkan folder ke ThinKerBelle · Foto Final.') + ' Lanjutkan?', 'Ya, setujui & pindahkan'))) { rvKunci(false); return; }
+        var tanya = /REVIEW_V2|PENGATURAN/.test(String(r.pesan || '')) || !r.pesan
+          ? 'Persetujuan ini memindahkan folder' + (r.seri ? ' "' + r.seri + '"' : '') + (r.nFoto ? ' berisi ' + r.nFoto + ' foto' : '') + ' ke ThinKerBelle · Foto Final.' : r.pesan;
+        if (!(await rvTanya('Pindahkan ke Foto Final?', tanya + ' Lanjutkan?', 'Ya, setujui & pindahkan'))) { rvKunci(false); return; }
         r = await rvTulis(fn, args.concat([{ yakin: true }]));
       }
       if (!r || r.ok === false) throw new Error((r && r.pesan) || 'Gagal menyimpan');
@@ -2411,13 +2550,57 @@ function salinTautan_(u, selesai) {
     var c = el('div', 'pagi', isi); c.querySelector('[data-gotim]').onclick = function () { go('tim'); };
     return c;
   }
+  // ---------- B1 · kartu Tim Arabelle terpisah dari getBoot (getTimArabelle), tampil dari simpanan HP lalu diperbarui ----------
+  var TIM_JALAN = null;
+  function timAda() { return !!(st.tim && !st.tim.tunda); }
+  function muatTim(paksa) {
+    if (TIM_JALAN) return TIM_JALAN;
+    if (!paksa && timAda() && !st.timLama && Date.now() - st.timAt < 60000) return Promise.resolve(st.tim);
+    // server sebelum B1: kartu Tim hanya ada di getDashboard (tanpa opsi)
+    var p = st.timServerLama ? call('getDashboard').then(function (d) { return d && d.tim; }) : call('getTimArabelle');
+    TIM_JALAN = p.then(function (t) {
+      TIM_JALAN = null; st.timGagal = '';
+      if (t && !t.tunda) pasangTim(t, true); else segarkanTim();
+      return t;
+    }, function (e) {
+      TIM_JALAN = null; var m = errMsg(e);
+      if (/Fungsi tidak dikenal/i.test(m)) { st.timServerLama = true; return null; }   // getBoot lama membawa kartu Tim
+      st.timGagal = m; segarkanTim(); throw e;
+    });
+    return TIM_JALAN;
+  }
+  function pasangTim(t, segar) {
+    st.tim = t;
+    if (segar) { st.timAt = Date.now(); st.timLama = false; st.timGagal = ''; simpanTim(t); ukurTandai('tim'); }
+    if (t && t.kirim && Number(t.kirim.exp) > Date.now()) SY_AUTH = t.kirim;
+    if (t && t.nama) SY_NAMA = t.nama;
+    segarkanTim();
+  }
+  function segarkanTim() { if (st.view === 'dasbor') isiSlotTim(); else if (st.view === 'tim') tampilTabTim(); }
+  function jamTim() { var d = new Date(st.timAt); return st.timAt ? ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2) : ''; }
+  function kerangkaTim() {
+    var k = ''; for (var i = 0; i < 3; i++) k += '<div class="rv-k rv-sk" aria-hidden="true" style="min-height:0;padding:10px 0;box-shadow:none;background:none"><span class="rv-tx"><b></b><small></small></span></div>';
+    return '<div class="card"><div class="sec"><h3>Tim Arabelle</h3><span class="mu">memuat…</span></div>' + k + '</div>';
+  }
+  function gagalTimHtml() { return '<div class="card"><div class="sec"><h3>Tim Arabelle</h3></div><p class="mu" style="margin:0 0 10px">' + esc(st.timGagal) + '</p><button class="btn-line" type="button" data-timulang>Coba lagi</button></div>'; }
+  function pasangUlangTim(box) { var b = box.querySelector('[data-timulang]'); if (b) b.onclick = function () { st.timGagal = ''; segarkanTim(); muatTim(true).catch(function () {}); }; }
+  function isiSlotTim() {
+    var s = $('dsTim'); if (!s) return; s.innerHTML = '';
+    if (timAda() && !st.tim.error) { s.appendChild(pagiIni(st.tim)); if (st.timLama || st.timGagal) s.appendChild(el('p', 'mu tim-ket', st.timGagal ? '⚠️ Data tim tersimpan ' + jamTim() + ' · ' + esc(st.timGagal) : 'Data tim tersimpan ' + jamTim() + ' · memperbarui…')); return; }
+    if (st.timGagal) { s.innerHTML = gagalTimHtml(); pasangUlangTim(s); return; }
+    if (timAda() && st.tim.error) return;   // sama seperti dulu: kartu tidak tampil kalau Hub belum terbaca
+    s.innerHTML = kerangkaTim();
+  }
   // ---------- Tab Tim Arabelle: semua yang berhubungan dengan tim jadi satu ----------
+  function tampilTabTim() {
+    var b = $('tBody');
+    if (timAda()) { renderTim(st.tim); if (st.timLama) b.insertBefore(el('div', 'rv-pita', '<span>Data tim tersimpan ' + esc(jamTim()) + ' · memperbarui…</span>'), b.firstChild); return; }
+    if (st.timGagal) { b.innerHTML = gagalTimHtml(); pasangUlangTim(b); return; }
+    b.innerHTML = kerangkaTim();
+  }
   async function loadTim(paksa) {
-    var have = st.dash && st.dash.tim;
-    if (have) renderTim(st.dash.tim); else $('tBody').innerHTML = '<p class="center-msg">Memuat…</p>';
-    if (have && !paksa && recent('dash')) return;
-    try { var d = await call('getDashboard'); mark('dash', d); st.dash = d; if (st.view === 'tim') renderTim(d.tim); }
-    catch (e) { if (!have) $('tBody').innerHTML = '<p class="center-msg">' + esc(errMsg(e)) + '</p>'; }
+    tampilTabTim();
+    try { await muatTim(paksa); } catch (e) {}
   }
   function renderTim(t) {
     var b = $('tBody'); b.innerHTML = '';
@@ -2491,11 +2674,13 @@ function salinTautan_(u, selesai) {
     var sub = bits.length ? 'Hari ini ada ' + bits.join(' dan ') + '.' + (next ? ' Posting berikutnya jam ' + next.time + '.' : '') : 'Jadwal hari ini lowong. Saatnya nyicil ide.';
 
     var box = $('dsBody'); box.innerHTML = '';
+    ukurTandai('dasbor');
+    if (st.dashLama) box.appendChild(el('div', 'rv-pita', '<span>Data tersimpan ' + esc(st.dashLama === todayISO() ? 'hari ini' : dayLabel(st.dashLama).toLowerCase()) + ' · memperbarui…</span>'));
     var cols = twoCols(box, '', true), left = cols[0], right = cols[1];
 
     var hero = el('div', 'hero', '<h2>' + esc(greet()) + '!</h2><p>' + esc(sub) + '</p><span data-logo class="hero-logo"></span>');
     left.appendChild(hero); applyLogo(hero);
-    if (d.tim && !d.tim.error) left.appendChild(pagiIni(d.tim));
+    if (isOwner()) { var slot = el('div', 'tim-slot', ''); slot.id = 'dsTim'; left.appendChild(slot); isiSlotTim(); }
 
     left.appendChild(weekStrip(d.week.map(function (w) { return w.date; }), st.dDay, function (ds) {
       var w = d.week.filter(function (x) { return x.date === ds; })[0];
@@ -3710,7 +3895,7 @@ function salinTautan_(u, selesai) {
     $('agAdd').textContent = agEdit ? 'Simpan perubahan' : 'Simpan agenda';
     $('agDate').value = agEdit ? agEdit.date : (st.aDay || st.boot.today);
     $('agTitle').value = agEdit ? agEdit.title : ''; $('agTime').value = agEdit ? agEdit.time : '';
-    var raw = agEdit ? String(agEdit.note || '') : '', names = (st.dash && st.dash.tim && st.dash.tim.nama) || [];
+    var raw = agEdit ? String(agEdit.note || '') : '', names = (st.tim && st.tim.nama) || [];
     var low = function (x) { return String(x).toLowerCase().replace(/\s+/g, ''); };
     var tagged = (raw.match(/@([^\s@,]+)/g) || []).map(function (x) { return low(x.slice(1)); });
     var all = tagged.indexOf('semua') >= 0 || tagged.indexOf('tim') >= 0;
@@ -3718,7 +3903,7 @@ function salinTautan_(u, selesai) {
     $('agNote').value = raw.replace(/@[^\s@,]+/g, '').replace(/#pribadi/ig, '').replace(/\s{2,}/g, ' ').trim();
     $('agTimWrap').hidden = false;
     $('agTimInfo').textContent = names.length ? 'Tidak ada yang dipilih = info saja untuk tim (Syifa sendiri).'
-      : (st.dash && st.dash.tim && st.dash.tim.error ? '⚠️ Daftar tim belum terbaca: ' + st.dash.tim.error : '⚠️ Daftar tim belum terbaca. Pastikan HUB_SHEET_ID di file Sinkron sudah diisi, lalu jalankan cekHub.');
+      : (st.tim && st.tim.error ? '⚠️ Daftar tim belum terbaca: ' + st.tim.error : '⚠️ Daftar tim belum terbaca. Pastikan HUB_SHEET_ID di file Sinkron sudah diisi, lalu jalankan cekHub.');
     $('agTim').innerHTML = names.length ? ['Semua tim'].concat(names).map(function (n) {
       var on = n === 'Semua tim' ? all : (all || tagged.indexOf(low(n)) >= 0);
       return '<button type="button" class="agt" data-n="' + esc(n) + '" aria-pressed="' + on + '">' + esc(n) + '</button>';
@@ -4006,7 +4191,7 @@ function salinTautan_(u, selesai) {
   $('ndSave').onclick = saveNoteDlg;
   $('itSave').onclick = saveItemDlg;
   $('idSave').onclick = saveIdeaDlg;
-  $('updBtn').onclick = function () { location.replace(location.pathname + '?v=' + Date.now()); };
+  $('updBtn').onclick = perbaruiTampilan;
   $('rtCancel').onclick = resetRoutineForm;
   $('rtAll').onclick = function () { rtDays = [0, 1, 2, 3, 4, 5, 6]; paintDays(); };
   $('rtWork').onclick = function () { rtDays = [1, 2, 3, 4, 5]; paintDays(); };
@@ -4181,6 +4366,12 @@ function salinTautan_(u, selesai) {
       },
       setPostStatus: function (t, id, s) { auth(t); var x = posts.filter(function (p) { return p.id === id; })[0]; x.status = s; return x; },
       deletePost: function (t, id, ym) { auth(t); posts = posts.filter(function (p) { return p.id !== id; }); return month(ym); },
+      getTimArabelle: function (t) {
+        var u = auth(t); if (u.role !== 'Owner') return null;
+        return { review: 1, perintahBuka: 1, kinerja: null, laporanTim: {}, nama: ['Ria', 'Cici', 'Atin'], lapor: 2, wajib: 3, belum: ['Atin'], post: 3, tayang: 2,
+          launch: [{ date: addDays(T, 2), text: 'Launching Contoh Scarf' }], agenda: [{ date: T, text: 'Photoshoot: Contoh', tim: 'Ria, Cici' }],
+          perintah: [{ isi: 'Contoh perintah ke tim', untuk: 'Ria', dibaca: 1, selesai: 0 }], catatan: [], kirimAlasan: 'mode contoh' };
+      },
       getDashboard: function (t) {
         var u = auth(t, true), up = upcoming(), week = [];
         for (var i = 0; i < 7; i++) { var ds = addDays(T, i); week.push({ date: ds, posts: sorted(posts.filter(function (p) { return p.date === ds; })), agenda: up.filter(function (a) { return a.date === ds; }) }); }
