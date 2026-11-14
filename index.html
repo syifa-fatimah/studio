@@ -3,7 +3,7 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
-<meta name="syifa-tampilan" content="2026.11.07-1">
+<meta name="syifa-tampilan" content="2026.11.15-1">
 <meta name="syifa-app" content="2026.10.20-20">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syifa Studio</title>
@@ -717,7 +717,7 @@
     </section>
 
     <section id="v-tim" class="page" hidden>
-      <div class="hdr" id="timHdr"><div class="ttl"><h1 class="big-title">Tim Arabelle</h1><span>Perintah, approval, laporan &amp; rapor tim</span></div>
+      <div class="hdr" id="timHdr"><div class="ttl"><h1 class="big-title">Tim Arabelle</h1><span>Perintah, laporan, rapor &amp; review foto</span></div>
         <button class="round" type="button" id="timRefresh" aria-label="Muat ulang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button></div>
       <div id="tBody" class="stack"><p class="center-msg">Memuat…</p></div>
       <div id="rvHal" class="rvhal" hidden>
@@ -1048,6 +1048,770 @@
 
 <div id="toast" role="status" aria-live="polite"></div>
 
+<!-- RVB:mulai sha=932532d998c11ed9a29edd6938da0015c4863f786e746ecc7773444ee2348f1f sumber=ef0c4aa -->
+<style id="rvbCss">
+/* RVB · pengaman (atas): token warna TKB terang di wilayah Review, dasar huruf TKB, svg sebaris seperti di TKB */
+#rvIsi.rvb,#rvbSheet,#rvbDim,.rvgl,.rvpv,#rvbLoad{--bg:#FFEFF5;--card:#FFF8FB;--ink:#4A1D33;--mut:#8A4C68;--deep:#BE2B66;--mid:#D9558A;--acc:#F7B3CE;--chip:#FFE3EE;--line:#F5CADB;--sh:rgba(190,43,102,.10);--ok:#2F7A55;--okbg:#E4F3EA;--warn:#C9822B;--acct:#BE2B66;--fade:rgba(255,239,245,.9);--nav:#BE2B66;--navt:#FFE3EE;color-scheme:light;--tile:#FFE3EE;--tile2:#FBCFE0;--chipnc:rgba(255,255,255,.7);--n-pink:#FBCFE0;--n-kuning:#FFDDE9;--n-hijau:#FFE6EE;--n-ungu:#F1D7F0;--n-biru:#F8C4DA}
+#rvIsi.rvb,#rvbSheet,.rvgl{font-size:15px;line-height:1.45;color:var(--ink)}
+#rvIsi.rvb{display:flex;flex-direction:column;gap:18px}
+:where(#rvIsi.rvb,#rvbSheet,.rvgl,.rvpv) svg{display:inline;max-width:100%}
+:where(#rvIsi.rvb,#rvbSheet,.rvgl) a{color:var(--acct)}
+:where(#rvIsi.rvb,#rvbSheet,.rvgl) img{max-width:100%}
+#rvIsi.rvb .ph,#rvbSheet .ph,.rvgl .ph{display:flex;align-items:flex-start;gap:12px}
+#rvIsi.rvb .ph div,#rvbSheet .ph div,.rvgl .ph div{flex:1}
+#rvIsi.rvb .ph h1,#rvbSheet .ph h1,.rvgl .ph h1{margin:0;font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+#rvIsi.rvb .ph p,#rvbSheet .ph p,.rvgl .ph p{margin:4px 0 0;color:var(--mut);font-size:14px}
+#rvIsi.rvb .acts,#rvbSheet .acts,.rvgl .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+#rvIsi.rvb .sbtn,#rvbSheet .sbtn,.rvgl .sbtn{border:0;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;background:var(--chip);color:var(--acct)}
+#rvIsi.rvb .sbtn.pri,#rvbSheet .sbtn.pri,.rvgl .sbtn.pri{background:var(--deep);color:#fff}
+#rvIsi.rvb .chip,#rvbSheet .chip,.rvgl .chip{display:inline-flex;align-items:center;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;background:var(--chip);color:var(--acct);white-space:nowrap}
+#rvIsi.rvb .chip.ok,#rvbSheet .chip.ok,.rvgl .chip.ok{background:var(--okbg);color:var(--ok)}
+#rvIsi.rvb .chip.wr,#rvbSheet .chip.wr,.rvgl .chip.wr{background:#FBEDE6;color:#A4472F}
+#rvIsi.rvb .chip.no,#rvbSheet .chip.no,.rvgl .chip.no{background:#FDE0E8;color:#B9466F}
+#rvIsi.rvb .card,#rvbSheet .card,.rvgl .card{background:var(--card);border-radius:24px;padding:16px 18px;box-shadow:0 6px 18px var(--sh)}
+#rvIsi.rvb .card h3,#rvbSheet .card h3,.rvgl .card h3{margin:0 0 6px;font-size:17px;font-weight:600}
+#rvIsi.rvb .bar,#rvbSheet .bar,.rvgl .bar{height:8px;border-radius:8px;background:var(--chip);overflow:hidden;margin-top:6px}
+#rvIsi.rvb .bar i,#rvbSheet .bar i,.rvgl .bar i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#E77FA6,#B9466F)}
+#rvIsi.rvb .bar.r i,#rvbSheet .bar.r i,.rvgl .bar.r i{background:#C2456B}
+#rvIsi.rvb .chips,#rvbSheet .chips,.rvgl .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+#rvIsi.rvb .chips button,#rvbSheet .chips button,.rvgl .chips button{flex:none;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--mut)}
+#rvIsi.rvb .chips button.on,#rvbSheet .chips button.on,.rvgl .chips button.on{background:var(--deep);border-color:var(--acct);color:#fff}
+.rvgl{position:fixed;inset:0;z-index:60;background:var(--bg);display:none;flex-direction:column;color:var(--ink)}
+.rvgl.show{display:flex}
+body.rvglon #load{z-index:70}
+.rvglk{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 14px 8px}
+.rvglk .rvglj{flex:1;min-width:0}
+.rvglk small{display:block;color:var(--mut);font-size:12px}
+.rvglk b{display:block;font-size:18px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rvglx{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--acct);display:grid;place-items:center;flex:none}
+.rvglbody{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:0 14px calc(16px + env(safe-area-inset-bottom))}
+.rvglkiri{display:flex;flex-direction:column;gap:10px}
+.rvglkanan{display:flex;flex-direction:column;gap:10px}
+.rvgls{position:relative;height:min(62vh,560px);border-radius:22px;overflow:hidden;background:#2A1020;touch-action:none;user-select:none;-webkit-user-select:none}
+.rvglph{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:blur(14px);opacity:.55;transform:scale(1.05)}
+.rvglw{position:absolute;transform-origin:50% 50%;will-change:transform}
+.rvglw img{width:100%;height:100%;display:block;object-fit:contain}
+.rvglw svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.rvglpin{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:#FFC400;color:#3A0F26;border:2px solid #4A1230;display:grid;place-items:center;font-size:13px;font-weight:700;pointer-events:none}
+.rvglpin.kirim{opacity:.6}
+.rvglpin.gagal{background:#F5A3A3}
+.rvglmuat{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff;font-size:13px;pointer-events:none}
+#rvIsi.rvb .rvspin,#rvbSheet .rvspin,.rvgl .rvspin{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;animation:rvputar .8s linear infinite}
+.rvglgagal{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff;text-align:center;padding:20px;font-size:13px}
+.rvglgagal a{color:#FFD6E6}
+.rvglz{position:absolute;right:12px;top:12px;padding:5px 11px;border-radius:99px;background:rgba(42,16,32,.78);color:#fff;font-size:12px;font-weight:600;pointer-events:none}
+.rvglz:empty{display:none}
+.rvglstrip{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px}
+.rvglstrip button{flex:none;position:relative;width:52px;height:64px;padding:0;border:0;border-radius:12px;overflow:hidden;background:var(--tile)}
+.rvglstrip button img{width:100%;height:100%;object-fit:cover;display:block}
+.rvglstrip button.on{outline:2.5px solid var(--deep);outline-offset:2px}
+.rvglstrip i{position:absolute;right:3px;top:3px;width:10px;height:10px;border-radius:50%;background:#FFC400;border:2px solid #4A1230}
+.rvglalat{display:flex;gap:6px}
+.rvglalat button{flex:1;min-width:0;min-height:54px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);color:var(--acct);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600;font-family:inherit}
+.rvglalat button.on{background:var(--deep);color:#fff;border-color:var(--deep)}
+.rvglalat button:disabled{opacity:.4}
+.rvglhint{color:var(--mut);font-size:13px;line-height:1.35}
+.rvglkom{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:12px}
+.rvglkom h4{margin:0 0 6px;font-size:15px}
+.rvglc{margin-top:8px;padding:10px 12px;border-radius:14px;background:var(--chip)}
+.rvglc div{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--mut)}
+.rvglc p{margin:4px 0 0;font-size:14px;line-height:1.4}
+.rvgltulis{display:flex;gap:8px;align-items:center;margin-top:10px}
+.rvgltulis input{flex:1;min-width:0;min-height:46px;border-radius:99px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);padding:0 14px;font:inherit}
+.rvgltulis button{width:46px;height:46px;border-radius:50%;border:0;background:var(--deep);color:#fff;display:grid;place-items:center;flex:none}
+.rvglput{display:flex;flex-direction:column;gap:8px}
+.rvglput .dua{display:flex;gap:8px}
+.rvglput .dua button{flex:1}
+.rvgllk{font-size:12px;color:var(--mut);display:flex;gap:12px;flex-wrap:wrap}
+.rvgllk a,.rvgllk button{color:var(--mut);background:none;border:0;padding:0;font:inherit;text-decoration:underline;cursor:pointer}
+#rvIsi.rvb .rvthb,#rvbSheet .rvthb,.rvgl .rvthb{display:block;padding:0;border:0;background:none;cursor:zoom-in;width:100%}
+@media (min-width:900px){.rvglbody{display:grid;grid-template-columns:minmax(0,1fr) 360px;align-items:start;gap:16px}.rvgls{height:calc(100vh - 170px)}.rvglkanan{position:sticky;top:0}}
+#rvIsi.rvb .rvbar,#rvbSheet .rvbar,.rvgl .rvbar{display:flex}
+#rvIsi.rvb .rvbar i,#rvbSheet .rvbar i,.rvgl .rvbar i{border-radius:0;background:var(--ok)}
+#rvIsi.rvb .rvbar i.r,#rvbSheet .rvbar i.r,.rvgl .rvbar i.r{background:#D98324}
+#rvIsi.rvb .rvnf,#rvbSheet .rvnf,.rvgl .rvnf{position:absolute;left:8px;bottom:8px;padding:3px 9px;border-radius:99px;background:rgba(255,248,251,.94);color:#7A2552;font-size:11px;font-weight:600}
+#rvIsi.rvb .rvdot,#rvbSheet .rvdot,.rvgl .rvdot{display:inline-block;flex:none;width:34px;height:34px;border-radius:50%;box-shadow:0 0 0 3px var(--card),0 0 0 4.5px var(--line)}
+#rvIsi.rvb .rvdot.kecil,#rvbSheet .rvdot.kecil,.rvgl .rvdot.kecil{width:14px;height:14px;box-shadow:0 0 0 1.5px var(--line)}
+#rvIsi.rvb .rvdot.ik,#rvbSheet .rvdot.ik,.rvgl .rvdot.ik{display:grid;place-items:center;background:var(--chip);color:var(--acct);box-shadow:none}
+#rvIsi.rvb .rvfd .pt,#rvbSheet .rvfd .pt,.rvgl .rvfd .pt{display:flex;flex-direction:column;gap:6px}
+#rvIsi.rvb .rvth,#rvbSheet .rvth,.rvgl .rvth{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:10px}
+#rvIsi.rvb .rvth img,#rvbSheet .rvth img,.rvgl .rvth img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;background:var(--tile);display:block}
+#rvIsi.rvb .rverr,#rvbSheet .rverr,.rvgl .rverr{background:#FDE7E7;color:#8E1F2F}
+#rvIsi.rvb .rvmuat,#rvbSheet .rvmuat,.rvgl .rvmuat,#rvIsi.rvb .rvtunggu,#rvbSheet .rvtunggu,.rvgl .rvtunggu{animation:rvdenyut 1.6s ease-in-out infinite}
+#rvIsi.rvb .rvdotp,#rvbSheet .rvdotp,.rvgl .rvdotp{position:absolute;right:8px;bottom:8px;width:18px;height:18px}
+#rvIsi.rvb .prk,#rvbSheet .prk,.rvgl .prk{cursor:pointer}
+#rvIsi.rvb .rvak,#rvbSheet .rvak,.rvgl .rvak{margin-top:8px}
+#rvIsi.rvb .rvak .sbtn,#rvbSheet .rvak .sbtn,.rvgl .rvak .sbtn{font-size:12px;padding:6px 12px}
+#rvIsi.rvb .rvik,#rvbSheet .rvik,.rvgl .rvik{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;height:100%;color:var(--acct);padding:8px;text-align:center}
+#rvIsi.rvb .rvik small,#rvbSheet .rvik small,.rvgl .rvik small{color:var(--mut);font-size:12px;margin:0}
+#rvIsi.rvb .rvik .sbtn,#rvbSheet .rvik .sbtn,.rvgl .rvik .sbtn{font-size:12px;padding:6px 12px;text-decoration:none}
+#rvIsi.rvb .rvdet,#rvbSheet .rvdet,.rvgl .rvdet{display:block;width:100%;border:0;padding:0;background:var(--tile);border-radius:18px;overflow:hidden;margin:12px 0 6px;cursor:zoom-in}
+#rvIsi.rvb .rvdet img,#rvbSheet .rvdet img,.rvgl .rvdet img{display:block;width:100%;max-height:60vh;object-fit:contain}
+#rvIsi.rvb .rvdet .rvik,#rvbSheet .rvdet .rvik,.rvgl .rvdet .rvik{min-height:180px}
+#rvIsi.rvb .rvlk,#rvbSheet .rvlk,.rvgl .rvlk{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+#rvIsi.rvb .rvlk a,#rvbSheet .rvlk a,.rvgl .rvlk a,#rvIsi.rvb .rvlk button,#rvbSheet .rvlk button,.rvgl .rvlk button{font-size:12.5px}
+.rvpv{position:fixed;inset:0;z-index:60;background:rgba(18,8,14,.96);display:none;flex-direction:column;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none}
+.rvpv.show{display:flex}
+.rvpvt{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;font-size:13px}
+.rvpvt span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rvpvt button{border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;width:40px;height:40px;display:grid;place-items:center}
+.rvpvt a{color:#fff;background:rgba(255,255,255,.14);border-radius:999px;padding:9px 13px;text-decoration:none;font-weight:600;white-space:nowrap}
+.rvpvs{flex:1;min-height:0;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:grab}
+.rvpvs img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transform-origin:center center;will-change:transform;-webkit-user-drag:none}
+.rvpvg{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:20px}
+.rvpvg a{color:#fff;background:rgba(255,255,255,.18);border-radius:999px;padding:10px 16px;text-decoration:none;font-weight:600}
+.rvpvn{position:absolute;top:50%;transform:translateY(-50%);border:0;background:rgba(255,255,255,.16);color:#fff;width:46px;height:46px;border-radius:999px;font-size:28px;line-height:1}
+.rvpvn.kiri{left:12px}
+.rvpvn.kanan{right:12px}
+.rvpvh{padding:8px 14px calc(12px + env(safe-area-inset-bottom));font-size:12px;opacity:.75;text-align:center}
+#rvIsi.rvb .prg,#rvbSheet .prg,.rvgl .prg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+#rvIsi.rvb .rvsk,#rvbSheet .rvsk,.rvgl .rvsk{cursor:default;box-shadow:none}
+#rvIsi.rvb .rvsk .pim,#rvbSheet .rvsk .pim,.rvgl .rvsk .pim,#rvIsi.rvb .rvsk i,#rvbSheet .rvsk i,.rvgl .rvsk i{background:var(--chip);animation:rvsk 1.1s ease-in-out infinite alternate}
+#rvIsi.rvb .rvsk .pt,#rvbSheet .rvsk .pt,.rvgl .rvsk .pt{padding:10px 12px 12px}
+#rvIsi.rvb .rvsk i,#rvbSheet .rvsk i,.rvgl .rvsk i{display:block;height:11px;border-radius:6px;margin:4px 0 8px}
+#rvIsi.rvb .rvsk i+i,#rvbSheet .rvsk i+i,.rvgl .rvsk i+i{width:60%}
+@media (prefers-reduced-motion:reduce){#rvIsi.rvb .rvsk .pim,#rvbSheet .rvsk .pim,.rvgl .rvsk .pim,#rvIsi.rvb .rvsk i,#rvbSheet .rvsk i,.rvgl .rvsk i{animation:none}}
+#rvIsi.rvb .prk,#rvbSheet .prk,.rvgl .prk{border:1px solid var(--line);background:var(--card);border-radius:20px;overflow:hidden;text-align:left;padding:0;color:var(--ink);box-shadow:0 6px 18px var(--sh)}
+#rvIsi.rvb .prk .pim,#rvbSheet .prk .pim,.rvgl .prk .pim{aspect-ratio:1/1;background:var(--tile);display:grid;place-items:center;font-size:34px;overflow:hidden}
+#rvIsi.rvb .prk .pim img,#rvbSheet .prk .pim img,.rvgl .prk .pim img{width:100%;height:100%;object-fit:cover}
+#rvIsi.rvb .prk .pt,#rvbSheet .prk .pt,.rvgl .prk .pt{padding:10px 12px 12px}
+#rvIsi.rvb .prk b,#rvbSheet .prk b,.rvgl .prk b{display:block;font-size:14px;line-height:1.25}
+#rvIsi.rvb .prk small,#rvbSheet .prk small,.rvgl .prk small{display:block;color:var(--mut);font-size:12px;margin-top:3px}
+#rvIsi.rvb .chips.wrap,#rvbSheet .chips.wrap,.rvgl .chips.wrap{flex-wrap:wrap;overflow:visible}
+#rvIsi.rvb .prg,#rvbSheet .prg,.rvgl .prg{align-items:start}
+#rvIsi.rvb .prk,#rvbSheet .prk,.rvgl .prk{min-width:0;display:flex;flex-direction:column;justify-content:flex-start;width:100%}
+#rvIsi.rvb .prk .pim,#rvbSheet .prk .pim,.rvgl .prk .pim{width:100%}
+#rvIsi.rvb .prk b,#rvbSheet .prk b,.rvgl .prk b{overflow-wrap:anywhere}
+@media (min-width:900px){#rvIsi.rvb .prg,#rvbSheet .prg,.rvgl .prg{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:520px){#rvIsi.rvb .card,#rvbSheet .card,.rvgl .card{padding:14px}}
+#rvIsi.rvb .empty,#rvbSheet .empty,.rvgl .empty{text-align:center;color:var(--mut);padding:18px 6px}
+#rvIsi.rvb .empty img,#rvbSheet .empty img,.rvgl .empty img{width:96px;display:block;margin:0 auto 6px}
+#rvbDim{position:fixed;inset:0;background:rgba(61,26,43,.38);opacity:0;pointer-events:none;transition:.25s;z-index:8}
+#rvbDim.show{opacity:1;pointer-events:auto}
+#rvbSheet{position:fixed;left:50%;bottom:0;width:min(440px,100vw);transform:translate(-50%,105%);background:var(--card);border-radius:32px 32px 0 0;padding:14px 20px calc(120px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(61,26,43,.18);transition:transform .38s cubic-bezier(.3,1.25,.5,1);z-index:9;max-height:90vh;overflow:auto}
+#rvbSheet.show{transform:translate(-50%,0)}
+#rvIsi.rvb .grab,#rvbSheet .grab,.rvgl .grab{width:44px;height:5px;border-radius:5px;background:var(--line);margin:0 auto 14px}
+#rvbSheet h2{margin:2px 0 14px;font-size:27px;font-weight:600;line-height:1.15;letter-spacing:-.02em}
+#rvIsi.rvb .fm label,#rvbSheet .fm label,.rvgl .fm label{display:block;font-size:13px;font-weight:600;color:var(--mut);margin:12px 0 6px}
+#rvIsi.rvb .fm input,#rvbSheet .fm input,.rvgl .fm input,#rvIsi.rvb .fm textarea,#rvbSheet .fm textarea,.rvgl .fm textarea,#rvIsi.rvb .fm select,#rvbSheet .fm select,.rvgl .fm select{width:100%;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;font:15px 'Outfit',sans-serif;background:var(--bg);color:var(--ink)}
+#rvIsi.rvb .fm textarea,#rvbSheet .fm textarea,.rvgl .fm textarea{min-height:84px;resize:vertical}
+#rvIsi.rvb .fm input[type=range],#rvbSheet .fm input[type=range],.rvgl .fm input[type=range]{padding:0;border:0;background:none;accent-color:var(--acct)}
+#rvIsi.rvb .big:disabled,#rvbSheet .big:disabled,.rvgl .big:disabled{opacity:.5}
+#rvIsi.rvb .info,#rvbSheet .info,.rvgl .info{background:var(--chip);color:var(--acct);border-radius:16px;padding:10px 12px;font-size:12.5px;margin-top:12px;line-height:1.55}
+#rvIsi.rvb .big,#rvbSheet .big,.rvgl .big{width:100%;border:0;border-radius:18px;padding:14px;font-weight:600;font-size:15px;background:var(--deep);color:#fff;margin-top:16px}
+#rvIsi.rvb .big.alt,#rvbSheet .big.alt,.rvgl .big.alt{background:var(--chip);color:var(--acct)}
+#rvIsi.rvb .back,#rvbSheet .back,.rvgl .back{align-self:flex-start;border:0;background:var(--chip);color:var(--acct);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;margin-bottom:6px}
+@media (min-width:900px){#rvbSheet{top:50%;bottom:auto;width:min(580px,92vw);transform:translate(-50%,-46%) scale(.97);opacity:0;pointer-events:none;border-radius:28px;padding:24px 28px 28px;max-height:88vh;transition:.25s;z-index:11}#rvbSheet.show{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#rvIsi.rvb .grab,#rvbSheet .grab,.rvgl .grab{display:none}#rvbDim{z-index:10}}
+#rvIsi.rvb .ico,#rvbSheet .ico,.rvgl .ico{display:inline-flex;vertical-align:-0.18em;margin-right:.38em;color:inherit;flex:none}
+#rvIsi.rvb .ico:last-child,#rvbSheet .ico:last-child,.rvgl .ico:last-child{margin-right:0}
+#rvIsi.rvb .ico svg,#rvbSheet .ico svg,.rvgl .ico svg{width:1.05em;height:1.05em;stroke-width:2}
+#rvIsi.rvb h2 .ico svg,#rvbSheet h2 .ico svg,.rvgl h2 .ico svg,#rvIsi.rvb h3 .ico svg,#rvbSheet h3 .ico svg,.rvgl h3 .ico svg{color:var(--acct)}
+#rvIsi.rvb .card,#rvbSheet .card,.rvgl .card{background:var(--card);border:1px solid var(--line)}
+#rvIsi.rvb .big,#rvbSheet .big,.rvgl .big{background:var(--deep);border-radius:999px;min-height:50px}
+#rvIsi.rvb .big.alt,#rvbSheet .big.alt,.rvgl .big.alt{background:var(--chip);color:var(--deep)}
+#rvIsi.rvb .chip,#rvbSheet .chip,.rvgl .chip{background:var(--chip);color:var(--deep)}
+#rvIsi.rvb .mswarn,#rvbSheet .mswarn,.rvgl .mswarn{padding:8px 10px;border-radius:12px;background:#FFF0E0;color:#7A3F0E;font-size:12px}
+#rvIsi.rvb .mssaran,#rvbSheet .mssaran,.rvgl .mssaran{padding:8px 10px;border-radius:12px;background:var(--okbg);color:#1F5A3D;font-size:12px}
+@keyframes rvputar{to{transform:rotate(360deg)}}
+@keyframes rvdenyut{50%{opacity:.5}}
+@keyframes rvsk{from{opacity:.55}to{opacity:1}}
+/* RVB · pengaman (bawah): kelas Syifa yang tidak boleh bocor ke Review, lapisan di atas dock Syifa */
+#rvIsi.rvb .chip,#rvbSheet .chip,.rvgl .chip{gap:0}
+#rvIsi.rvb .empty,#rvbSheet .empty{font-size:inherit}
+#rvIsi.rvb .card,#rvbSheet .card{min-width:0}
+#rvIsi.rvb .back{display:none}
+#rvJudul .ico{display:inline-flex;vertical-align:-0.18em;margin-right:.38em;color:inherit}#rvJudul .ico svg{display:inline;width:1.05em;height:1.05em;stroke-width:2}
+.rvgl .rvglzb{display:none}
+#rvbDim{z-index:40}#rvbSheet{z-index:41;overscroll-behavior:contain}
+body.rvglon #toast{z-index:70}
+.rvglbody{overscroll-behavior:contain}
+.rvglalat button,.rvglput button,.rvglstrip button,.rvgllk button{touch-action:manipulation}
+#rvbLoad{position:fixed;left:50%;top:45%;transform:translate(-50%,-50%);z-index:80;display:none;align-items:center;gap:10px;background:rgba(42,16,32,.86);color:#fff;padding:12px 18px;border-radius:999px;font-size:14px}
+#rvbLoad .rvspin{width:20px;height:20px;border-width:2.5px}
+</style>
+<script id="rvbJs">
+// ===================== RVB · lapisan pengganti (shim) untuk blok Review salinan ThinKerBelle (K2) =====================
+// Lingkup GLOBAL: tombol onclick="…" di blok TKB memanggil nama global. Kode Syifa tetap di dalam IIFE-nya sendiri.
+// Sumber berkas ini: k2/shim_rvb.js. Disisipkan oleh salin_review_syifa.py; jangan disunting langsung di index.html.
+// Pemanggilan server lewat window.__syRv (diekspor IIFE Syifa): izin Syifa (SY_AUTH) tetap hanya di memori.
+var TOKEN = '', LIHAT = '', TAB = '', kembali = '';   // kembali = '': header Syifa sudah punya tombol Kembali
+const D0_RVB = { nama: '', bolehReview: false, bolehSetujuV2: null, reviewV2: null, pimpinan: false, review: {} };
+var D = Object.assign({}, D0_RVB);
+const RVB = { riw: false };   // riw = lembar bawah sedang punya entri riwayat sendiri (tombol kembali HP menutupnya)
+const SY_RVB = () => window.__syRv || null;
+const $ = id => document.getElementById(id === 'sheet' ? 'rvbSheet' : id === 'dim' ? 'rvbDim' : id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const thumb = (id, w) => id ? 'https:\/\/drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + (w || 400) : '';
+// kunci HP diberi awalan ss_ (TKB & Syifa bisa satu origin): ss_tkbRev2_<nama>, ss_tkbTandaAntre1; draf catatan = ss_rvc1 (diganti penyalin)
+const simpanLokal = (k, v) => { try { localStorage.setItem('ss_' + k, JSON.stringify(v)); } catch (e) {} }, bacaLokal = k => { try { return JSON.parse(localStorage.getItem('ss_' + k) || 'null'); } catch (e) { return null; } };
+function react(k, teks) { const s = SY_RVB(); teks = String(teks || ''); if (s && teks) s.toast(s.netral(teks), k === 'gagal' || k === 'bingung'); }
+function loading(on, t) { let el = document.getElementById('rvbLoad');
+  if (!el) { el = document.createElement('div'); el.id = 'rvbLoad'; el.innerHTML = '<span class="rvspin"></span><b></b>'; document.body.appendChild(el); }
+  el.style.display = on ? 'flex' : 'none'; if (t) el.querySelector('b').textContent = t; }
+function pasangLembarRvb() { if ($('rvbSheet')) return; const d = document.createElement('div'), s = document.createElement('div');
+  d.id = 'rvbDim'; d.className = 'dim'; s.id = 'rvbSheet'; s.className = 'sheet'; s.setAttribute('role', 'dialog');
+  d.onclick = () => tutup(); document.body.appendChild(d); document.body.appendChild(s); }
+function buka(h) { pasangLembarRvb(); const s = $('sheet'); s.innerHTML = '<div class="grab"></div>' + h; s.classList.add('show'); $('dim').classList.add('show'); s.scrollTop = 0;
+  if (!RVB.riw) { try { history.pushState({ rv: 1, lv: RVS ? 2 : 1, rvs: RVS, lembar: 1 }, ''); RVB.riw = true; } catch (e) {} } }
+function tutup(dariKembali) { const s = $('sheet'), d = $('dim'); if (s) s.classList.remove('show'); if (d) d.classList.remove('show');
+  if (RVB.riw) { RVB.riw = false; if (!dariKembali) { try { history.back(); } catch (e) {} } } }
+const kosong = (st, t) => `<div class="card empty">${t}</div>`;   // tanpa stiker maskot TKB
+function judul(t, s) { const j = $('rvJudul'), b = $('rvSub'); if (j) { j.innerHTML = t; rapikanIkon(j); } if (b) b.innerHTML = s || ''; return ''; }   // tombol "+" Ajukan tidak dibawa (K2-2)
+function go() {}
+function bukaForm() { react('bingung', 'Belum tersedia di Syifa Studio.'); }
+function muat() { const s = SY_RVB(); if (s && s.timBasi) s.timBasi(); }   // kartu Tim Syifa dibaca ulang saat dibuka lagi
+const kerangkaRvb = () => kerangkaRv();   // kartu abu-abu milik ThinKerBelle (App 5.11), disalin bersama blok
+function render() {
+  if (TAB !== 'review') return; const isi = $('rvIsi'); if (!isi) return;
+  if (RV && D.reviewV2 == null) D.reviewV2 = !!RV.v2pakai;   // cadangan bila syReviewSaya belum ada di server
+  if (RV && D.bolehSetujuV2 == null) D.bolehSetujuV2 = !!RV.v2pakai;
+  if (RV && !('v2pakai' in RV)) { isi.innerHTML = kosong('', 'Review foto belum bisa dimuat. Ketuk tombol muat ulang di atas.'); return; }   // muatReview gagal (RV kosong buatan blok)
+  if (RV && !rvV2()) { if (RV._dariCache) { isi.innerHTML = kerangkaRvb(); return; } lepasRvb(); SY_RVB().pakaiLama(RV); return; }   // V2 terkunci → tampilan K1
+  isi.classList.add('rvb'); isi.innerHTML = vReview(); rapikanIkon(isi);   // rvb = jarak antarbagian seperti .app TKB
+}
+// pemetaan google.script.run TKB → jembatan Syifa (args[0] = TOKEN dibuang)
+const GET_RVB = { apiReviewFoto: ['reviewV2', a => ({ arsip: !!(a[0] && a[0].arsip) }), 1], apiReviewSampul: ['sampul', a => ({ ids: a[0] })],
+  apiReviewFolder: ['folder', a => ({ id: a[0], segar: !!a[1] })], apiReviewTanda: ['tanda', a => ({ indukId: a[0], folderId: a[1] })] };
+const POST_RVB = /^api(ReviewPutusKelompok|ReviewTandaSimpan|ReviewTandaHapus|ReviewSampulPilih|ReviewPutus)$/;
+function gsr(fn, args, ok, fail) {
+  const s = SY_RVB(), a = (args || []).slice(1), salah = e => { loading(false); (fail || (x => react('gagal', '⚠️ ' + x.message)))(e instanceof Error ? e : new Error(String(e))); };
+  if (!s) return salah(new Error('Syifa Studio belum siap.'));
+  const g = GET_RVB[fn];
+  if (g) return s.tbPakai(g[0], g[1](a)).then(j => { if (!g[2]) return ok(j); if (!j || !j.ok) throw new Error((j && j.pesan) || 'Review foto belum bisa dimuat.'); ok(j.data); }).catch(salah);
+  // {ok:false, perluYakin} tidak dilempar. Ditolak server (mis. rem SYIFA_REVIEW_TULIS, hak) → ok({ok:false}) supaya tampil "ditolak", bukan "sinyal putus"/antrean
+  if (POST_RVB.test(fn)) return s.rvTulis(fn.slice(3), fn === 'apiReviewPutus' ? [a[0], a[1], a[2], a[3] || {}] : a).then(ok, e => e && e.ditolak ? (loading(false), ok({ ok: false, pesan: e.message })) : salah(e));
+  salah(new Error('Belum tersedia di Syifa Studio.'));   // Arsipkan/Pulihkan/Ajukan/Upload (K2-2)
+}
+// ikon: hanya di wilayah Review (bukan seluruh dokumen seperti di TKB)
+const ANTRE_IKON_RVB = new Set(); let JADWAL_IKON_RVB = 0;
+new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { const e = n.nodeType === 1 ? n : n.parentElement; if (!e || !e.closest) return;
+  if (!(TAB === 'review' ? e.closest('#rvHal,#rvbSheet,#rvgl,#rvpv') : e.closest('#rvbSheet,#rvgl,#rvpv'))) return;
+  ANTRE_IKON_RVB.add(e); if (!JADWAL_IKON_RVB) JADWAL_IKON_RVB = requestAnimationFrame(() => { JADWAL_IKON_RVB = 0; const a = [...ANTRE_IKON_RVB]; ANTRE_IKON_RVB.clear();
+    a.forEach(x => { if (x.isConnected && !a.some(y => y !== x && y.contains(x))) rapikanIkon(x); }); }); }))).observe(document.body, { childList: true, subtree: true });
+
+// ==== BLOK SALINAN ThinKerBelle Apps.html (ef0c4aa) ====
+const I = { home: '<path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/>', cal: '<rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>', plus: '<path d="M12 5v14M5 12h14"/>',
+  task: '<path d="M4 6.5l1.5 1.5L8 5.5M4 12.5 5.5 14 8 11.5M4 18.5 5.5 20 8 17.5"/><path d="M11 7h9M11 13h9M11 19h9"/>', more: '<rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/>',
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>', arr: '<path d="M9 6l6 6-6 6"/>', up: '<path d="M12 19V5M6 11l6-6 6 6"/>', down: '<path d="M12 5v14M6 13l6 6 6-6"/>', cam: '<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>' };
+Object.assign(I, { trend: '<path d="M3.5 17 9 11.5l4 4 7.5-8"/><path d="M15 7.5h5.5V13"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', spark: '<path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4M6.6 6.6l2.3 2.3M15.1 15.1l2.3 2.3M17.4 6.6l-2.3 2.3M8.9 15.1l-2.3 2.3"/>', users: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.4.2 4 1.8 4.5 4.8"/>', lock: '<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>', rocket: '<path d="M12 3c3 2 4.5 5.5 4 10l-2 3h-4l-2-3c-.5-4.5 1-8 4-10z"/><circle cx="12" cy="9.5" r="1.6"/><path d="M8.5 13.5 6 16v2.5l3-1M15.5 13.5 18 16v2.5l-3-1"/>', alert: '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.3"/>', flower: '<circle cx="12" cy="12" r="2.2"/><path d="M12 9.8c-1.8-2.2-1.8-4.8 0-6.3 1.8 1.5 1.8 4.1 0 6.3zM12 14.2c1.8 2.2 1.8 4.8 0 6.3-1.8-1.5-1.8-4.1 0-6.3zM9.8 12c-2.2 1.8-4.8 1.8-6.3 0 1.5-1.8 4.1-1.8 6.3 0zM14.2 12c2.2-1.8 4.8-1.8 6.3 0-1.5 1.8-4.1 1.8-6.3 0z"/>', eye: '<path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>', pin: '<path d="M12 21s-6.5-6.2-6.5-11A6.5 6.5 0 0 1 18.5 10c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>', pen: '<path d="M15.5 4.5l4 4L8 20H4v-4z"/><path d="M13.5 6.5l4 4"/>', phone: '<rect x="7" y="2.8" width="10" height="18.4" rx="2.5"/><path d="M11 17.8h2"/>', video: '<rect x="3" y="6.5" width="13" height="11" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/>', clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>', mega: '<path d="M3.5 10v4h3l8 4.5v-13l-8 4.5z"/><path d="M18 9.5a3.5 3.5 0 0 1 0 5"/>', doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>', link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>', chart: '<path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/>', box: '<path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/>', trash: '<path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/>', search: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>', case: '<rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V5h6v2.5M3.5 12.5h17"/>', chat: '<path d="M4 5h16v11H9l-5 4z"/>', at: '<circle cx="12" cy="12" r="3.5"/><path d="M15.5 12v1.5a2.5 2.5 0 0 0 5 0V12a8.5 8.5 0 1 0-3.3 6.7"/>', music: '<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>', image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m20.5 16-5-5-8 8.5"/>', ring: '<circle cx="12" cy="12" r="8.5"/>', user: '<circle cx="12" cy="8" r="3.8"/><path d="M4.5 20c.8-4 3.8-6.3 7.5-6.3s6.7 2.3 7.5 6.3"/>', gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/>', money: '<rect x="3" y="6.5" width="18" height="11" rx="2.5"/><circle cx="12" cy="12" r="2.6"/>', sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/>', moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>', heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>', out: '<path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10"/>', star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8L3.5 9.7l5.9-.9z"/>', x: '<path d="M6 6l12 12M18 6 6 18"/>', palette: '<path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.2-1-1.6-1-2.6 0-.9.7-1.4 1.7-1.4h2.2a3.8 3.8 0 0 0 3.8-3.8c0-4.2-3.8-7.5-8.5-7.5z"/><circle cx="8" cy="11" r="1"/><circle cx="12" cy="8" r="1"/><circle cx="16" cy="11" r="1"/>' });
+Object.assign(I, { folder: '<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.2h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>', fotoCek: '<rect x="4" y="5" width="16" height="14" rx="3"/><path d="m8.6 12.2 2.4 2.4 4.4-4.8"/>', muatUlang: '<path d="M19 12a7 7 0 1 1-2.05-4.95"/><path d="M19 4.5V8h-3.5"/>' });
+Object.assign(I, { dress: '<path d="M8.5 3.5 4 6.2l1.6 4.3h2.6v10h7.6v-10h2.6L20 6.2l-4.5-2.7c-.5 1.5-1.9 2.4-3.5 2.4s-3-.9-3.5-2.4z"/>', cut: '<circle cx="6" cy="6.5" r="2.5"/><circle cx="6" cy="17.5" r="2.5"/><path d="M8.2 7.8 20 18M8.2 16.2 20 6"/>' });
+const EMO = { '📤': 'fotoCek', '✕': 'x', '🔄': 'muatUlang', '🔔': 'bell', '👗': 'dress', '✂': 'cut', '✅': 'check', '✓': 'check', '✨': 'spark', '🎉': 'spark', '🎊': 'spark', '👥': 'users', '👭': 'users', '🔒': 'lock', '🚀': 'rocket', '🗓': 'cal', '📅': 'cal', '📆': 'cal', '⚠': 'alert', '❌': 'x', '🌸': 'flower', '👀': 'eye', '📌': 'pin', '📍': 'pin', '✍': 'pen', '✏': 'pen', '📝': 'task', '📲': 'phone', '📱': 'phone', '📸': 'cam', '📷': 'cam', '🎬': 'video', '🎞': 'video', '⏰': 'clock', '⏳': 'clock', '💡': 'bulb', '💭': 'bulb', '📣': 'mega', '📄': 'doc', '📋': 'doc', '📁': 'doc', '🧾': 'doc', '🔗': 'link', '📎': 'link', '📊': 'chart', '📈': 'trend', '🏆': 'star', '🎯': 'star', '📦': 'box', '🗑': 'trash', '🔍': 'search', '🧳': 'case', '🤝': 'chat', '💬': 'chat', '🧵': 'at', '🎵': 'music', '🖼': 'image', '⭕': 'ring', '⬜': 'ring', '⚪': 'ring', '👤': 'user', '👑': 'star', '🛠': 'gear', '⚙': 'gear', '💰': 'money', '🌴': 'sun', '☀': 'sun', '🌙': 'moon', '😴': 'moon', '💗': 'heart', '❤': 'heart', '🚪': 'out', '🎨': 'palette', '✋': 'user' };
+const reEmo = new RegExp('(' + Object.keys(EMO).join('|') + ')\uFE0F?', 'gu'), reSisa = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B1C}\u{2B55}\u{231A}-\u{23FF}]\uFE0F?/gu, adaEmo = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B1C}\u{2B55}\u{231A}-\u{23FF}\u2713]/u;
+function rapikanIkon(root) {
+  if (!root || !root.querySelectorAll) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => { const p = n.parentElement; if (!p || p.closest('textarea,script,style,option,.uc')) return NodeFilter.FILTER_REJECT; return adaEmo.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; } });
+  const daftar = []; while (w.nextNode()) daftar.push(w.currentNode);
+  daftar.forEach(n => { const bag = n.nodeValue.split(reEmo), f = document.createDocumentFragment();
+    bag.forEach((x, i) => { if (i % 2) { const sp = document.createElement('span'); sp.className = 'ico'; sp.innerHTML = ic(EMO[x], 16); f.appendChild(sp); } else if (x) f.appendChild(document.createTextNode(x.replace(reSisa, '').replace(/\s{2,}/g, ' '))); });
+    n.replaceWith(f); });
+  root.querySelectorAll('option').forEach(o => { if (adaEmo.test(o.textContent)) o.textContent = o.textContent.replace(reEmo, '').replace(reSisa, '').trim(); });
+}
+const ic = (k, s) => `<svg width="${s || 22}" height="${s || 22}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
+const WARNA_HEX = { 'light grey': '#CDCFD1', 'light gray': '#CDCFD1', grey: '#A9ABAE', gray: '#A9ABAE', abu: '#A9ABAE', charcoal: '#6E6D69', 'light sage': '#D3D5BD', sage: '#B5BFA1', 'broken white': '#EEEDE6', 'off white': '#F2EFE6', white: '#F7F5F0', putih: '#F7F5F0',
+  cream: '#EFE3CC', krem: '#EFE3CC', cappuccino: '#A97A5C', frappuccino: '#B4AAA6', 'dusty pink': '#C9959A', dusty: '#B76E78', black: '#1E1E1E', hitam: '#1E1E1E', choco: '#6B5446', coklat: '#6B5446', brown: '#7A5A45', mocca: '#8A6A55', mocha: '#8A6A55',
+  maroon: '#5E1A2A', burgundy: '#6A1F2E', lime: '#CDBA4E', mauve: '#A68C99', peach: '#F0CDB8', blush: '#C9AAA0', biscuit: '#E8D2AE', beige: '#E6C7A6', nude: '#D9B8A0', navy: '#2B3A55', olive: '#6B6B3A', army: '#5A5E3D', mustard: '#C9A13B',
+  terracotta: '#B7735C', rose: '#D7A1A8', pink: '#F2B5C8', lilac: '#C7B5D6', lavender: '#C8BFE0', ungu: '#7E5A8E', purple: '#7E5A8E', mint: '#BFE3D0', denim: '#56688C', blue: '#5B7DB1', biru: '#5B7DB1', green: '#5E8C61', hijau: '#5E8C61',
+  red: '#B03A3A', merah: '#B03A3A', yellow: '#E8C95A', kuning: '#E8C95A', orange: '#E08A4A', oranye: '#E08A4A', tosca: '#3F9C9A', teal: '#3F7F7E', khaki: '#BDAE85', taupe: '#8F8174', silver: '#C4C6C8', gold: '#C8A45A',
+  dusk: '#9C87A1', champagne: '#D9C39C', azure: '#7FA4C8', indigo: '#4E5A8C', roselle: '#C66C7B', nilam: '#3F5B7D', madu: '#C99A4B', asmara: '#C66676', indu: '#9AA8BA',
+  rosewood: '#A15F63', terracota: '#C46A48', terracotta: '#C46A48', slate: '#6D7985', mist: '#B6C0C3',
+  bhumi: '#8C6467', kirana: '#E3C3C4', samudra: '#7F8C99', forest: '#4E5540', agni: '#6F3B3D', optimis: '#6C6F73', artsy: '#C8CACE', dignity: '#CDBAA3', love: '#B88E95', ruby: '#8E2E37' };
+const KUNCI_WARNA = Object.keys(WARNA_HEX).sort((a, b) => b.length - a.length);
+const kerangkaRv = () => `<div class="prg" aria-busy="true" aria-label="Memuat preview & approval">${'<div class="prk rvsk"><div class="pim"></div><div class="pt"><i></i><i></i></div></div>'.repeat(6)}</div>`;
+// =========================== REVIEW FOTO (hasil edit) ===========================
+let RV = null, RVF = '', RVL = {}, RVA = [], PV = null, RVC = {}, RVAR = null, RVS = null, SRB = null;   // RVS = seri yang dibuka (V2), SRB = hasil Baca isi folder
+const rvList = () => (RVF === 'Arsip' ? (RVAR && RVAR.list) : (RV && RV.list)) || [];   // A1: tab Arsip memakai daftar terpisah
+try { RVC = JSON.parse(localStorage.getItem('ss_rvc1') || '{}') || {}; } catch (e) {}   // draf catatan review per foto (tidak hilang saat pindah foto / app ke latar)
+const ST_RV = { Menunggu: ['⏳', 'wr'], Revisi: ['✏️', 'no'], Disetujui: ['✅', 'ok'] };
+// 1.6 (P4): cache per akun (tkbRev2_<nama>) · tampil dulu dari HP, lalu diperbarui. Jawaban lama dibuang: nomor urut, waktuServer, dan RVKOTOR (aksi tulis sesudah permintaan dikirim).
+let RVKOTOR = 0, RVWAKTU = 0;
+const kunciRv = () => 'tkbRev2_' + ((D && D.nama) || '');
+function simpanRv_() { if (LIHAT || !RV) return; simpanLokal(kunciRv(), { t: Date.now(), d: RV }); }
+function bacaRv_() { const c = bacaLokal(kunciRv()); return c && c.d && Date.now() - c.t < 864e5 ? c : null; }
+function muatReview(lalu) { const n = ++muatReview.n, kirim = Date.now(); muatReview.jalan = true; gsr('apiReviewFoto', [TOKEN], d => { if (n !== muatReview.n) return; muatReview.jalan = false;
+    if (kirim < RVKOTOR) return muatReview(lalu);
+    if (RV && !RV._dariCache && d && RV.waktuServer && d.waktuServer && d.waktuServer < RV.waktuServer) return;
+    RV = d || { list: [] }; RV._dariCache = 0; RVWAKTU = Date.now(); simpanRv_(); if (lalu) lalu(); else if (TAB === 'review' && !$('sheet').classList.contains('show') && !GL) render(); }, e => { muatReview.jalan = false; RV = RV || { list: [], ps: [], jenis: [] }; react('gagal', '⚠️ ' + e.message); }); }
+muatReview.n = 0;
+const JL_RV = { gambar: ['image', 'Gambar'], folder: ['folder', 'Folder'], dokumen: ['doc', 'Dokumen'], video: ['video', 'Video'], lainnya: ['link', 'Link'] };
+const jlRv = x => JL_RV[x.jl] ? x.jl : x.fotoId ? 'gambar' : 'lainnya';
+const satuGbr = x => jlRv(x) === 'gambar' && !!x.fotoId && x.akses !== false && !x._gagal;   // _gagal: sudah dicoba di HP ini dan tidak bisa dimuat
+// alamat gambar Drive: lh3 (=wN) lalu cadangan thumbnail Drive (keduanya tidak terdokumentasi), terakhir tombol "Buka di Drive"
+const srcRv = (id, w, ke) => ke ? thumb(id, w) : 'https:\/\/lh3.googleusercontent.com/d/' + encodeURIComponent(id) + '=w' + w;
+function muatGbr(img, id, w, selesai) { let ke = 0;
+  img.onload = () => { img.onload = img.onerror = null; selesai && selesai(true); };
+  img.onerror = () => { if (++ke < 2) { img.src = srcRv(id, w, ke); return; } img.onload = img.onerror = null; selesai && selesai(false); };
+  img.src = srcRv(id, w, 0); }
+function ikonRv(x, gagal) { const J = JL_RV[jlRv(x)]; gagal = gagal || x._gagal;
+  return `<div class="rvik">${ic(gagal ? 'alert' : x.akses === false ? 'lock' : J[0], 34)}<small>${gagal ? 'Gambar tidak bisa dimuat' : x.akses === false ? 'Link belum bisa dibaca' : J[1]}</small>${x.link ? `<a class="sbtn" href="${esc(x.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Buka di Drive</a>` : ''}</div>`; }
+// daftar: w400, dimuat saat terlihat, maksimal 4 unduhan bersamaan
+const RVQ = { jalan: 0, antre: [], io: null };
+function antreGbr() { while (RVQ.jalan < 4 && RVQ.antre.length) { const im = RVQ.antre.shift(); if (!im.isConnected) continue; RVQ.jalan++;
+  const x = rvList()[Number(im.dataset.i)];
+  muatGbr(im, im.dataset.rv, 400, ok => { RVQ.jalan--; if (!ok && x) { x._gagal = true; if (im.parentElement) im.outerHTML = ikonRv(x, true); /* 1.6: hanya gambar yang diganti, lencana di kotak yang sama tetap */ } antreGbr(); }); } }
+function pasangGbrRv() { const imgs = [...document.querySelectorAll('img[data-rv]:not([data-q])')]; if (!imgs.length) return;
+  if (!RVQ.io && 'IntersectionObserver' in window) RVQ.io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { RVQ.io.unobserve(e.target); RVQ.antre.push(e.target); antreGbr(); } }), { rootMargin: '300px' });
+  imgs.forEach(im => { im.dataset.q = '1'; if (RVQ.io) RVQ.io.observe(im); else RVQ.antre.push(im); }); antreGbr(); }
+// =========================== REVIEW V2 · PER SERI (di balik REVIEW_V2, server Review 1.4) ===========================
+const rvV2 = () => !!(D.reviewV2 && RV && RV.v2 && RV.v2pakai);
+// warna untuk bulatan: hanya kalau nama folder dikenali (#hex / kamus WARNA_HEX); selain itu '' → ikon folder
+const hexRv = n => { const t = String(n || '').toLowerCase().trim(), m = t.match(/#([0-9a-f]{6}|[0-9a-f]{3})\b/i); if (m) return '#' + m[1];
+  if (WARNA_HEX[t]) return WARNA_HEX[t]; const k = KUNCI_WARNA.find(x => new RegExp('\\b' + x + '\\b').test(t)); return k ? WARNA_HEX[k] : ''; };
+const lamaRv = t => { const m = Math.round((Date.now() - t) / 6e4); return m < 1 ? 'barusan' : m < 60 ? m + ' menit lalu' : Math.round(m / 60) + ' jam lalu'; };
+const seriRv = () => (RVF === 'Arsip' ? (RVAR && RVAR.seri) : (RV && RV.seri)) || [];
+function bukaSeriRv(id) { RVS = id; render(); scrollTo(0, 0); }
+// gambar Drive di grid: lh3, cadangan thumbnail Drive, lalu kotak kosong (tanpa server)
+const imgRv = (id, w) => `<img loading="lazy" alt="" referrerpolicy="no-referrer" src="${srcRv(id, w, 0)}" onerror="if(!this.dataset.k){this.dataset.k=1;this.src=thumb('${esc(id)}',${w})}else{this.onerror=null;this.removeAttribute('src')}">`;
+// sampul kartu folder yang belum ada: placeholder berdenyut (diminta saat terlihat) · gagal/kosong: ikon + Buka asli di Drive
+function ikonFolderRv(g) {
+  const gagal = g.statusBaca === 'gagal', kosongF = g.statusBaca === 'kosong';
+  if (!gagal && !kosongF) return `<div class="rvik${g.statusBaca === 'nanti' ? '' : ' rvtunggu'}" data-sampul="${esc(g.folderId)}">${ic('folder', 34)}<small>${g.statusBaca === 'nanti' ? 'Sampul menyusul' : 'Memuat sampul…'}</small></div>`;
+  return `<div class="rvik">${ic(gagal ? 'alert' : 'folder', 34)}<small>${gagal ? 'Folder belum bisa dibaca' : 'Tidak ada foto sampai 3 tingkat folder'}</small>${g.link ? `<a class="sbtn" href="${esc(g.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Buka asli di Drive</a>` : ''}</div>`;
+}
+function kartuSeriRv(g) {
+  const L = rvList(), i0 = L.findIndex(x => x.id === (g.induk || g.warna[0])), x0 = L[i0] || {}, st = ST_RV[g.status] || ST_RV.Menunggu, n = g.nFolder || g.warna.length || 1;
+  const buka = g.v2 ? `bukaSeriRv('${esc(g.id)}')` : `bukaReview(${i0})`;
+  const gbr = g.induk ? (g.sampul ? `<img data-rv="${esc(g.sampul)}" data-i="${i0}" alt="" referrerpolicy="no-referrer">` : ikonFolderRv(g))
+    : (g.v2 ? !!g.sampul && !x0._gagal : satuGbr(x0)) ? `<img data-rv="${esc(g.v2 ? g.sampul : x0.fotoId)}" data-i="${i0}" alt="" referrerpolicy="no-referrer">` : ikonRv(x0);
+  const ringkas = [g.cnt.Disetujui && g.cnt.Disetujui + ' setuju', g.cnt.Revisi && g.cnt.Revisi + ' revisi', g.cnt.Menunggu && g.cnt.Menunggu + ' menunggu'].filter(Boolean).join(' · ');
+  return `<div class="prk" data-seri="${esc(g.id)}" role="button" tabindex="0" onclick="${buka}" onkeydown="if(event.key==='Enter')${buka}"><div class="pim" style="position:relative">${gbr}${g.v2 && n > 1 ? `<span class="rvnf">${n} folder</span>` : ''}</div>
+    <div class="pt"><b>${esc(g.nama)}</b><small><span class="chip ${st[1]}">${st[0]} ${esc(g.status)}</span>${g.v2 ? '' : ` <span class="chip">${(JL_RV[jlRv(x0)] || JL_RV.lainnya)[1]}</span>`}${!g.v2 && x0.revisi ? ` <span class="chip">rev ${x0.revisi}</span>` : ''}</small>
+    ${g.v2 && n > 1 ? `<div class="bar rvbar"><i style="width:${Math.round(g.cnt.Disetujui / n * 100)}%"></i><i class="r" style="width:${Math.round(g.cnt.Revisi / n * 100)}%"></i></div><small>${esc(ringkas)}</small>` : ''}${g.v2 && g.foto ? `<small>${g.foto} foto</small>` : ''}
+    <small>${esc([g.jenis, g.oleh].filter(Boolean).join(' · '))}</small>${x0.arsip ? `<small>📦 ${x0.arsip.otomatis ? 'Arsip otomatis' : 'Diarsipkan'}</small>` : ''}</div></div>`;
+}
+// ---------- sampul bertahap: kartu yang terlihat saja, maks 3 folder per panggilan, 1 panggilan sekaligus ----------
+const SPQ = { io: null, antre: [], jalan: false, sudah: {} };
+function pasangSampulRv() {
+  const els = [...document.querySelectorAll('[data-sampul]:not([data-sq])')]; if (!els.length || LIHAT) return;
+  if (!SPQ.io && 'IntersectionObserver' in window) SPQ.io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { SPQ.io.unobserve(e.target); mintaSampulRv(e.target.dataset.sampul); } }), { rootMargin: '200px' });
+  els.forEach(el => { el.dataset.sq = '1'; if (SPQ.io) SPQ.io.observe(el); else mintaSampulRv(el.dataset.sampul); });
+}
+function mintaSampulRv(id) { if (!id || SPQ.antre.includes(id) || Date.now() - (SPQ.sudah[id] || 0) < 6e5) return; SPQ.antre.push(id); clearTimeout(SPQ.t); SPQ.t = setTimeout(jalanSampulRv, 150); }   // jeda singkat: kartu yang terlihat bersamaan masuk 1 panggilan
+function jalanSampulRv() {
+  if (SPQ.jalan || !SPQ.antre.length) return; const ids = SPQ.antre.splice(0, 3); SPQ.jalan = true; ids.forEach(id => { SPQ.sudah[id] = Date.now(); });
+  gsr('apiReviewSampul', [TOKEN, ids], r => { SPQ.jalan = false; const d = (r && r.ok && r.data) || {}; ids.forEach(id => terapSampulRv(id, d[id] || { status: 'nanti' }, r && r.kartu)); jalanSampulRv(); },
+    () => { SPQ.jalan = false; ids.forEach(id => terapSampulRv(id, { status: 'nanti' })); jalanSampulRv(); });
+}
+// hasil sampul → data (RV/RVAR, disimpan di HP) dan kartu yang sedang tampil, tanpa menggambar ulang seluruh daftar
+function terapSampulRv(id, h, kartu) {
+  const ubah = [];
+  [RV, RVAR].forEach(R => { if (!R) return; (R.seri || []).forEach(g => { if (g.folderId !== id) return; g.statusBaca = h.status; g.pesanBaca = h.pesan || ''; if (h.status === 'ok') { g.sampul = h.sampul || g.sampul || ''; g.foto = h.jumlah || g.foto; }
+    const k = kartu && kartu[g.induk]; if (k) Object.assign(g, { cnt: k.cnt, status: k.status, nFolder: k.nFolder }); ubah.push(g); }); });   // 1.6 (P2): lencana & bar langsung benar
+  simpanRv_();
+  ubah.forEach(g => document.querySelectorAll('.prk[data-seri]').forEach(el => { if (el.dataset.seri === g.id) el.outerHTML = kartuSeriRv(g); }));
+  pasangGbrRv(); pasangSampulRv();
+}
+function vReviewSeri() {
+  if ((RV._dariCache || Date.now() - RVWAKTU > 6e5) && !muatReview.jalan) muatReview();
+  if (RVS) return vSeriRv(RVS);
+  let h = kembali + judul('📤 Review foto', RV._dariCache ? 'Diperbarui ' + lamaRv(RV._dariCache) + (Date.now() - RV._dariCache > 6e5 ? ' · data lama, memperbarui…' : ' · memperbarui…') : 'Hasil edit untuk dicek penyetuju', `<button class="round" onclick="bukaForm('seri')" aria-label="Ajukan review">${ic('plus', 24)}</button>`);
+  const G = RV.seri || [], n = s => G.filter(g => g.status === s).length, adaArsip = !!RV.arsipAktif;
+  if (!RVF || RVF === 'Semua' || (RVF === 'Arsip' && !adaArsip)) RVF = (D.review && D.review.revisiku) ? 'Revisi' : 'Menunggu';
+  h += `<div class="chips wrap">${['Menunggu', 'Revisi', 'Disetujui'].concat(adaArsip ? ['Arsip'] : []).map(s => `<button class="${RVF === s ? 'on' : ''}" onclick="RVF='${s}';render()">${s === 'Arsip' ? '📦 ' : ''}${s} ${s === 'Arsip' ? (RVAR ? (RVAR.seri || []).length : RV.jmlSeriArsip || 0) : n(s)}</button>`).join('')}</div>`;
+  if (RVF === 'Arsip') { if (!RVAR) { muatArsipRv(); return h + kosong('s11', 'Memuat arsip…'); }
+    h += `<p style="color:var(--mut);font-size:13px;margin:8px 0 0">Seri yang diarsipkan tidak muncul di tab lain, tapi fotonya tetap tersimpan. Seri yang semua foldernya disetujui lebih dari ${RVAR.arsipHari || 30} hari masuk ke sini otomatis.</p>`; }
+  const daftar = RVF === 'Arsip' ? (RVAR.seri || []) : G.filter(g => g.status === RVF);
+  if (!daftar.length) return h + kosong('s13', { Menunggu: 'Tidak ada foto yang menunggu review.', Revisi: 'Tidak ada revisi. Semua beres 🎉', Disetujui: 'Belum ada seri yang selesai disetujui.', Arsip: 'Arsip masih kosong.' }[RVF]);
+  setTimeout(() => { pasangGbrRv(); pasangSampulRv(); }, 0);
+  return h + `<div class="prg">${daftar.map(kartuSeriRv).join('')}</div>`;
+}
+function vSeriRv(id) {
+  const g = seriRv().find(x => x.id === id); if (!g) { RVS = null; return vReviewSeri(); }
+  if (g.induk) return vFolderRv(g);
+  const L = rvList(), idx = g.warna.map(w => L.findIndex(x => x.id === w)).filter(i => i >= 0);
+  let h = `<button class="back" onclick="RVS=null;render()">‹ Semua seri</button>` + judul(esc(g.nama), esc([g.jenis, g.ps].filter(Boolean).join(' · ') || 'Review foto'));
+  h += `<div class="card"><small style="display:block">📤 Dikirim ${esc(g.oleh)} · ${esc(g.waktu)}</small><small style="display:block">🔗 1 link Drive · ${idx.length} folder · ${g.foto} foto terbaca otomatis</small>
+    ${g.link ? `<div class="acts"><a class="sbtn" href="${esc(g.link)}" target="_blank" rel="noopener">${ic('link', 14)} Buka folder di Drive</a></div>` : ''}</div>`;
+  h += `<div class="acts"><span class="chip ok">${g.cnt.Disetujui} disetujui</span><span class="chip no">${g.cnt.Revisi} revisi</span><span class="chip wr">${g.cnt.Menunggu} menunggu</span></div>`;
+  h += `<div class="prg">${idx.map(i => { const x = L[i], st = ST_RV[x.status] || ST_RV.Menunggu, hx = hexRv(x.warna);
+    return `<div class="prk rvfd card" role="button" tabindex="0" onclick="bukaReview(${i})" onkeydown="if(event.key==='Enter')bukaReview(${i})"><div class="pt">${hx ? `<span class="rvdot" style="background:${hx}"></span>` : `<span class="rvdot ik">${ic('folder', 18)}</span>`}
+      <b>${esc(x.warna || 'Folder')}</b><small>${(x.foto || []).length} foto</small><small><span class="chip ${st[1]}">${st[0]} ${esc(x.status)}</span>${x.revisi ? ` <span class="chip">rev ${x.revisi}</span>` : ''}</small></div></div>`; }).join('')}</div>`;
+  if (g.status === 'Disetujui') h += `<div class="info">✅ Semua folder ${esc(g.nama)} sudah disetujui. Folder seri dipindah ke ThinKerBelle · Foto Final.</div>`;
+  return h;
+}
+// grid thumbnail foto (lembar detail): ketuk = buka file di Drive
+function gridFotoF(F, aksi) {
+  F = F || []; if (!F.length) return '';
+  return `<div class="rvth">${F.slice(0, 80).map((f, i) => `<button type="button" class="rvthb" title="${esc(f.n)}" onclick="${aksi ? aksi(i) : ''}">${imgRv(f.id, 300)}</button>`).join('')}</div>
+    <small style="display:block;color:var(--mut);margin-top:6px">${F.length} foto · ketuk foto untuk melihat besar, memberi tanda &amp; komentar.</small>`;
+}
+function gridFotoRv(x) { const sk = 'b|' + x.id; GLS[sk] = { foto: x.foto || [], judul: x.warna || 'Foto', sub: x.produk || '' }; return (x.foto || []).length ? gridFotoF(x.foto, i => `bukaGaleriRv('${esc(sk)}',${i})`) : `<div class="rvdet" style="cursor:default">${ikonRv(x)}</div>`; }
+// ---------- layar folder (seri induk, 1.5): isi dari REVIEW FOLDER, tanpa konversi ----------
+const FRV = {};   // isi folder per folderId: { muat, d, err }
+function muatFolderRv(fid, segar) {
+  const F = FRV[fid] = FRV[fid] || {}; if (F.muat) return;
+  if (LIHAT) { F.err = '👀 Mode lihat: isi folder tidak dimuat.'; return; }
+  F.muat = true;
+  const ulang = () => { if (TAB === 'review' && RVS && !$('sheet').classList.contains('show')) render(); };
+  gsr('apiReviewFolder', [TOKEN, fid, !!segar], r => { F.muat = false; if (!r || !r.ok) F.err = (r && r.pesan) || 'Isi folder belum bisa dibaca'; else { F.d = r; F.err = ''; terapSampulRv(fid, r); } ulang(); if (r && r.ok && r.basi && !segar) muatFolderRv(fid, true); },
+    e => { F.muat = false; F.err = '⚠️ Gagal membaca: ' + ((e && e.message) || 'koneksi terputus'); ulang(); });
+}
+// status kelompok = baris kelompoknya kalau sudah ada (dibuat saat ada keputusan), kalau tidak = status induk
+function stKelompokRv(g, k, n) { const L = rvList(), induk = L.find(x => x.id === g.induk) || {}, a = n > 1 ? L.find(x => x.seri === g.induk && x.id !== g.induk && x.folderId === k.id) : null, x = a || induk; return { x: x, st: x.status || 'Menunggu' }; }
+function vFolderRv(g) {
+  const fid = g.folderId; let F = FRV[fid]; if (!F || (!F.d && !F.muat && !F.err)) { muatFolderRv(fid); F = FRV[fid]; }
+  const d = F.d, grup = d ? d.grup || [] : [], n = grup.length, i0 = rvList().findIndex(x => x.id === g.induk), qf = `'${esc(fid)}'`;
+  let h = `<button class="back" onclick="RVS=null;render()">‹ Semua seri</button>` + judul(esc(g.nama), esc([g.jenis, g.ps].filter(Boolean).join(' · ') || 'Review foto'));
+  h += `<div class="card"><small style="display:block">📤 Dikirim ${esc(g.oleh)} · ${esc(g.waktu)}</small>${d && d.status === 'ok' ? `<small style="display:block">🔗 1 link Drive · ${n} folder · ${d.jumlah} foto terbaca otomatis${d.dibaca ? ' · dibaca ' + esc(d.dibaca) : ''}</small>` : ''}
+    <div class="acts">${g.link ? `<a class="sbtn" href="${esc(g.link)}" target="_blank" rel="noopener">${ic('link', 14)} Buka asli di Drive</a>` : ''}${d ? `<button class="sbtn" onclick="muatFolderRv(${qf},true);render()" ${F.muat ? 'disabled' : ''}>${F.muat ? '⏳ Membaca…' : '⟳ Muat ulang isi folder'}</button>` : ''}</div></div>`;
+  const lembar = i0 >= 0 && D.bolehReview ? `<button class="big alt" onclick="bukaReview(${i0})">Putuskan seluruh folder tanpa melihat isi</button>` : '';   // jalur lama (Owner/GM) sampai pemilik memutuskan
+  if (!d) return h + (F.err ? `<div class="info rverr">${esc(F.err)}</div><div class="acts"><button class="sbtn" onclick="FRV[${qf}]={};render()">Coba lagi</button></div>` : `<div class="info rvmuat">⏳ Membaca isi folder… biasanya 3–10 detik</div>`);
+  if (d.status !== 'ok' && d.status !== 'kosong') return h + `<div class="card"><div class="rvik" style="height:auto;padding:18px 8px">${ic(d.status === 'nanti' ? 'folder' : 'alert', 34)}<small>${d.status === 'nanti' ? 'Drive sedang sibuk. Coba baca lagi sebentar lagi.' : 'Folder belum bisa dibaca' + (d.pesan ? ': ' + esc(d.pesan) : '') + '. Pastikan folder dibagikan ke akun Arabelle atau siapa pun yang punya link.'}</small></div>
+    <div class="acts"><button class="sbtn pri" onclick="muatFolderRv(${qf},true);render()">Coba baca lagi</button></div></div>` + lembar;
+  if (!n) return h + `<div class="card"><div class="rvik" style="height:auto;padding:18px 8px">${ic('folder', 34)}<small>Tidak ada foto sampai 3 tingkat folder. ${g.link ? `<a href="${esc(g.link)}" target="_blank" rel="noopener">Buka asli di Drive</a>` : ''}</small></div></div>` + lembar;
+  const S = grup.map(k => stKelompokRv(g, k, n)), c = { Disetujui: 0, Revisi: 0, Menunggu: 0 }; S.forEach(s => { c[c[s.st] !== undefined ? s.st : 'Menunggu']++; });
+  h += `<div class="acts"><span class="chip ok">${c.Disetujui} disetujui</span><span class="chip no">${c.Revisi} revisi</span><span class="chip wr">${c.Menunggu} menunggu</span></div>`;
+  h += `<div class="prg">${grup.map((k, j) => { const s = ST_RV[S[j].st] || ST_RV.Menunggu, f0 = (k.foto || [])[0], hx = hexRv(k.nama), on = `bukaKelompokRv('${esc(g.id)}',${j})`;
+    return `<div class="prk" role="button" tabindex="0" onclick="${on}" onkeydown="if(event.key==='Enter')${on}"><div class="pim" style="position:relative">${f0 ? imgRv(f0.id, 400) : ic('folder', 34)}${hx ? `<span class="rvdot kecil rvdotp" style="background:${hx}"></span>` : ''}</div>
+      <div class="pt"><b>${esc(k.nama)}</b><small>${(k.foto || []).length} foto${k.sub ? ' · ' + esc(k.sub) : ''}</small><small><span class="chip ${s[1]}">${s[0]} ${esc(S[j].st)}</span>${S[j].x.revisi ? ` <span class="chip">rev ${S[j].x.revisi}</span>` : ''}</small></div></div>`; }).join('')}</div>`;
+  if (d.terpotong) h += `<div class="mswarn" style="margin-top:10px">⚠️ Folder terlalu besar: hanya sebagian foto yang terbaca. Sebaiknya pecah jadi beberapa seri.</div>`;
+  if (c.Disetujui === n) h += `<div class="info">✅ Semua folder ${esc(g.nama)} sudah disetujui. Folder seri dipindah ke ThinKerBelle · Foto Final.</div>`;
+  return h;
+}
+function bukaKelompokRv(gid, j) {
+  const g = seriRv().find(x => x.id === gid), F = g && FRV[g.folderId], d = F && F.d, k = d && d.grup[j]; if (!k) return;
+  const n = d.grup.length, S = stKelompokRv(g, k, n), x = S.x, st = ST_RV[S.st] || ST_RV.Menunggu, kunci = gid + '|' + k.id, sk = 'k|' + kunci;
+  GLS[sk] = { foto: k.foto || [], judul: k.nama, sub: g.nama + (g.jenis ? ' · ' + g.jenis : ''), induk: g.induk, folderId: k.id, gid: gid, j: j, pengunggah: x.oleh || g.oleh };
+  bukaKelompokRv.a = [gid, j];
+  buka(`<h2>${esc(g.nama)}${n > 1 ? ' · ' + esc(k.nama) : ''}</h2><div class="acts" style="margin-top:0"><span class="chip ${st[1]}">${st[0]} ${esc(S.st)}</span>${g.jenis ? `<span class="chip">${esc(g.jenis)}</span>` : ''}${x.revisi ? `<span class="chip">revisi ke-${x.revisi}</span>` : ''}</div>
+    ${gridFotoF(k.foto, i => `bukaGaleriRv('${esc(sk)}',${i})`)}
+    <div class="rvlk"><a class="sbtn" href="https:\/\/drive.google.com/drive/folders/${esc(k.id)}" target="_blank" rel="noopener">${ic('link', 14)} Buka asli di Drive</a></div>
+    <div class="card"><small style="display:block">📤 ${esc(x.oleh || g.oleh)} · ${esc(x.waktu || g.waktu)}</small>${x.reviewer && S.st !== 'Menunggu' ? `<small style="display:block">${S.st === 'Disetujui' ? '✅' : '✏️'} ${esc(x.reviewer === 'Syifa' ? 'Umi Syifa' : x.reviewer)} · ${esc(x.waktuReview)}</small>` : ''}
+      ${x.pesan ? `<div class="info">💬 Catatan pengaju: ${esc(x.pesan)}</div>` : ''}${x.catatan && S.st !== 'Menunggu' ? `<div class="info">✏️ ${esc(x.catatan)}</div>` : ''}${x.riwayat ? `<details style="margin-top:8px"><summary><small>Riwayat</small></summary><small style="white-space:pre-line;display:block;color:var(--mut)">${esc(x.riwayat)}</small></details>` : ''}</div>
+    ${S.st === 'Revisi' ? `<div class="info">✏️ Untuk revisi: ganti foto langsung di folder Drive ini, lalu ketuk Muat ulang isi folder.</div>` : ''}
+    ${!x.arsip && D.bolehSetujuV2 && S.st === 'Disetujui' ? `<div class="info">✅ Disetujui${x.reviewer ? ' oleh ' + esc(x.reviewer) : ''}.</div><button class="big alt" onclick="keputusanRv('${esc(gid)}',${j},'batal')">↩️ Batalkan persetujuan</button>` : ''}
+    ${!x.arsip && D.bolehSetujuV2 && S.st !== 'Disetujui' ? `<button class="big" onclick="keputusanRv('${esc(gid)}',${j},'setuju')">✅ Setujui folder ini</button><div class="fm"><textarea id="rvc" style="min-height:70px" placeholder="Catatan revisi (boleh kosong kalau sudah ada tanda atau komentar di foto)" oninput="drafRv('${esc(kunci)}',this.value)">${esc(RVC[kunci] || '')}</textarea></div><button class="big alt" onclick="keputusanRv('${esc(gid)}',${j},'revisi')">✏️ Minta revisi</button>` : ''}`);
+}
+// keputusan per folder (lembar & galeri) · 'setuju' yang melengkapi seri butuh konfirmasi kedua (server: perluYakin)
+function keputusanRv(gid, j, kep, yakin, ditanya) {
+  const g = seriRv().find(x => x.id === gid), d = g && FRV[g.folderId] && FRV[g.folderId].d, k = d && d.grup[j]; if (!k) return;
+  if (kep === 'batal' && !ditanya) return tanyaBatalRv(gid, j, k);   // App 5.11: Batalkan persetujuan selalu dikonfirmasi dulu
+  const c = kep === 'revisi' && $('rvc') ? $('rvc').value.trim() : '';
+  loading(true, 'Menyimpan…');
+  gsr('apiReviewPutusKelompok', [TOKEN, g.induk, k.id, kep, c, { yakin: !!yakin }], r => { loading(false);
+    if (r && r.perluYakin) return yakinRv(gid, j, r.pesan);
+    if (!r || !r.ok) return react('gagal', (r && r.pesan) || 'Gagal');
+    const kk = g.induk + '|' + k.id; if (GLT[kk] && kep !== 'setuju') GLT[kk].kunciRevisi = kep === 'revisi';
+    drafRv(gid + '|' + k.id, ''); if (GL) tutupGl(); tutup(); react('selesai', r.pesan); RVKOTOR = Date.now(); muatReview(); muat(true); },
+    e => { loading(false); react('gagal', '⚠️ ' + ((e && e.message) || 'Gagal')); });
+}
+// Konfirmasi Batalkan persetujuan (K2-3 B). Folder di Foto Final tidak dipindah balik; status kembali Menunggu.
+function tanyaBatalRv(gid, j, k) {
+  const isi = `<h2>Batalkan persetujuan?</h2><div class="info" style="margin-top:0"><b>${esc((k && k.nama) || 'Folder ini')}</b> kembali berstatus <b>Menunggu</b> dan perlu disetujui lagi. File yang sudah ada di folder Foto Final tidak dipindah balik.</div><button class="big" onclick="keputusanRv('${esc(gid)}',${j},'batal',false,true)">↩️ Ya, batalkan persetujuan</button><button class="big alt" onclick="${GL ? 'tampilPutGl(true)' : 'tutup()'}">Tidak jadi</button>`;
+  if (GL) { const p = $('glput'); if (p) { p.innerHTML = isi; return; } } buka(isi);
+}
+function yakinRv(gid, j, pesan) {
+  const isi = `<h2>Folder terakhir</h2><div class="info" style="margin-top:0">${esc(pesan)} Lanjutkan?</div><button class="big" onclick="keputusanRv('${esc(gid)}',${j},'setuju',true)">✅ Ya, setujui &amp; pindahkan</button><button class="big alt" onclick="${GL ? 'tampilPutGl(true)' : 'tutup()'}">Batal</button>`;
+  if (GL) { const p = $('glput'); if (p) p.innerHTML = isi; } else buka(isi);
+}
+// =========================== 1.6 · GALERI DI DALAM APP (Langkah 4) ===========================
+// Lapisan layar penuh di atas lembar folder. Kembali (HP/browser) menutup galeri saja. Foto tidak membuka Drive; "Buka asli di Drive" = tautan sekunder.
+// Tanda: X/Y persen gambar asli; ID dibuat HP (kirim ulang aman); gagal kirim → antrean tkbTandaAntre1, dikirim lagi saat online / galeri dibuka.
+let GL = null; const GLS = {}, GLT = {};   // GLS: sumber galeri per lembar · GLT: tanda per folder (indukId|folderId)
+const urlFotoRv = (id, w) => 'https:\/\/lh3.googleusercontent.com/d/' + encodeURIComponent(id) + '=w' + w;
+const fileDriveRv = id => 'https:\/\/drive.google.com/file/d/' + encodeURIComponent(id) + '/view';
+function bukaGaleriRv(key, pos) {
+  const S = GLS[key]; if (!S || !(S.foto || []).length) return;
+  GL = { S: S, key: key, pos: Math.max(0, Math.min(pos, S.foto.length - 1)), s: 1, x: 0, y: 0, alat: 'lihat', aktifN: null, draw: null, muatId: 0 };
+  let el = $('rvgl'); if (!el) { el = document.createElement('div'); el.id = 'rvgl'; el.className = 'rvgl'; document.body.appendChild(el); }
+  el.innerHTML = `<div class="rvglk"><button class="rvglx" onclick="tutupGl()" aria-label="Kembali ke folder">${ic('x', 22)}</button><div class="rvglj"><small id="glsub"></small><b id="gljud"></b></div><span class="chip" id="glhit"></span></div>
+    <div class="rvglbody"><div class="rvglkiri"><div class="rvgls" id="gls"><img class="rvglph" id="glph" alt="" referrerpolicy="no-referrer"><div class="rvglw" id="glw"><img id="gli" alt="" referrerpolicy="no-referrer" draggable="false"><svg id="glsvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg><div id="glpin"></div></div>
+      <div class="rvglmuat" id="glmuat"><span class="rvspin"></span><small>Memuat foto…</small></div><div class="rvglgagal" id="glgagal" style="display:none"></div>
+      <button class="rvpvn kiri" id="glki" onclick="geserGl(-1)" aria-label="Foto sebelumnya">‹</button><button class="rvpvn kanan" id="glka" onclick="geserGl(1)" aria-label="Foto berikutnya">›</button><span class="rvglz" id="glz"></span></div>
+      <div class="rvglstrip" id="glstrip"></div></div>
+    <div class="rvglkanan"><div class="rvglalat" id="glalat"></div><div class="rvglhint" id="glhint"></div><div class="rvglkom" id="glkom"></div><div class="rvglput" id="glput"></div><div class="rvgllk" id="gllk"></div></div></div>`;
+  el.classList.add('show'); document.body.classList.add('rvglon');
+  gerakGl($('gls')); document.addEventListener('keydown', tombolGl); window.addEventListener('resize', ukurGl);
+  try { history.pushState({ rvgl: 1 }, ''); GL.riwayat = true; } catch (e) {}
+  tampilGl(); kirimAntreTanda();
+  if (S.induk) muatTandaGl();
+}
+function tutupGl(dariKembali) { if (!GL) return; const riw = GL.riwayat; GL = null;
+  const el = $('rvgl'); if (el) { el.classList.remove('show'); el.innerHTML = ''; } document.body.classList.remove('rvglon');
+  document.removeEventListener('keydown', tombolGl); window.removeEventListener('resize', ukurGl);
+  if (!dariKembali && riw) { try { history.back(); } catch (e) {} } }
+window.addEventListener('popstate', () => { if (GL) tutupGl(true); });
+const fotoGl = () => GL.S.foto[GL.pos];
+const kunciGl = () => GL.S.induk + '|' + GL.S.folderId;
+const tandaGl = () => (GLT[kunciGl()] || { tanda: [] }).tanda;
+const hakGl = () => { const T = GLT[kunciGl()]; if (T && T.hak) return T.hak; const sendiri = GL.S.pengunggah === D.nama; return { tanda: !!D.bolehSetujuV2, komentar: !!D.bolehSetujuV2 || sendiri, sampul: !!D.bolehSetujuV2 || sendiri }; };
+function muatTandaGl() { const k = kunciGl(); if (GL) { GL.galatTanda = ''; }
+  const galat = p => { if (GL && kunciGl() === k) { GL.galatTanda = p; alatGl(); } };   // tampil di petunjuk galeri (+ Coba lagi), tanpa pop-up
+  gsr('apiReviewTanda', [TOKEN, GL.S.induk, GL.S.folderId], r => { if (!r || !r.ok) return galat((r && r.pesan) || 'Tanda belum termuat.'); if (GL && kunciGl() === k) GL.galatTanda = ''; const lokal = ((GLT[k] || {}).tanda || []).filter(t => t.status);   // yang belum terkirim tetap tampil
+    GLT[k] = { tanda: r.tanda.concat(lokal.filter(t => !r.tanda.some(x => x.id === t.id))), hak: r.hak, revisi: r.revisi, lama: r.lama, bisaUrung: r.bisaUrung, kunciRevisi: !!r.kunciRevisi };
+    if (GL && kunciGl() === k) { gambarTandaGl(); stripGl(); panelGl(); } }, () => galat('Sinyal putus: tanda belum termuat.')); }
+// ---------- foto ----------
+function tampilGl() { if (!GL) return; const f = fotoGl(), n = GL.S.foto.length, id = ++GL.muatId;
+  GL.s = 1; GL.x = 0; GL.y = 0; GL.besar = false; GL.aktifN = null; GL.draw = null;
+  $('gljud').textContent = GL.S.judul || 'Foto'; $('glsub').textContent = GL.S.sub || ''; $('glhit').textContent = 'Foto ' + (GL.pos + 1) + ' dari ' + n;
+  $('glki').style.display = $('glka').style.display = n > 1 ? '' : 'none';
+  const im = $('gli'), ph = $('glph'); $('glgagal').style.display = 'none'; $('glmuat').style.display = ''; im.style.visibility = 'hidden';
+  ph.src = urlFotoRv(f.id, 400);   // latar buram dari ukuran kecil (biasanya sudah ada di cache browser)
+  let ke = 0; im.onload = () => { if (!GL || GL.muatId !== id) return; $('glmuat').style.display = 'none'; im.style.visibility = ''; ukurGl(); pramuatGl(); };
+  im.onerror = () => { if (!GL || GL.muatId !== id) return; if (++ke < 2) { im.src = thumb(f.id, 1600); return; }
+    $('glmuat').style.display = 'none'; const g = $('glgagal'); g.style.display = ''; g.innerHTML = `${ic('alert', 34)}<div>Foto tidak bisa dimuat di app.</div><a href="${fileDriveRv(f.id)}" target="_blank" rel="noopener">Buka asli di Drive</a>`; };
+  im.src = urlFotoRv(f.id, 1600);
+  ubahGl(); stripGl(); alatGl(); panelGl(); gambarTandaGl();
+}
+// kotak gambar = ukuran foto yang tampil (object-fit: contain), supaya tanda dalam persen tepat di gambar
+function ukurGl() { if (!GL) return; const st = $('gls'), w = $('glw'), im = $('gli'); if (!st || !w) return; const W = st.clientWidth, H = st.clientHeight, r = (im.naturalWidth && im.naturalHeight) ? im.naturalWidth / im.naturalHeight : W / H;
+  const ww = W / H > r ? H * r : W, hh = W / H > r ? H : W / r; Object.assign(w.style, { width: ww + 'px', height: hh + 'px', left: (W - ww) / 2 + 'px', top: (H - hh) / 2 + 'px' }); }
+function pramuatGl() { if (!GL) return; const n = GL.S.foto.length; if (n < 2) return; [GL.pos + 1, GL.pos - 1].forEach(i => { const f = GL.S.foto[(i + n) % n]; if (f) { const b = new Image(); b.referrerPolicy = 'no-referrer'; b.src = urlFotoRv(f.id, 1600); } }); }
+function ubahGl() { const w = $('glw'); if (!w || !GL) return; w.style.transform = 'translate(' + GL.x + 'px,' + GL.y + 'px) scale(' + GL.s + ')'; $('glz').textContent = GL.s > 1.05 ? 'Zoom ' + GL.s.toFixed(1) + '×' : '';
+  document.querySelectorAll('#glpin .rvglpin').forEach(p => { p.style.transform = 'scale(' + (1 / GL.s) + ')'; });
+  if (GL.s > 1.6 && !GL.besar) { GL.besar = true; const f = fotoGl(), b = new Image(); b.referrerPolicy = 'no-referrer'; b.onload = () => { if (GL && fotoGl() === f) $('gli').src = b.src; }; b.src = urlFotoRv(f.id, 2400); } }
+function zoomGl(s, cx, cy) { if (!GL) return; const box = $('gls').getBoundingClientRect(), s2 = Math.max(1, Math.min(5, s));
+  if (cx != null) { const ox = cx - box.left - box.width / 2, oy = cy - box.top - box.height / 2; GL.x = ox - (ox - GL.x) * s2 / GL.s; GL.y = oy - (oy - GL.y) * s2 / GL.s; }
+  GL.s = s2; if (s2 === 1) { GL.x = 0; GL.y = 0; } batasGl(); ubahGl(); }
+function batasGl() { const box = $('gls').getBoundingClientRect(), mx = box.width * (GL.s - 1) / 2, my = box.height * (GL.s - 1) / 2; GL.x = Math.max(-mx, Math.min(mx, GL.x)); GL.y = Math.max(-my, Math.min(my, GL.y)); }
+function geserGl(d) { if (!GL || GL.S.foto.length < 2) return; GL.pos = (GL.pos + d + GL.S.foto.length) % GL.S.foto.length; tampilGl(); }
+function keFotoGl(i) { if (!GL) return; GL.pos = i; tampilGl(); }
+function tombolGl(e) { if (!GL || /^(INPUT|TEXTAREA)$/.test((e.target || {}).tagName || '')) return;
+  if (e.key === 'Escape') { e.preventDefault(); tutupGl(); } else if (e.key === 'ArrowLeft') geserGl(-1); else if (e.key === 'ArrowRight') geserGl(1);
+  else if (e.key === '+' || e.key === '=') zoomGl(GL.s * 1.4); else if (e.key === '-') zoomGl(GL.s / 1.4); }
+// posisi pointer → persen gambar (memperhitungkan zoom & geser, karena kotak gambar ikut ditransformasi)
+function persenGl(e) { const r = $('glw').getBoundingClientRect(); return [Math.round(Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100)) * 10) / 10, Math.round(Math.max(0, Math.min(100, (e.clientY - r.top) / r.height * 100)) * 10) / 10]; }
+function gerakGl(el) { const P = new Map(); let awal = null, ketuk = 0;
+  el.onwheel = e => { if (!GL || GL.alat === 'pin' || GL.alat === 'coret') return; e.preventDefault(); zoomGl(GL.s * Math.exp(-e.deltaY * 0.0015), e.clientX, e.clientY); };
+  el.onpointerdown = e => { if (!GL || e.target.closest('button,a')) return; try { el.setPointerCapture(e.pointerId); } catch (x) {}
+    if (GL.alat === 'coret' && hakGl().tanda) { GL.draw = [persenGl(e)]; gambarTandaGl(); return; }
+    P.set(e.pointerId, { x: e.clientX, y: e.clientY }); const t = [...P.values()];
+    awal = { s: GL.s, x: GL.x, y: GL.y, px: e.clientX, py: e.clientY, jarak: t.length === 2 ? Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y) : 0, gerak: false, dua: t.length === 2 || (awal && awal.dua) }; };
+  el.onpointermove = e => { if (!GL) return;
+    if (GL.draw) { const p = persenGl(e), l = GL.draw[GL.draw.length - 1]; if (Math.abs(p[0] - l[0]) + Math.abs(p[1] - l[1]) > 0.6) { GL.draw.push(p); gambarTandaGl(); } return; }
+    if (!P.has(e.pointerId) || !awal) return; P.set(e.pointerId, { x: e.clientX, y: e.clientY }); const t = [...P.values()];
+    if (t.length === 2 && awal.jarak) { awal.gerak = true; zoomGl(awal.s * Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y) / awal.jarak, (t[0].x + t[1].x) / 2, (t[0].y + t[1].y) / 2); return; }
+    const dx = e.clientX - awal.px, dy = e.clientY - awal.py; if (Math.abs(dx) + Math.abs(dy) > 6) awal.gerak = true;
+    if (GL.s > 1 && GL.alat !== 'pin') { GL.x = awal.x + dx; GL.y = awal.y + dy; batasGl(); ubahGl(); } };
+  el.onpointerup = el.onpointercancel = e => { if (!GL) return;
+    if (GL.draw) { const pts = GL.draw; GL.draw = null; if (e.type === 'pointerup' && pts.length) simpanTandaGl({ jenis: 'coret', x: pts[0][0], y: pts[0][1], garis: sederhanaGl(pts).map(p => p[0] + ',' + p[1]).join(' ') }); else gambarTandaGl(); return; }
+    if (!P.has(e.pointerId)) return; P.delete(e.pointerId); if (!awal || P.size) return; const dx = e.clientX - awal.px;
+    if (GL.alat === 'pin' && !awal.gerak && !awal.dua && hakGl().tanda) { const p = persenGl(e); simpanTandaGl({ jenis: 'pin', x: p[0], y: p[1] }); }
+    else if (GL.alat === 'zoom' && !awal.gerak && !awal.dua) zoomGl(GL.s >= 3 ? 1 : GL.s + 1, e.clientX, e.clientY);
+    else if (!awal.dua && GL.s === 1 && Math.abs(dx) > 60 && GL.alat !== 'pin') geserGl(dx < 0 ? 1 : -1);
+    else if (!awal.gerak && !awal.dua && GL.alat === 'lihat') { const kini = Date.now(); if (kini - ketuk < 320) { ketuk = 0; zoomGl(GL.s > 1 ? 1 : 2.5, e.clientX, e.clientY); } else ketuk = kini; }
+    awal = null; };
+}
+// Ramer–Douglas–Peucker (toleransi 0,5 %), lalu maks 80 titik
+function sederhanaGl(pts) {
+  const rdp = (a, eps) => { if (a.length < 3) return a; const [x1, y1] = a[0], [x2, y2] = a[a.length - 1], L = Math.hypot(x2 - x1, y2 - y1) || 1; let m = 0, i0 = 0;
+    for (let i = 1; i < a.length - 1; i++) { const d = Math.abs((y2 - y1) * a[i][0] - (x2 - x1) * a[i][1] + x2 * y1 - y2 * x1) / L; if (d > m) { m = d; i0 = i; } }
+    return m > eps ? rdp(a.slice(0, i0 + 1), eps).slice(0, -1).concat(rdp(a.slice(i0), eps)) : [a[0], a[a.length - 1]]; };
+  let h = rdp(pts, 0.5); if (h.length > 80) { const k = Math.ceil(h.length / 80); h = h.filter((_, i) => i % k === 0 || i === h.length - 1); } return h;
+}
+// ---------- tanda: gambar, simpan, urungkan ----------
+function gambarTandaGl() { if (!GL) return; const f = fotoGl(), T = tandaGl().filter(t => t.foto === f.id && t.jenis !== 'komentar'), dl = g => 'M ' + g.trim().split(/\s+/).map(p => p.replace(',', ' ')).join(' L ');
+  const garis = T.filter(t => t.jenis === 'coret' && t.garis).map(t => dl(t.garis)).concat(GL.draw && GL.draw.length ? [dl(GL.draw.map(p => p[0] + ',' + p[1]).join(' '))] : []).join(' ');
+  $('glsvg').innerHTML = garis ? `<path d="${garis}" fill="none" stroke="#4A1230" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><path d="${garis}" fill="none" stroke="#FFC400" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>` : '';
+  $('glpin').innerHTML = T.map(t => `<span class="rvglpin ${t.status || ''}" style="left:${t.x}%;top:${t.y}%;transform:scale(${1 / GL.s})">${t.n || '•'}</span>`).join('');
+}
+function idTandaRv() { return 'T' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function simpanTandaGl(d) { if (!GL) return; const k = kunciGl(), f = fotoGl(); GLT[k] = GLT[k] || { tanda: [] };
+  const sendiri = GLT[k].tanda.filter(t => t.foto === f.id && t.jenis !== 'komentar'), t = Object.assign({ id: idTandaRv(), foto: f.id, oleh: D.nama, waktu: 'baru saja', status: 'kirim', n: d.jenis === 'komentar' ? (d.n || 0) : sendiri.reduce((a, x) => Math.max(a, x.n || 0), 0) + 1 }, d);
+  GLT[k].tanda.push(t); if (d.jenis !== 'komentar') GL.aktifN = t.n; gambarTandaGl(); stripGl(); panelGl();
+  const kirim = { id: t.id, indukId: GL.S.induk, folderId: GL.S.folderId, fotoId: f.id, jenis: t.jenis, x: t.x, y: t.y, garis: t.garis || '', teks: t.teks || '', n: t.n };
+  kirimTandaRv(kirim, t);
+}
+function kirimTandaRv(kirim, t) {
+  gsr('apiReviewTandaSimpan', [TOKEN, kirim], r => { if (r && r.ok) { hapusAntreTanda(kirim.id); if (t && t.batal) return hapusDiamRv(kirim.id, 1); if (t) Object.assign(t, r.tanda, { status: '' }); }
+      else { if (t) { t.status = 'gagal'; t.pesan = (r && r.pesan) || 'Gagal'; } react('gagal', (r && r.pesan) || 'Tanda belum tersimpan'); hapusAntreTanda(kirim.id); }
+      if (GL) { gambarTandaGl(); stripGl(); panelGl(); } },
+    e => { if (t && t.batal) return; if (t) t.status = 'gagal'; simpanAntreTanda(kirim); if (GL) { gambarTandaGl(); panelGl(); } react('bingung', 'Sinyal putus: tanda disimpan di HP dan dikirim lagi otomatis.'); });
+}
+const ANTRE_T = 'tkbTandaAntre1';
+function simpanAntreTanda(k) { const a = (bacaLokal(ANTRE_T) || []).filter(x => x.id !== k.id); a.push(k); simpanLokal(ANTRE_T, a.slice(-100)); }
+function hapusAntreTanda(id) { const a = bacaLokal(ANTRE_T) || []; if (a.some(x => x.id === id)) simpanLokal(ANTRE_T, a.filter(x => x.id !== id)); }
+function kirimAntreTanda() { if (LIHAT || !navigator.onLine) return; (bacaLokal(ANTRE_T) || []).forEach(k => { const T = (GLT[k.indukId + '|' + k.folderId] || { tanda: [] }).tanda.find(t => t.id === k.id); kirimTandaRv(k, T); }); }
+window.addEventListener('online', kirimAntreTanda);
+// Urungkan = pin/coret TERAKHIR milikmu di foto ini (komentar tidak ikut). Hilang dari layar langsung; server gagal → dikembalikan + pesan.
+const tandakuGl = () => tandaGl().filter(t => t.foto === fotoGl().id && t.oleh === D.nama && t.jenis !== 'komentar');
+const PESAN_V2_URUNG = 'Urungkan belum bisa menyimpan: minta admin menjalankan Siapkan Review V2';
+const PESAN_REVISI_URUNG = 'Sudah terkirim ke pengunggah bersama Minta revisi, tambahkan komentar koreksi';
+function alasanUrungGl(t) { if (!t || t.status) return ''; const T = GLT[kunciGl()] || {};
+  return T.kunciRevisi ? PESAN_REVISI_URUNG : T.bisaUrung === false ? PESAN_V2_URUNG : ''; }
+function hapusDiamRv(id, ulang) { gsr('apiReviewTandaHapus', [TOKEN, id], r => { if (!(r && r.ok) && ulang) hapusDiamRv(id, 0); }, () => { if (ulang) setTimeout(() => hapusDiamRv(id, 0), 3000); }); }
+function pesanUrungRv(p) { return /Dihapus pada|REVIEW TANDA|Siapkan Review V2/i.test(p || '') ? PESAN_V2_URUNG : /Minta revisi/i.test(p || '') ? PESAN_REVISI_URUNG + '. Tanda dikembalikan.' : 'Urungkan gagal: ' + (p || 'coba lagi') + '. Tanda dikembalikan.'; }
+function urungkanGl() { if (!GL) return; const k = kunciGl(), mine = tandakuGl(), t = mine[mine.length - 1];
+  if (!t) return react('bingung', tandaGl().some(x => x.foto === fotoGl().id && x.jenis !== 'komentar') ? 'Hanya tanda milikmu yang bisa diurungkan' : 'Belum ada pin atau coret milikmu di foto ini');
+  const al = alasanUrungGl(t); if (al) return react('bingung', al);   // kolom belum siap / revisi terkirim: tidak ada yang dihapus di layar
+  const L = GLT[k].tanda, i = L.indexOf(t), gambar = () => { if (GL && kunciGl() === k) { gambarTandaGl(); stripGl(); panelGl(); } };
+  L.splice(i, 1); GL.aktifN = null; gambar(); react('baca', 'Tanda ' + (t.n || '') + ' diurungkan');
+  if (t.status === 'kirim') { t.batal = true; hapusAntreTanda(t.id); return; }   // masih dikirim: dihapus di server begitu tersimpan (kirimTandaRv)
+  if (t.status) { hapusAntreTanda(t.id); return; }                                   // gagal / antrean HP: belum ada di server
+  const balik = p => { const A = (GLT[k] || { tanda: [] }).tanda; if (!A.includes(t)) A.splice(Math.min(i, A.length), 0, t); gambar(); react('gagal', p); };
+  gsr('apiReviewTandaHapus', [TOKEN, t.id], r => { if (r && r.ok) return; const T0 = GLT[k] || {}, p = (r && r.pesan) || '';
+      if (r && r.kunciRevisi) T0.kunciRevisi = true; else if (/Dihapus pada|REVIEW TANDA|Siapkan Review V2/i.test(p)) T0.bisaUrung = false;   // ketukan berikutnya tidak menghapus sementara
+      balik(pesanUrungRv(p)); }, () => balik('Sinyal putus: tanda dikembalikan, coba lagi saat online.'));
+}
+function kirimKomentarGl() { const i = $('glin'), teks = i ? i.value.trim() : ''; if (!teks) return; i.value = ''; simpanTandaGl({ jenis: 'komentar', teks: teks, n: GL.aktifN || 0 }); GL.aktifN = null; panelGl(); }
+// ---------- panel: alat, komentar, keputusan, sampul ----------
+function alatGl() { if (!GL) return; const h = hakGl(), b = (a, label, ik, boleh) => `<button class="${GL.alat === a ? 'on' : ''}" ${boleh === false ? 'disabled' : ''} onclick="alatPilihGl('${a}')" aria-pressed="${GL.alat === a}">${ic(ik, 20)}${label}</button>`;
+  const tk = tandakuGl(), al = alasanUrungGl(tk[tk.length - 1]), mine = tk.length > 0 && !al, lain = !mine && tandaGl().some(t => t.foto === fotoGl().id && t.jenis !== 'komentar');
+  isiAlatGl(b('lihat', 'Geser', 'arr') + b('zoom', 'Zoom', 'search') + (GL.S.induk ? b('pin', 'Pin', 'pin', h.tanda) + b('coret', 'Coret', 'pen', h.tanda) + `<button ${mine ? '' : 'disabled'} onclick="urungkanGl()">${ic('muatUlang', 20)}Urungkan</button>` : ''));
+  $('glhint').textContent = { lihat: 'Geser foto ke kiri/kanan atau pakai panah untuk pindah. Ketuk dua kali / cubit / scroll untuk zoom.', zoom: 'Ketuk bagian foto untuk memperbesar (1×, 2×, 3×).', pin: 'Ketuk foto untuk menaruh pin bernomor.', coret: 'Seret jari atau mouse di foto untuk mencoret bagian yang perlu direvisi.' }[GL.alat] +
+    (GL.S.induk && !h.tanda ? ' Pin & coret untuk Owner, GM, dan Leader.' : '') + (GL.S.induk && h.tanda && lain ? ' Hanya tanda milikmu yang bisa diurungkan.' : '') + (GL.S.induk && tk.length && al ? ' ' + al + '.' : '');
+  if (GL.galatTanda) $('glhint').innerHTML = esc($('glhint').textContent) + `<br><span style="color:var(--acct)">${esc(GL.galatTanda)}</span> <button class="lnk" onclick="muatTandaGl()" style="border:0;background:none;color:var(--acct);font-weight:700;text-decoration:underline;padding:0">Coba lagi</button>`;
+}
+// Baris alat digambar ulang setiap panel diperbarui (mis. jawaban server tiba). Mengganti innerHTML di tengah ketukan membuat Safari iPhone
+// membuang klik, jadi tombol yang sudah ada diperbarui di tempat (kelas, disabled, isi); innerHTML hanya dipakai bila susunannya berubah.
+function isiAlatGl(html) { const el = $('glalat'); if (!el) return; if (el._html === html) return; el._html = html;
+  const tp = document.createElement('template'); tp.innerHTML = html; const baru = [...tp.content.children], lama = [...el.children];
+  if (baru.length !== lama.length || baru.some((x, i) => x.getAttribute('onclick') !== lama[i].getAttribute('onclick'))) { el.innerHTML = html; return; }
+  baru.forEach((x, i) => { const y = lama[i]; y.className = x.className; y.disabled = x.disabled; ['aria-pressed', 'aria-label'].forEach(a => { const v = x.getAttribute(a); if (v === null) y.removeAttribute(a); else y.setAttribute(a, v); }); if (y.innerHTML !== x.innerHTML) y.innerHTML = x.innerHTML; });
+}
+function alatPilihGl(a) { if (!GL) return; GL.alat = a; if (a === 'pin' || a === 'coret') { GL.s = 1; GL.x = 0; GL.y = 0; ubahGl(); } alatGl(); }
+function stripGl() { if (!GL) return; const per = {}; tandaGl().forEach(t => { per[t.foto] = (per[t.foto] || 0) + 1; });
+  $('glstrip').innerHTML = GL.S.foto.map((f, i) => `<button class="${i === GL.pos ? 'on' : ''}" onclick="keFotoGl(${i})" aria-label="Foto ${i + 1}${per[f.id] ? ', ' + per[f.id] + ' tanda/komentar' : ''}"><img loading="lazy" alt="" referrerpolicy="no-referrer" src="${urlFotoRv(f.id, 200)}">${per[f.id] ? '<i></i>' : ''}</button>`).join('');
+  const on = $('glstrip').querySelector('.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+function panelGl() { if (!GL) return; const f = fotoGl(), h = hakGl(), T = tandaGl().filter(t => t.foto === f.id), kom = T.filter(t => t.jenis === 'komentar'), tnd = T.filter(t => t.jenis !== 'komentar');
+  $('glkom').style.display = GL.S.induk ? '' : 'none';
+  if (GL.S.induk) $('glkom').innerHTML = `<h4>Komentar · foto ${GL.pos + 1}${kom.length ? ' (' + kom.length + ')' : ''}</h4>${tnd.length ? `<small style="color:var(--mut)">${tnd.length} tanda di foto ini</small>` : ''}
+    ${kom.length ? kom.map(c => `<div class="rvglc"><div><b style="color:var(--ink)">${esc(c.oleh)}</b><span>${esc(c.waktu || '')}${c.status === 'kirim' ? ' · mengirim…' : c.status === 'gagal' ? ' · belum terkirim' : ''}</span></div><p>${c.n ? 'Tanda ' + c.n + (tnd.some(x => x.n === c.n) ? '' : ' (diurungkan)') + ': ' : ''}${esc(c.teks)}</p></div>`).join('') : `<div class="rvglc"><p style="color:var(--mut)">Belum ada komentar di foto ini.${h.tanda ? ' Taruh pin atau coretan, lalu tulis catatannya di sini.' : ''}</p></div>`}
+    ${h.komentar ? `${GL.aktifN ? `<div style="margin-top:8px"><span class="chip">Catatan untuk tanda ${GL.aktifN}</span></div>` : ''}<div class="rvgltulis"><input id="glin" placeholder="Tulis komentar…" aria-label="Tulis komentar" onkeydown="if(event.key==='Enter'){event.preventDefault();kirimKomentarGl()}"><button onclick="kirimKomentarGl()" aria-label="Kirim komentar">${ic('arr', 20)}</button></div>` : ''}`;
+  tampilPutGl(); alatGl();
+  const s0 = seriRv().find(x => x.id === GL.S.gid) || {}, bisaSampul = GL.S.induk && h.sampul, jadi = s0.sampul === f.id;
+  $('gllk').innerHTML = `<a href="${fileDriveRv(f.id)}" target="_blank" rel="noopener">Buka asli di Drive</a>${bisaSampul ? (jadi ? '<span>⭐ Sampul seri</span>' : `<button onclick="sampulGl('${esc(f.id)}')">⭐ Jadikan sampul</button>`) : ''}`;
+}
+function tampilPutGl() { if (!GL) return; const p = $('glput'); if (!p) return; if (!GL.S.induk || !D.bolehSetujuV2) { p.innerHTML = ''; return; }
+  const g = seriRv().find(x => x.id === GL.S.gid), d = g && FRV[g.folderId] && FRV[g.folderId].d, k = d && d.grup[GL.S.j]; if (!k) { p.innerHTML = ''; return; }
+  const S = stKelompokRv(g, k, d.grup.length), nT = tandaGl().length;
+  if (S.st === 'Disetujui') { p.innerHTML = `<div class="mssaran" style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span>✅ Folder ini sudah disetujui${S.x.reviewer ? ' oleh ' + esc(S.x.reviewer) : ''}</span><button class="sbtn" onclick="keputusanRv('${esc(GL.S.gid)}',${GL.S.j},'batal')">Batalkan</button></div>`; return; }
+  p.innerHTML = `<div class="dua"><button class="big alt" style="opacity:${nT ? 1 : .55}" onclick="${nT ? `keputusanRv('${esc(GL.S.gid)}',${GL.S.j},'revisi')` : `react('bingung','Tandai dulu bagian yang perlu direvisi dengan pin/coret, atau tulis komentar.')`}">✏️ Minta revisi${nT ? ' (' + nT + ')' : ''}</button><button class="big" onclick="keputusanRv('${esc(GL.S.gid)}',${GL.S.j},'setuju')">✅ Setujui folder ini</button></div>`;
+}
+function sampulGl(fileId) { if (!GL) return; const gid = GL.S.gid, induk = GL.S.induk;
+  gsr('apiReviewSampulPilih', [TOKEN, induk, fileId], r => { if (!r || !r.ok) return react('gagal', (r && r.pesan) || 'Gagal'); react('selesai', r.pesan);
+    [RV, RVAR].forEach(R => (R && R.seri || []).forEach(g => { if (g.id === gid) g.sampul = r.sampul; })); simpanRv_(); panelGl(); }, e => react('gagal', '⚠️ ' + ((e && e.message) || 'Gagal'))); }
+function vReview() {
+  if (!RV) { const c = bacaRv_(); if (c) { RV = c.d; RV._dariCache = c.t; muatReview(); } }   // 1.6 (P4): cache dulu, supaya tampilan V2 langsung dipakai
+  if (rvV2()) return vReviewSeri();
+  let h = kembali + judul('📤 Preview &amp; approval', 'Hasil edit untuk dicek penyetuju', `<button class="round" onclick="bukaForm('review')" aria-label="Ajukan hasil edit">${ic('plus', 24)}</button>`);
+  if (!RV) { const c = bacaRv_(); muatReview(); if (c) { RV = c.d; RV._dariCache = c.t; } else return h + kerangkaRv(); }
+  const L = RV.list || [], n = s => L.filter(x => x.status === s).length, adaArsip = !!RV.arsipAktif;   // L = daftar bawaan, tanpa yang terarsip
+  if (!RVF || (RVF === 'Arsip' && !adaArsip)) RVF = (D.review && D.review.revisiku) ? 'Revisi' : 'Menunggu';
+  h += `<div class="chips wrap">${['Menunggu', 'Revisi', 'Disetujui', 'Semua'].concat(adaArsip ? ['Arsip'] : []).map(s => `<button class="${RVF === s ? 'on' : ''}" onclick="RVF='${s}';render()">${s === 'Arsip' ? '📦 ' : ''}${s} ${s === 'Semua' ? L.length : s === 'Arsip' ? (RVAR ? RVAR.list.length : RV.jmlArsip || 0) : n(s)}</button>`).join('')}</div>`;
+  if (RVF === 'Arsip') { if (!RVAR) { muatArsipRv(); return h + kosong('s11', 'Memuat arsip…'); } }
+  const a = rvList().map((x, i) => Object.assign({ i }, x)).filter(x => RVF === 'Semua' || RVF === 'Arsip' || x.status === RVF); RVA = a.map(x => x.i);
+  if (RVF === 'Arsip') h += `<p style="color:var(--mut);font-size:13px;margin:4px 0 0">Arsip hanya menyembunyikan dari daftar. Data, Riwayat, dan file Drive tetap utuh. Disetujui lebih dari ${RVAR.arsipHari || 7} hari masuk ke sini otomatis.</p>`;
+  if (!a.length) return h + kosong('s13', RVF === 'Arsip' ? 'Arsip masih kosong.' : RVF === 'Revisi' ? 'Tidak ada revisi 🎉' : RVF === 'Menunggu' ? 'Tidak ada foto yang menunggu.' : 'Belum ada foto.');
+  setTimeout(pasangGbrRv, 0);
+  return h + `<div class="prg">${a.map(x => { const st = ST_RV[x.status] || ST_RV.Menunggu, J = JL_RV[jlRv(x)];
+    return `<div class="prk" role="button" tabindex="0" onclick="bukaReview(${x.i})" onkeydown="if(event.key==='Enter')bukaReview(${x.i})"><div class="pim">${satuGbr(x) ? `<img data-rv="${esc(x.fotoId)}" data-i="${x.i}" alt="" referrerpolicy="no-referrer">` : ikonRv(x)}</div><div class="pt"><b>${esc(x.produk || 'Foto')}${x.warna ? ' · ' + esc(x.warna) : ''}</b>
+      <small><span class="chip ${st[1]}">${st[0]} ${esc(x.status)}</span> <span class="chip">${J[1]}</span>${x.revisi ? ` <span class="chip">rev ${x.revisi}</span>` : ''}</small><small>${esc([x.jenis, x.oleh].filter(Boolean).join(' · '))}</small>${x.status === 'Revisi' && x.catatan && !x.arsip ? `<small class="uc" style="color:var(--ink)">"${esc(x.catatan.slice(0, 80))}"</small>` : ''}${x.arsip ? `<small>📦 ${x.arsip.otomatis ? 'otomatis' : esc([x.arsip.oleh, x.arsip.pada].filter(Boolean).join(' · '))}</small>` : ''}
+      ${x.bolehArsip && (!x.arsip || x.arsip.manual) ? `<div class="rvak"><button class="sbtn" onclick="event.stopPropagation();${x.arsip ? 'pulihkanRv' : 'arsipRv'}(${x.i})">${x.arsip ? 'Pulihkan' : 'Arsipkan'}</button></div>` : ''}</div></div>`; }).join('')}</div>`;
+}
+// ---------- arsip (A1) ----------
+function muatArsipRv() { if (muatArsipRv.jalan) return; muatArsipRv.jalan = true;
+  gsr('apiReviewFoto', [TOKEN, { arsip: true }], d => { muatArsipRv.jalan = false; RVAR = d || { list: [] }; if (TAB === 'review' && RVF === 'Arsip' && !$('sheet').classList.contains('show')) render(); },
+    e => { muatArsipRv.jalan = false; RVAR = { list: [] }; react('gagal', '⚠️ ' + e.message); }); }
+function segarArsipRv() { RVAR = null; muatReview(); if (RVF === 'Arsip') muatArsipRv(); muat(true); }
+function arsipRv(i, yakin) { const x = rvList()[i]; if (!x) return;
+  if (!yakin && x.status !== 'Disetujui') return buka(`<h2>📦 Arsipkan foto ini?</h2><div class="info" style="margin-top:0"><b>${esc(x.produk || 'Foto')}</b> masih berstatus <b>${esc(x.status)}</b>. Setelah diarsipkan, foto ini tidak muncul lagi di daftar penyetuju sampai dipulihkan.<br><br>Tidak ada yang dihapus: data, Riwayat, dan file Drive tetap utuh.</div>
+    <button class="big" onclick="arsipRv(${i},true)">Ya, arsipkan</button><button class="big alt" onclick="tutup()">Batal</button>`);
+  tutup(); loading(true, 'Mengarsipkan…'); gsr('apiReviewArsip', [TOKEN, x.id], r => { loading(false); if (!r || !r.ok) return react('gagal', (r && r.pesan) || 'Gagal'); react('selesai', r.pesan); segarArsipRv(); }); }
+function pulihkanRv(i) { const x = rvList()[i]; if (!x) return;
+  tutup(); loading(true, 'Memulihkan…'); gsr('apiReviewPulihkan', [TOKEN, x.id], r => { loading(false); if (!r || !r.ok) return react('gagal', (r && r.pesan) || 'Gagal'); react('selesai', r.pesan); segarArsipRv(); }); }
+function drafRv(id, v) { if (v && v.trim()) RVC[id] = v; else delete RVC[id]; try { localStorage.setItem('ss_rvc1', JSON.stringify(RVC)); } catch (e) {} }
+// pop-up pembaruan ditunda kalau ada catatan review yang sedang diketik (lembar detail atau penampil terbuka)
+function rvAdaDraf() { const t = $('rvc'); return !!((t && t.value.trim() && $('sheet').classList.contains('show')) || (PV && Object.keys(RVC).length)); }
+function bukaReview(i) {
+  const x = rvList()[i]; if (!x) return; const st = ST_RV[x.status] || ST_RV.Menunggu, J = JL_RV[jlRv(x)], bolehUp = !x.seri && !x.arsip && x.status === 'Revisi' && (x.oleh === D.nama || D.nama === 'Firda' || D.pimpinan);
+  bukaReview.i = i;
+  buka(`<h2>${esc(x.produk || 'Foto')}${x.warna ? ' · ' + esc(x.warna) : ''}</h2><div class="acts" style="margin-top:0"><span class="chip ${st[1]}">${st[0]} ${esc(x.status)}</span><span class="chip">${J[1]}</span>${x.jenis ? `<span class="chip">${esc(x.jenis)}</span>` : ''}${x.revisi ? `<span class="chip">revisi ke-${x.revisi}</span>` : ''}</div>
+    ${x.seri ? gridFotoRv(x) : satuGbr(x) ? `<button class="rvdet" id="rvdb" onclick="bukaPenampil(${i})" aria-label="Lihat foto layar penuh"><img id="rvdi" alt="Foto ${esc(x.produk)}" referrerpolicy="no-referrer"></button>` : `<div class="rvdet" style="cursor:default">${ikonRv(x)}</div>`}
+    <div class="rvlk">${satuGbr(x) ? `<button class="sbtn" onclick="bukaPenampil(${i})">${ic('search', 14)} Perbesar</button>` : ''}${x.link ? `<a class="sbtn" href="${esc(x.link)}" target="_blank" rel="noopener">${ic('link', 14)} Buka asli di Drive</a>` : ''}</div>
+    <div class="card">${x.ps ? `<small style="display:block">📸 ${esc(x.ps)}</small>` : ''}<small style="display:block">📤 ${esc(x.oleh)} · ${esc(x.waktu)}</small>
+      ${x.reviewer ? `<small style="display:block">${x.status === 'Disetujui' ? '✅' : '✏️'} ${esc(x.reviewer === 'Syifa' ? 'Umi Syifa' : x.reviewer)} · ${esc(x.waktuReview)}</small>` : ''}
+      ${x.pesan ? `<div class="info">💬 Catatan pengaju: ${esc(x.pesan)}</div>` : ''}${x.catatan ? `<div class="info">✏️ ${esc(x.catatan)}</div>` : ''}${x.riwayat ? `<details style="margin-top:8px"><summary><small>Riwayat</small></summary><small style="white-space:pre-line;display:block;color:var(--mut)">${esc(x.riwayat)}</small></details>` : ''}</div>
+    ${bolehUp ? `<button class="big" onclick="bukaForm('review',${i})">📤 Upload hasil revisi</button>` : ''}
+    ${x.arsip ? `<div class="info">📦 ${x.arsip.otomatis ? 'Masuk Arsip otomatis: disetujui lebih dari ' + (x.arsip.hari || 7) + ' hari lalu' : 'Diarsipkan' + (x.arsip.oleh ? ' oleh ' + esc(x.arsip.oleh) : '') + (x.arsip.pada ? ' · ' + esc(x.arsip.pada) : '')}.</div>${x.arsip.manual && x.bolehArsip ? `<button class="big alt" onclick="pulihkanRv(${i})">Pulihkan ke daftar</button>` : ''}` : ''}
+    ${x.seri && x.status === 'Revisi' ? `<div class="info">✏️ Untuk revisi: ganti foto langsung di folder Drive ini. Tombol kirim ulang per folder menyusul.</div>` : ''}${!x.arsip && x.bolehArsip && !x.seri ? `<button class="big alt" onclick="arsipRv(${i})">📦 Arsipkan</button>` : ''}
+    ${!x.arsip && D.bolehReview && x.status !== 'Disetujui' ? `<button class="big" onclick="putusRv(${i},'setuju')">✅ ${x.seri ? 'Setujui folder ini' : 'Setujui · pindah ke folder Final'}</button><div class="fm"><textarea id="rvc" style="min-height:70px" placeholder="Catatan revisi, mis. crop lebih rapat, warna kulit lebih hangat" oninput="drafRv('${esc(x.id)}',this.value)">${esc(RVC[x.id] || '')}</textarea></div><button class="big alt" onclick="putusRv(${i},'revisi')">✏️ Minta revisi</button>` : ''}`);
+  const im = $('rvdi'); if (im) muatGbr(im, x.fotoId, 800, ok => { if (!ok) x._gagal = true; if (!ok && $('rvdb')) $('rvdb').outerHTML = `<div class="rvdet" style="cursor:default">${ikonRv(x, true)}</div>`; });
+}
+function putusRv(i, kep) { const x = rvList()[i], c = $('rvc') ? $('rvc').value.trim() : ''; if (kep === 'revisi' && !c) return react('bingung', 'Tulis catatan revisinya dulu ya');
+  tutup(); loading(true, 'Menyimpan…'); gsr('apiReviewPutus', [TOKEN, x.id, kep, c], r => { loading(false); if (!r || !r.ok) return react('gagal', (r && r.pesan) || 'Gagal'); drafRv(x.id, ''); react('selesai', r.pesan); muatReview(); muat(true); }); }
+// ---------- penampil foto layar penuh (V1): cubit / ketuk dua kali / roda / klik dua kali / seret, panah & Esc ----------
+function bukaPenampil(i) {
+  const daftar = (RVA.indexOf(i) >= 0 ? RVA : [i]).filter(j => rvList()[j] && satuGbr(rvList()[j])); let pos = daftar.indexOf(i); if (pos < 0) { daftar.unshift(i); pos = 0; }
+  PV = { daftar, pos, s: 1, x: 0, y: 0 };
+  let el = $('rvpv'); if (!el) { el = document.createElement('div'); el.id = 'rvpv'; el.className = 'rvpv'; document.body.appendChild(el); }
+  el.innerHTML = `<div class="rvpvt"><button onclick="tutupPenampil()" aria-label="Tutup">${ic('x', 22)}</button><span id="rvpvj"></span><a id="rvpva" target="_blank" rel="noopener">Buka asli di Drive</a></div>
+    <div class="rvpvs" id="rvpvs"><img id="rvpvi" alt="" referrerpolicy="no-referrer" draggable="false"><div class="rvpvg" id="rvpvg" style="display:none"></div>
+    <button class="rvpvn kiri" id="rvpvk" onclick="geserPenampil(-1)" aria-label="Foto sebelumnya">‹</button><button class="rvpvn kanan" id="rvpvn" onclick="geserPenampil(1)" aria-label="Foto berikutnya">›</button></div>
+    <div class="rvpvh">Cubit, ketuk dua kali, atau gulir untuk zoom · geser untuk pindah foto</div>`;
+  el.classList.add('show'); gerakPenampil($('rvpvs')); document.addEventListener('keydown', tombolPenampil);
+  try { history.pushState({ rvpv: 1 }, ''); PV.riwayat = true; } catch (e) {}
+  tampilPenampil();
+}
+function tampilPenampil() { if (!PV) return; const x = rvList()[PV.daftar[PV.pos]], im = $('rvpvi'), g = $('rvpvg'), n = PV.daftar.length;
+  PV.s = 1; PV.x = 0; PV.y = 0; PV.besar = false; ubahPenampil();
+  $('rvpvj').textContent = (n > 1 ? (PV.pos + 1) + ' / ' + n + ' · ' : '') + (x.produk || 'Foto') + (x.warna ? ' · ' + x.warna : '') + ' · ' + x.status; $('rvpva').href = x.link || '#';
+  $('rvpvk').style.display = $('rvpvn').style.display = n > 1 ? '' : 'none';
+  g.style.display = 'none'; im.style.display = ''; im.removeAttribute('src');
+  muatGbr(im, x.fotoId, 800, ok => { if (ok) return; im.style.display = 'none'; g.style.display = ''; g.innerHTML = `${ic('alert', 34)}<div>Gambar tidak bisa dimuat di app.</div>${x.link ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">Buka di Drive</a>` : ''}`; });
+  [-1, 1].forEach(d => { const y = rvList()[PV.daftar[(PV.pos + d + n) % n]]; if (y && n > 1) new Image().src = srcRv(y.fotoId, 800, 0); });   // pramuat tetangga
+}
+function ubahPenampil() { const im = $('rvpvi'); if (!im || !PV) return; im.style.transform = 'translate(' + PV.x + 'px,' + PV.y + 'px) scale(' + PV.s + ')';
+  if (PV.s > 1.4 && !PV.besar) { PV.besar = true; const x = rvList()[PV.daftar[PV.pos]], b = new Image(); b.referrerPolicy = 'no-referrer'; b.onload = () => { if (PV && rvList()[PV.daftar[PV.pos]] === x) im.src = b.src; }; b.src = srcRv(x.fotoId, 1600, 0); } }
+function zoomPenampil(s, cx, cy) { if (!PV) return; const box = $('rvpvs').getBoundingClientRect(), s2 = Math.max(1, Math.min(5, s));
+  if (cx != null) { const ox = cx - box.left - box.width / 2, oy = cy - box.top - box.height / 2; PV.x = ox - (ox - PV.x) * s2 / PV.s; PV.y = oy - (oy - PV.y) * s2 / PV.s; }
+  PV.s = s2; if (s2 === 1) { PV.x = 0; PV.y = 0; } batasPenampil(); ubahPenampil(); }
+function batasPenampil() { const box = $('rvpvs').getBoundingClientRect(), mx = box.width * (PV.s - 1) / 2, my = box.height * (PV.s - 1) / 2; PV.x = Math.max(-mx, Math.min(mx, PV.x)); PV.y = Math.max(-my, Math.min(my, PV.y)); }
+function geserPenampil(d) { if (!PV || PV.daftar.length < 2) return; PV.pos = (PV.pos + d + PV.daftar.length) % PV.daftar.length; tampilPenampil(); }
+function tombolPenampil(e) { if (!PV) return; if (e.key === 'Escape') { e.preventDefault(); tutupPenampil(); } else if (e.key === 'ArrowLeft') geserPenampil(-1); else if (e.key === 'ArrowRight') geserPenampil(1);
+  else if (e.key === '+' || e.key === '=') zoomPenampil(PV.s * 1.4); else if (e.key === '-') zoomPenampil(PV.s / 1.4); }
+function gerakPenampil(el) { const P = new Map(); let awal = null, ketuk = 0;
+  el.onwheel = e => { e.preventDefault(); zoomPenampil(PV.s * Math.exp(-e.deltaY * 0.0015), e.clientX, e.clientY); };
+  el.onpointerdown = e => { if (e.target.closest('button,a')) return; try { el.setPointerCapture(e.pointerId); } catch (x) {} P.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const t = [...P.values()]; awal = { s: PV.s, x: PV.x, y: PV.y, px: e.clientX, py: e.clientY, jarak: t.length === 2 ? Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y) : 0, gerak: false, dua: t.length === 2 || (awal && awal.dua && P.size > 1) }; };
+  el.onpointermove = e => { if (!P.has(e.pointerId) || !awal) return; P.set(e.pointerId, { x: e.clientX, y: e.clientY }); const t = [...P.values()];
+    if (t.length === 2 && awal.jarak) { const j = Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y); awal.gerak = true; zoomPenampil(awal.s * j / awal.jarak, (t[0].x + t[1].x) / 2, (t[0].y + t[1].y) / 2); return; }
+    const dx = e.clientX - awal.px, dy = e.clientY - awal.py; if (Math.abs(dx) + Math.abs(dy) > 6) awal.gerak = true;
+    if (PV.s > 1) { PV.x = awal.x + dx; PV.y = awal.y + dy; batasPenampil(); ubahPenampil(); } };
+  el.onpointerup = el.onpointercancel = e => { if (!P.has(e.pointerId)) return; P.delete(e.pointerId); if (!awal) return;
+    const dx = e.clientX - awal.px;
+    if (!P.size) { if (!awal.dua && PV.s === 1 && Math.abs(dx) > 60) geserPenampil(dx < 0 ? 1 : -1);
+      else if (!awal.gerak && !awal.dua) { const kini = Date.now(); if (kini - ketuk < 320) { ketuk = 0; zoomPenampil(PV.s > 1 ? 1 : 2.5, e.clientX, e.clientY); } else ketuk = kini; }
+      awal = null; } };
+}
+function tutupPenampil(dariKembali) { if (!PV) return; const i = PV.daftar[PV.pos], riw = PV.riwayat; PV = null;
+  const el = $('rvpv'); if (el) { el.classList.remove('show'); el.innerHTML = ''; } document.removeEventListener('keydown', tombolPenampil);
+  if (riw && !dariKembali) { try { history.back(); } catch (e) {} }
+  if ($('sheet').classList.contains('show') && bukaReview.i !== i) bukaReview(i);   // lembar detail ikut foto terakhir; draf catatan tetap (RVC)
+}
+window.addEventListener('popstate', () => { if (PV) tutupPenampil(true); });
+// ==== PENGHUBUNG (dijalankan SESUDAH blok TKB) ====
+function lepasRvb() { if (GL) tutupGl(true); RVB.riw = false; tutup(true); if (PV) tutupPenampil(true); RVS = null; TAB = ''; loading(false); const i = $('rvIsi'); if (i) i.classList.remove('rvb'); }
+// buka dari kartu Tim Syifa (IIFE sudah membuka halaman #rvHal + riwayat {rv:1, lv:0})
+window.RVB_buka = async function () {
+  const s = SY_RVB(); TAB = 'review'; RVS = null; pasangLembarRvb(); $('rvIsi').innerHTML = kerangkaRvb();
+  const iz = await s.segarIzin().catch(() => null);
+  if (TAB !== 'review') return;
+  if (!iz) { lepasRvb(); s.pakaiLama(null); return; }   // tanpa izin Syifa: alur K1 (masuk dengan kode WA)
+  const c = bacaLokal('rvSaya1');   // dari HP hanya nama & bolehReview; hak V2 menunggu jawaban segar (cadangan = v2pakai)
+  D = Object.assign({}, D0_RVB, c && c.nama === iz.nama && c.d ? { nama: c.d.nama || iz.nama, bolehReview: !!c.d.bolehReview } : { nama: iz.nama }, { pimpinan: false, review: {} });
+  if (RV && RV._nama !== D.nama) RV = null;   // ganti akun → jangan pakai daftar akun lain
+  render();
+  s.tbPakai('reviewSaya', {}).then(j => { if (!j || !j.ok || !j.data || !j.data.nama) return;
+    Object.assign(D, j.data, { pimpinan: false, review: {} }); simpanLokal('rvSaya1', { nama: iz.nama, d: j.data }); }, () => {})
+    .then(() => { if (TAB === 'review' && !GL && !$('sheet').classList.contains('show')) render(); });
+};
+window.RVB_render = render;
+window.RVB_segar = function () { Object.keys(FRV).forEach(k => { delete FRV[k]; }); Object.keys(GLT).forEach(k => { if (!(GLT[k].tanda || []).some(t => t.status)) delete GLT[k]; }); RVAR = null; muatReview(); render(); };
+window.RVB_tutup = lepasRvb;
+// kembali HP / tombol Kembali header: mundur satu tingkat (galeri & penampil V1 ditutup oleh pendengar popstate milik blok TKB)
+window.RVB_pop = function (s) { if (s.rvgl || s.rvpv) return;
+  if (!s.lembar && $('sheet') && $('sheet').classList.contains('show')) { RVB.riw = false; tutup(true); }
+  const r = s.rvs || null; if (r !== RVS) { RVS = r; render(); scrollTo(0, 0); } };
+// pop-up pembaruan Syifa menunggu: draf catatan, antrean tanda belum terkirim, atau galeri terbuka
+window.RVB_sibuk = () => !!(GL || PV || rvAdaDraf() || (bacaLokal(ANTRE_T) || []).length || document.getElementById('rvbLoad') && document.getElementById('rvbLoad').style.display === 'flex');
+const bukaSeriAsliRvb = bukaSeriRv;
+bukaSeriRv = function (id) { bukaSeriAsliRvb(id); try { history.pushState({ rv: 1, lv: 1, rvs: id }, ''); } catch (e) {} };
+const simpanRvAsliRvb = simpanRv_;
+simpanRv_ = function () { if (RV) RV._nama = D.nama; simpanRvAsliRvb(); };
+
+</script>
+<!-- RVB:akhir -->
 <script>
 (function () {
   'use strict';
@@ -1527,6 +2291,7 @@
   function amanUpd() {
     if (document.querySelector('dialog[open]')) return false;                    // dialog/formulir terbuka
     if (st.busy) return false;                                                  // sedang menyimpan
+    if (window.RVB_sibuk && window.RVB_sibuk()) return false;                  // K2: Review (draf, antrean tanda, galeri)
     if ($('rvCat') && $('rvCat').value.trim()) return false;                    // catatan revisi belum dikirim
     if (document.querySelector('#rvIsi [data-kep]:disabled')) return false;     // keputusan Review sedang dikirim
     var a = document.activeElement;
@@ -2119,11 +2884,13 @@ function salinTautan_(u, selesai) {
       try { history.pushState({ rv: 1, lv: 0 }, '', '#tim/review'); } catch (e) {}
     }
     rvTampilHal(true); window.scrollTo(0, 0);
+    if (window.RVB_buka) { RV.tkb = true; rvPita(''); window.RVB_buka(); return; }   // K2: Review sama dengan ThinKerBelle; V2 terkunci → pakaiLama
     if (!RV.data) RV.data = rvAmbil();
     rvRender(); rvMuat();
   }
   function rvTutup(diam) {
     if (!RV.buka) return;
+    if (RV.tkb && window.RVB_tutup) window.RVB_tutup(); RV.tkb = false;
     RV.buka = false; RV.lv = []; rvTutupPv(true); rvTampilHal(false);
     if (!diam) { var y = RV.gulir; requestAnimationFrame(function () { window.scrollTo(0, y); }); }
   }
@@ -2139,6 +2906,7 @@ function salinTautan_(u, selesai) {
     if (RV.pv) { rvTutupPv(true); return; }
     if (!RV.buka) return;
     if (!s || !s.rv) { rvTutup(); return; }
+    if (RV.tkb) { if (window.RVB_pop) window.RVB_pop(s); return; }
     RV.lv = RV.lv.slice(0, s.lv || 0); rvRender();
   });
 
@@ -2154,6 +2922,7 @@ function salinTautan_(u, selesai) {
     try { await muatTim(true); } catch (e) {}
   }
   async function rvMuat() {
+    if (RV.tkb) { if (window.RVB_segar) window.RVB_segar(); return; }
     var jalan = ++RV.jalan;
     rvPita(RV.data ? (RV.dariHP ? 'Data tersimpan di HP (' + rvJam(RV.dariHP) + ') · memperbarui…' : 'Memperbarui…') : '');
     try {
@@ -2175,6 +2944,7 @@ function salinTautan_(u, selesai) {
   // ---------- tampilan ----------
   function rvRender() {
     if (!RV.buka) return;
+    if (RV.tkb) { if (window.RVB_render) window.RVB_render(); return; }   // K2: halaman diisi modul Review salinan TKB
     var top = RV.lv[RV.lv.length - 1];
     if (!top) return rvDaftar();
     if (!RV.data) { $('rvIsi').innerHTML = rvKerangka(2); return; }
@@ -2304,7 +3074,7 @@ function salinTautan_(u, selesai) {
     return ambilBatas(TB_API, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, TB_BATAS)
       .then(function (r) { return r.text(); }, function (e) { throw new Error(e && e.batas ? e.message : 'Koneksi ke ThinKerBelle gagal. Cek internet lalu coba lagi.'); })
       .then(function (t) { var j = null; try { j = JSON.parse(t); } catch (e) {} if (!j) throw new Error('ThinKerBelle belum menjawab dengan benar. Coba lagi sebentar.');
-        if (!j.ok) throw new Error(j.pesan || 'Gagal menyimpan'); return j.data; });
+        if (!j.ok) { var x = new Error(j.pesan || 'Gagal menyimpan'); x.ditolak = true; throw x; } return j.data; });   // K2: ditolak server ≠ koneksi putus
   }
   async function rvKirimPutus(fn, argsTanpaOpsi, kep) {
     var cat = $('rvCat') ? $('rvCat').value.trim() : '';
@@ -2609,8 +3379,8 @@ function salinTautan_(u, selesai) {
     var h = hariIniTim(t);
     // aksi cepat
     var aksi = el('div', 'pagi', '<div class="pg-angka"><div><b>' + t.lapor + '/' + t.wajib + '</b><small>lapor hari ini</small></div><div><b>' + t.tayang + '/' + t.post + '</b><small>posting tayang</small></div><div><b>' + (t.review || 0) + '</b><small>menunggu approval</small></div></div>' +
-      '<div class="pg-aksi pg-4"><button type="button" data-a="perintah">📣 Perintah</button><button type="button" data-a="approval">👀 Approval' + (t.review ? ' · ' + t.review : '') + '</button><button type="button" data-a="kinerja">📊 Kinerja</button><button type="button" data-a="rapor">📑 Rapor</button><button type="button" data-a="review">📸 Review foto' + (t.reviewFoto ? ' · ' + t.reviewFoto : '') + '</button><button type="button" data-a="produk">👗 Produk &amp; sampel</button></div>');
-    aksi.querySelector('[data-a="perintah"]').onclick = bukaPerintah; aksi.querySelector('[data-a="approval"]').onclick = bukaApproval;
+      '<div class="pg-aksi pg-4"><button type="button" data-a="review">📸 Review foto' + (t.reviewFoto ? ' · ' + t.reviewFoto : '') + '</button><button type="button" data-a="perintah">📣 Perintah</button><button type="button" data-a="kinerja">📊 Kinerja</button><button type="button" data-a="rapor">📑 Rapor</button><button type="button" data-a="produk">👗 Produk &amp; sampel</button></div>');   // K2: Review foto pertama, Approval caption pindah ke Konten
+    aksi.querySelector('[data-a="perintah"]').onclick = bukaPerintah;
     aksi.querySelector('[data-a="kinerja"]').onclick = function () { if (t.kinerja && !t.kinerja.error) bukaKinerja(t); else toast('Data kinerja belum tersedia', true); };
     aksi.querySelector('[data-a="rapor"]').onclick = function () { bukaRapor(null); };
     aksi.querySelector('[data-a="produk"]').onclick = function () { bukaProdukTim(); };
@@ -2641,7 +3411,7 @@ function salinTautan_(u, selesai) {
     var row = function (bg, icon, small, title, sub) {
       return '<div class="row"><span class="ic" style="background:' + bg + '">' + icon + '</span><span class="t"><small>' + esc(small) + '</small><b>' + esc(title) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span></div>';
     };
-    var h = '<div class="sec"><h3>Tim Arabelle</h3><span style="display:flex;gap:14px">' + '<button class="link" type="button" data-perintah>📣 Perintah</button><button class="link" type="button" data-approval>👀 Approval</button><button class="link" type="button" data-rapor>📑 Rapor</button>' + (t.kinerja && !t.kinerja.error ? '<button class="link" type="button" data-kinerja>Kinerja tim</button>' : '<span class="mu">dari ThinKerBelle</span>') + '</span></div>';
+    var h = '<div class="sec"><h3>Tim Arabelle</h3><span style="display:flex;gap:14px">' + '<button class="link" type="button" data-perintah>📣 Perintah</button><button class="link" type="button" data-rapor>📑 Rapor</button>' + (t.kinerja && !t.kinerja.error ? '<button class="link" type="button" data-kinerja>Kinerja tim</button>' : '<span class="mu">dari ThinKerBelle</span>') + '</span></div>';
     if (t.error) return el('div', 'card', h + '<p class="empty">Belum bisa membaca data tim: ' + esc(t.error) + '</p>');
     h += row('var(--t-mint)', I.list, 'Laporan hari ini', t.lapor + ' dari ' + t.wajib + ' sudah lapor', t.belum.length ? 'Belum: ' + t.belum.join(', ') : 'Semua sudah lapor 🎉');
     h += row('var(--t-sky)', I.cal, 'Posting tim hari ini', t.tayang + ' dari ' + t.post + ' sudah tayang', '');
@@ -2649,7 +3419,7 @@ function salinTautan_(u, selesai) {
     (t.agenda || []).slice(0, 3).forEach(function (a) { h += row('var(--t-lilac)', I.clock, dayLabel(a.date), a.text, a.tim ? '👥 ' + a.tim : ''); });
     (t.perintah || []).forEach(function (p) { h += row('var(--t-peach)', I.note, 'Perintahmu ke ' + (p.untuk || 'tim'), '📣 ' + p.isi, '👀 ' + p.dibaca + ' dibaca · ✅ ' + p.selesai + ' selesai'); });
     (t.catatan || []).forEach(function (c) { h += row('var(--t-butter)', I.note, 'Catatan tim dari ' + c.dari, '📌 ' + c.isi, ''); });
-    var c = el('div', 'card', h), kb = c.querySelector('[data-kinerja]'), pb = c.querySelector('[data-perintah]'); if (kb) kb.onclick = function () { bukaKinerja(t); }; if (pb) pb.onclick = bukaPerintah; var rb = c.querySelector('[data-rapor]'); if (rb) rb.onclick = function () { bukaRapor(null); }; var ab = c.querySelector('[data-approval]'); if (ab) ab.onclick = bukaApproval;
+    var c = el('div', 'card', h), kb = c.querySelector('[data-kinerja]'), pb = c.querySelector('[data-perintah]'); if (kb) kb.onclick = function () { bukaKinerja(t); }; if (pb) pb.onclick = bukaPerintah; var rb = c.querySelector('[data-rapor]'); if (rb) rb.onclick = function () { bukaRapor(null); };
     return c;
   }
 
@@ -3045,6 +3815,7 @@ function salinTautan_(u, selesai) {
       b.onclick = function () { st.kTab = b.dataset.tab; renderKonten(); };
     });
     body.appendChild(seg);
+    if (isOwner()) { var nAp = (st.tim && st.tim.review) || 0, bAp = el('button', 'btn-line', '👀 Approval caption' + (nAp ? ' · ' + nAp + ' menunggu' : '')); bAp.type = 'button'; bAp.style.width = '100%'; bAp.onclick = bukaApproval; body.appendChild(bAp); }   // K2: Approval caption dipindah dari tab Tim
     if (st.kTab === 'cal') renderCal(body);
     else if (st.kTab === 'list') renderPostList(body);
     else if (st.kTab === 'ideas') renderIdeas(body);
@@ -4421,6 +5192,13 @@ function salinTautan_(u, selesai) {
       deleteNote: function (t, id) { auth(t, true); notes = notes.filter(function (n) { return n.id !== id; }); return notes; }
     };
   })();
+
+  // K2 · jembatan untuk modul Review salinan ThinKerBelle (script global RVB). Izin tetap di memori IIFE (tidak disimpan).
+  window.__syRv = { tbPakai: tbPakai, rvTulis: rvTulis, toast: toast, netral: netralV2,
+    izin: function () { return SY_AUTH && Number(SY_AUTH.exp) > Date.now() ? SY_AUTH : null; },
+    segarIzin: async function () { if (!SY_AUTH || Number(SY_AUTH.exp) <= Date.now()) { SY_AUTH = null; await rvIzin(); } return SY_AUTH && Number(SY_AUTH.exp) > Date.now() ? SY_AUTH : null; },
+    pakaiLama: function (d) { RV.tkb = false; if (d) { RV.data = d; RV.dariHP = 0; rvSimpan(d); } else if (!RV.data) RV.data = rvAmbil(); rvRender(); if (!d) rvMuat(); },
+    timBasi: function () { forget('dash'); } };
 
   start();
 })();
