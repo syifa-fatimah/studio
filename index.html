@@ -3,7 +3,7 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
-<meta name="syifa-tampilan" content="2026.11.15-1">
+<meta name="syifa-tampilan" content="2026.11.18-2">
 <meta name="syifa-app" content="2026.10.20-20">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syifa Studio</title>
@@ -354,6 +354,21 @@
   .rp span { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-weight: 600; color: var(--muted); }
   .rp .in { padding-left: 46px; font-size: 22px; font-weight: 600; min-height: 60px; }
   .note-add { display: flex; gap: 10px; flex-wrap: wrap; }
+  /* Naskah (fitur naskah) */
+  .nk-cari { display: flex; gap: 10px; margin-bottom: 12px; }
+  .nk-cari .in { flex: 1; width: auto; }
+  .nk-item { display: block; width: 100%; text-align: left; background: var(--card, #fff); border: 1px solid var(--line, #F5CADB); border-radius: 18px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; }
+  .nk-item b { display: block; font-size: 16px; }
+  .nk-item p { margin: 4px 0; font-size: 14px; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .nk-item small { font-size: 12px; color: var(--muted); }
+  .nk-atas { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .nk-st { font-size: 13px; color: var(--muted); margin-left: auto; }
+  .nk-st.ok { color: #3E8E64; } .nk-st.err { color: #B23A48; }
+  #nkJudul { font-size: 20px; font-weight: 600; margin-bottom: 10px; }
+  #nkIsi { width: 100%; min-height: 58vh; font-size: 16px; line-height: 1.6; resize: vertical; padding: 14px; }
+  .nk-bawah { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+  .nk-bentrok { background: #FFF1E6; border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; font-size: 14px; }
+
   .note-add .in { flex: 1; width: auto; }
   .notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   @media (min-width: 900px) { .notes { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); } }
@@ -373,6 +388,17 @@
   .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
   .cap-row { display: flex; justify-content: space-between; align-items: center; }
+  /* Konten (fitur konten) */
+  .kn-st { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 3px 9px; white-space: nowrap; align-self: center; }
+  .kn-st.tayang { background: #DDF2E6; color: #2F6E4D; } .kn-st.terjadwal { background: var(--t-lilac); color: #4B3A78; } .kn-st.belum { background: var(--t-peach); color: #8A4A2A; }
+  .kn-hari.ini { color: var(--rose); }
+  .kn-kosong { font-size: 13px; color: var(--muted); padding: 2px 0 8px; }
+
+  .cekpost { background: var(--pink-soft); border-radius: 16px; padding: 12px 14px; margin-top: 4px; }
+  .cekpost-b { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; padding: 6px 0; }
+  .cekpost-b input { width: 20px; height: 20px; flex: none; margin-top: 1px; }
+  .tplrow { display: flex; gap: 8px; margin-top: -4px; } .tplrow select { flex: 1; min-width: 0; } .tplrow .btn-line { flex: none; padding: 0 16px; }
+  .tplrow2 { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; margin-top: -2px; }
   .dlg-actions { display: flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
   .dlg-actions button { flex: 1; }
   .dlg-actions a { flex: 1; justify-content: center; white-space: nowrap; }
@@ -737,6 +763,10 @@
       <div id="fBody" class="stack"><p class="center-msg">Memuat keuangan…</p></div>
     </section>
 
+    <section id="v-naskah" class="page" hidden>
+      <div class="hdr"><div class="ttl"><h1 class="big-title">Naskah</h1><span>Tulisan panjang pribadi · hanya kamu yang bisa melihat</span></div></div>
+      <div id="nkBody"></div>
+    </section>
     <section id="v-catatan" class="page" hidden>
       <div class="hdr"><div class="ttl"><h1 class="big-title">Catatan</h1><span>Ide, pengingat, dan hal penting</span></div></div>
       <div class="note-add">
@@ -776,6 +806,8 @@
         <span class="cap-row"><span>Caption &amp; hashtag</span><span id="capCount">0 / 2200</span></span>
         <textarea class="in" id="pCaption" maxlength="2200" rows="5" placeholder="Hook, isi caption, #hashtag"></textarea>
       </label>
+      <div class="tplrow"><select class="in" id="pTpl" aria-label="Template caption"></select><button class="btn-line" type="button" id="pTplPakai">Tempel</button></div>
+      <div class="tplrow2"><button class="link" type="button" id="pTplSimpan">＋ Simpan jadi template</button><button class="link" type="button" id="pTplHapus">Hapus</button></div>
       <label class="lbl">Link postingan<input class="in" id="pLink" type="url" placeholder="Isi setelah tayang"></label>
       <div class="metrics" id="pMetrics">
         <div><b style="font-size:15px">Hasil setelah tayang</b><p class="mu">Isi dari Insights Instagram/TikTok. Dipakai untuk report.</p></div>
@@ -788,6 +820,12 @@
           <label class="lbl">Share<input class="in" id="mShares" inputmode="numeric" placeholder="0"></label>
           <label class="lbl">Save<input class="in" id="mSaves" inputmode="numeric" placeholder="0"></label>
         </div>
+      </div>
+      <div class="cekpost" id="pCek" hidden>
+        <b style="font-size:15px">Checklist sebelum posting</b>
+        <p class="mu" style="margin:2px 0 6px;font-size:13px">Centang semua dulu sebelum menyimpan sebagai Terjadwal / Sudah Posting.</p>
+        <div id="pCekIsi"></div>
+        <button class="link" type="button" id="pCekLewati" style="margin-top:4px;font-size:13px">Lewati checklist (namamu tercatat)</button>
       </div>
       <div class="dlg-actions">
         <button class="btn-line" type="button" id="pDelete">Hapus</button>
@@ -855,10 +893,13 @@
     </div>
     <div class="dlg-body">
       <label class="lbl">Judul<input class="in" id="agTitle" maxlength="150" placeholder="Contoh: Kunjungan supplier"></label>
+      <div class="type-seg" id="agMode" role="group" aria-label="Lama agenda"><button type="button" data-m="1" aria-pressed="true">Sehari</button><button type="button" data-m="n" aria-pressed="false">Beberapa hari</button></div>
       <div class="two">
-        <label class="lbl">Tanggal<input class="in" id="agDate" type="date"></label>
-        <label class="lbl">Jam<input class="in" id="agTime" type="time"></label>
+        <label class="lbl"><span id="agDateL">Tanggal</span><input class="in" id="agDate" type="date"></label>
+        <label class="lbl" id="agTimeW">Jam<input class="in" id="agTime" type="time"></label>
+        <label class="lbl" id="agUntilW" hidden>Sampai tanggal<input class="in" id="agUntil" type="date"></label>
       </div>
+      <p class="mu" id="agRentang" hidden style="margin:-4px 0 0;font-size:13px"></p>
       <label class="lbl">Kategori<select class="in" id="agTag"></select></label>
       <label class="lbl">Catatan<input class="in" id="agNote" maxlength="400" placeholder="Opsional, misalnya lokasi"></label>
       <div class="lbl" id="agTimWrap">Ajak tim Arabelle<div id="agTim" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px"></div>
@@ -949,7 +990,7 @@
       <h3 style="margin:6px 0 0;font-size:16px">Cepat</h3>
       <div class="qchips">
         <button type="button" data-qa="todo">✅ To-do</button><button type="button" data-qa="target">🎯 Target</button><button type="button" data-qa="note">📝 Catatan</button>
-        <button type="button" data-qa="routine">💊 Rutinitas</button><button type="button" data-qa="sched">⏰ Jadwal per jam</button><button type="button" data-qa="agendaList">🗓️ Lihat semua agenda</button>
+        <button type="button" data-qa="routine">💊 Rutinitas</button><button type="button" data-qa="sched">⏰ Jadwal per jam</button><button type="button" data-qa="agendaList">🗓️ Lihat semua agenda</button><button type="button" data-qa="naskah">✍️ Naskah</button>
       </div>
     </div>
   </div>
@@ -1875,14 +1916,15 @@ simpanRv_ = function () { if (RV) RV._nama = D.nama; simpanRvAsliRvb(); };
   };
   var VIEWS = {
     dasbor: { label: 'Beranda', icon: I.home },
-    konten: { label: 'Kalender konten', icon: I.cal },
+    konten: { label: 'Konten', icon: I.cal },
     harian: { label: 'Jadwal', icon: I.list },
     agenda: { label: 'Agenda & dinas', icon: I.clock },
     tim: { label: 'Tim Arabelle', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4.2 4.3 1.8 4.9 4.8"/></svg>' },
     uang: { label: 'Keuangan', icon: I.wallet },
-    catatan: { label: 'Catatan', icon: I.note }
+    catatan: { label: 'Catatan', icon: I.note },
+    naskah: { label: 'Naskah', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>' }
   };
-  var ALL_VIEWS = ['dasbor', 'konten', 'harian', 'agenda', 'tim', 'uang', 'catatan'];
+  var ALL_VIEWS = ['dasbor', 'konten', 'harian', 'agenda', 'tim', 'uang', 'catatan', 'naskah'];
 
   var hasGAS = typeof google !== 'undefined' && google.script && google.script.run;
   var hasAPI = /^https:\/\/script\.google\.com\/.+\/exec$/.test(API_URL);
@@ -2107,27 +2149,19 @@ simpanRv_ = function () { if (RV) RV._nama = D.nama; simpanRvAsliRvb(); };
   var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   function introMode() {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'still';
-    return 'full';   // animasi penuh setiap kali app dibuka (±3,5 detik)
+    return 'full';   // 15 Nov: playIntro ±1 detik untuk semua mode
   }
-  async function playIntro() {
-    var box = $('bootScreen'), mode = introMode();
-    var set = function (c) { box.classList.add(c); };
-    if (mode !== 'full') ['in', 'squish', 'pop'].forEach(set);
-    else {
-      await wait(80); set('in');
-      await wait(750); set('squish');
-      await wait(650); set('pop');
-      await wait(500);
-    }
+  async function playIntro() {   // ±1 detik (15 Nov 2026): tanpa urutan squish/pop
+    var box = $('bootScreen'), set = function (c) { box.classList.add(c); };
+    ['in', 'squish', 'pop'].forEach(set);
     while (!intro.ready) await wait(50);
     if (!st.boot) return;
     $('pillTxt').textContent = greet() + ', ' + st.boot.user.name + '!';
-    set('greet');
-    if (mode === 'full') { await wait(700); set('tag'); }
+    set('greet'); set('tag');
     intro.done = true;
-    await wait(mode === 'full' ? 1100 : 400);
+    await wait(600);
     box.classList.add('leave');
-    await wait(mode === 'full' ? 320 : 0);
+    await wait(250);
     enterOnce();
   }
   function enterOnce() { if (intro.entered || !intro.done || !st.boot) return; intro.entered = true; enterApp(); }
@@ -2225,7 +2259,7 @@ simpanRv_ = function () { if (RV) RV._nama = D.nama; simpanRvAsliRvb(); };
     document.querySelectorAll('[data-demo]').forEach(function (x) { x.hidden = live; });
     $('sideRole').textContent = b.user.name + (owner ? ' · Owner' : ' · Tim konten');
     $('kSub').textContent = b.owner + ' · Instagram × TikTok';
-    var keys = owner ? ['dasbor', 'konten', 'harian', 'tim', 'uang', 'catatan'] : ['konten', 'harian'];
+    var keys = owner ? ['dasbor', 'konten', 'harian', 'tim', 'uang', 'catatan', 'naskah'] : ['konten', 'harian'];
     $('appScreen').classList.add('has-nav');
     var side = $('sideNav'), dock = $('dock');
     side.innerHTML = ''; dock.innerHTML = '';
@@ -2291,6 +2325,7 @@ simpanRv_ = function () { if (RV) RV._nama = D.nama; simpanRvAsliRvb(); };
   function amanUpd() {
     if (document.querySelector('dialog[open]')) return false;                    // dialog/formulir terbuka
     if (st.busy) return false;                                                  // sedang menyimpan
+    if (NK.kotor || NK.jalan) return false;                                     // naskah belum tersimpan
     if (window.RVB_sibuk && window.RVB_sibuk()) return false;                  // K2: Review (draf, antrean tanda, galeri)
     if ($('rvCat') && $('rvCat').value.trim()) return false;                    // catatan revisi belum dikirim
     if (document.querySelector('#rvIsi [data-kep]:disabled')) return false;     // keputusan Review sedang dikirim
@@ -2448,13 +2483,14 @@ simpanRv_ = function () { if (RV) RV._nama = D.nama; simpanRvAsliRvb(); };
 
   function go(view) {
     if (RV.buka) rvTutup(true);
+    if (st.view === 'naskah' && view !== 'naskah' && NK.buka) nkTutup(true);   // pindah halaman: naskah disimpan dulu
     st.view = view;
     ALL_VIEWS.forEach(function (k) { $('v-' + k).hidden = k !== view; });
     document.querySelectorAll('[data-view]').forEach(function (x) {
       if (x.dataset.view === view || (view === 'agenda' && x.dataset.view === 'harian')) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current');
     });
     window.scrollTo(0, 0);
-    ({ dasbor: loadDash, konten: loadKonten, harian: loadDay, agenda: loadAgenda, tim: loadTim, uang: loadFinance, catatan: loadNotes })[view]();
+    ({ dasbor: loadDash, konten: loadKonten, harian: loadDay, agenda: loadAgenda, tim: loadTim, uang: loadFinance, catatan: loadNotes, naskah: loadNaskah })[view]();
   }
 
   /** Garis waktu: rows = [{start,end,title,sub,chip,done,kind,x,onOpen}] */
@@ -2503,6 +2539,7 @@ simpanRv_ = function () { if (RV) RV._nama = D.nama; simpanRvAsliRvb(); };
     else if (k === 'note') { go('catatan'); setTimeout(function () { var i = document.querySelector('#v-catatan textarea, #v-catatan input'); if (i) i.focus(); }, 600); }
     else if (k === 'routine') openRoutineDlg();
     else if (k === 'agendaList') go('agenda');
+    else if (k === 'naskah') go('naskah');
     else { st.hDate = today; st.dayFocus = k; go('harian'); }
   }
 
@@ -2534,7 +2571,7 @@ simpanRv_ = function () { if (RV) RV._nama = D.nama; simpanRvAsliRvb(); };
     return [l, r];
   }
 
-  function invalidate() { forget('dash'); st.rep = {}; }
+  function invalidate() { forget('dash'); forget('konten'); st.rep = {}; }
 
   // =====================================================================
   // BERANDA (Owner)
@@ -3308,6 +3345,8 @@ function salinTautan_(u, selesai) {
     var ag = (t.agenda || []).filter(function (a) { return a.date === hr; });
     return { hr: hr, kerja: kerja, ag: ag };
   }
+  // Ringkasan angka kemarin (fitur angka): kosong kalau server belum mengirim t.angka atau reach belum ada
+  function barisAngka(t) { var a = t && t.angka; if (!a || !a.reach) return ''; return '<p class="mu" style="margin:6px 0 0;font-size:13px">📈 Kemarin: ' + (a.posting || 0) + ' posting IG · reach ' + Number(a.reach).toLocaleString('id-ID') + '</p>'; }
   function pagiIni(t) {
     SY_AUTH = t && t.kirim && Number(t.kirim.exp) > Date.now() ? t.kirim : SY_AUTH; SY_NAMA = (t && t.nama) || SY_NAMA;
     var h = hariIniTim(t);
@@ -3316,6 +3355,7 @@ function salinTautan_(u, selesai) {
     isi += h.kerja.slice(0, 4).map(function (k) { return '<div class="pg-it"><i class="av">' + esc(k.nama.charAt(0)) + '</i><p><b>' + esc(k.nama) + '</b><small>' + esc(k.x.selesai || k.x.sedang || '—') + '</small></p></div>'; }).join('');
     if (!h.ag.length && !h.kerja.length) isi += '<p class="mu" style="margin:8px 0 0;font-size:14px">Belum ada laporan tim hari ini.</p>';
     if (t.belum && t.belum.length) isi += '<p class="mu" style="margin:8px 0 0;font-size:13px">Belum lapor: ' + esc(t.belum.join(', ')) + '</p>';
+    isi += barisAngka(t);
     isi += '<button class="btn-line" type="button" data-gotim style="width:100%;margin-top:12px">Buka tab Tim Arabelle ›</button>';
     var c = el('div', 'pagi', isi); c.querySelector('[data-gotim]').onclick = function () { go('tim'); };
     return c;
@@ -3385,6 +3425,7 @@ function salinTautan_(u, selesai) {
     aksi.querySelector('[data-a="rapor"]').onclick = function () { bukaRapor(null); };
     aksi.querySelector('[data-a="produk"]').onclick = function () { bukaProdukTim(); };
     aksi.querySelector('[data-a="review"]').onclick = function () { bukaReviewFoto(); };
+    if (barisAngka(t)) aksi.insertAdjacentHTML('beforeend', barisAngka(t));
     b.appendChild(aksi);
     // yang dikerjakan hari ini
     var hk = '<div class="sec"><h3>Dikerjakan hari ini</h3></div>' + h.ag.map(function (a) { return '<div class="pg-it"><i>🗓️</i><p><b>' + esc(a.text) + '</b>' + (a.tim ? '<small>👥 ' + esc(a.tim) + '</small>' : '') + '</p></div>'; }).join('') +
@@ -3466,7 +3507,7 @@ function salinTautan_(u, selesai) {
         chip: plain(p.status), done: p.status === S.DONE, onOpen: function () { openPost(p, null, loadDash); } });
     });
     w.agenda.forEach(function (a) {
-      dayRows.push({ start: a.time || '', title: a.title, sub: a.note || 'Agenda', chip: a.tag,
+      dayRows.push({ start: a.time || '', title: a.title, sub: (a.hari ? 'Hari ' + a.hari + ' · ' : '') + (a.note || 'Agenda'), chip: a.tag,
         onOpen: function () { openAgendaDlg(a, function () { forget('dash'); loadDash(); }); } });
     });
     if (st.dDay === today) (d.focus || []).filter(function (x) { return x.type === 'Jadwal'; }).forEach(function (x) {
@@ -3511,19 +3552,19 @@ function salinTautan_(u, selesai) {
     var c = d.content;
     taruh(right, el('div', 'card', '<div class="sec"><h3>Ringkasan</h3><button class="link" type="button" data-go="report">Lihat report</button></div>' +
       '<div class="row"><span class="ic" style="background:var(--t-mint)">' + I.cal + '</span><span class="t"><small>Konten bulan ini</small><b>' + c.done + ' dari ' + c.total + ' sudah tayang</b><span>' + c.sched + ' terjadwal, ' + c.open + ' masih proses</span></span></div>' +
-      (d.trips.length ? '<div class="row"><span class="ic" style="background:var(--t-pink)">' + I.clock + '</span><span class="t"><small>Dinas berikutnya</small><b>' + esc(d.trips[0].title) + '</b><span>' + esc(dayLabel(d.trips[0].date)) + (d.trips[0].time ? ', ' + esc(d.trips[0].time) : '') + '</span></span></div>' : '') +
+      (d.trips.length ? '<div class="row"><span class="ic" style="background:var(--t-pink)">' + I.clock + '</span><span class="t"><small>Dinas berikutnya</small><b>' + esc(d.trips[0].title) + '</b><span>' + esc(dayLabel(d.trips[0].date) + rentangAg(d.trips[0])) + (d.trips[0].time ? ', ' + esc(d.trips[0].time) : '') + '</span></span></div>' : '') +
       '<button class="row" type="button" data-go="catatan" style="width:100%;border-left:0;border-right:0;border-bottom:0;background:none;text-align:left;cursor:pointer"><span class="ic" style="background:var(--t-lilac)">' + I.note + '</span><span class="t"><small>' + (d.notes.length ? 'Catatan terbaru · ' + d.noteCount + ' catatan' : 'Catatan') + '</small><b>' + esc(d.notes.length ? d.notes[0].text : 'Tulis catatan singkat') + '</b></span><span class="mu" style="font-size:18px">›</span></button>'), 'ringkasan', '📊 Ringkasan konten', c.total ? c.done + '/' + c.total + ' tayang' : '');
     var semuaAg = st.agenda || [].concat.apply([], d.week.map(function (w) { return w.agenda; }));
-    var up = semuaAg.filter(function (a) { return a.date >= today; }).slice(0, 5);
+    var up = unikAg(semuaAg.filter(function (a) { return a.date >= today; })).slice(0, 5);
     var ac = el('div', 'card', '<div class="sec"><h3>Agenda akan datang</h3><button class="link" type="button">Lihat semua</button></div>' + (up.length ? up.map(function (a) {
-      return '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(dayLabel(a.date)) + (a.time ? ' · ' + esc(a.time) : '') +
+      return '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(dayLabel(a.date) + rentangAg(a)) + (a.time ? ' · ' + esc(a.time) : '') +
         '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span></div>';
     }).join('') : '<p class="empty">Belum ada agenda yang akan datang.</p>'));
     ac.querySelector('.link').onclick = function () { go('agenda'); };
     void ac;   // agenda & dinas sekarang ada di tab Jadwal (menyatu dengan jadwal harian), beranda jadi lebih ringkas
 
     right.querySelectorAll('[data-go]').forEach(function (b) {
-      b.onclick = function () { if (b.dataset.go === 'report') { st.kTab = 'report'; go('konten'); } else go(b.dataset.go); };
+      b.onclick = function () { if (b.dataset.go === 'report') { st.fReport = true; go('uang'); } else go(b.dataset.go); };
     });
   }
 
@@ -3789,6 +3830,7 @@ function salinTautan_(u, selesai) {
   // KALENDER KONTEN + REPORT
   // =====================================================================
   async function loadKonten() {
+    if (isOwner()) { loadKontenOwner(); return; }   // 18 Nov: halaman Konten (Owner)
     if (!st.kMonth) st.kMonth = st.boot.today.slice(0, 7);
     var ym = st.kMonth, key = 'posts:' + ym, have = st.postsMonth === ym;
     if (have) renderKonten(); else $('kBody').innerHTML = '<p class="center-msg">Memuat kalender…</p>';
@@ -3806,6 +3848,7 @@ function salinTautan_(u, selesai) {
   function shiftKMonth(n) { st.kMonth = shiftMonth(st.kMonth, n); st.kDay = ''; loadKonten(); }
 
   function renderKonten() {
+    if (isOwner()) { loadKontenOwner(); return; }
     if (!st.kDay || st.kDay.slice(0, 7) !== st.kMonth) st.kDay = st.boot.today.slice(0, 7) === st.kMonth ? st.boot.today : st.kMonth + '-01';
     var body = $('kBody'); body.innerHTML = '';
     var seg = el('div', 'seg', '<button role="tab" type="button" data-tab="cal">Kalender</button><button role="tab" type="button" data-tab="list">Daftar</button><button role="tab" type="button" data-tab="ideas">Bank ide</button><button role="tab" type="button" data-tab="report">Report</button>');
@@ -3822,6 +3865,70 @@ function salinTautan_(u, selesai) {
     else renderReport(body);
   }
 
+  // 18 Nov · halaman Konten untuk Owner (fitur konten): Approval caption · jadwal minggu ini dari ThinKerBelle · performa ringkas · Bank ide
+  function loadKontenOwner(paksa) {
+    renderKontenOwner();
+    if (st.kTab === 'ideas' || (!paksa && st.konten && recent('konten'))) return;
+    call('getKonten', !!paksa).then(function (k) { var ch = mark('konten', k); st.konten = k; st.kontenErr = ''; if (st.view === 'konten' && st.kTab !== 'ideas' && (ch || paksa)) renderKontenOwner(); },
+      function (e) { st.kontenErr = /tidak dikenal/i.test(errMsg(e)) ? 'Server Syifa Studio belum versi terbaru (getKonten).' : errMsg(e); if (st.view === 'konten' && st.kTab !== 'ideas') renderKontenOwner(); });
+  }
+  function knStatus(p) { var s = String(p || '').toLowerCase(); return /tayang|sudah/.test(s) ? 'tayang' : /terjadwal|jadwal/.test(s) ? 'terjadwal' : 'belum'; }
+  function knAngka(n) { return Number(n || 0).toLocaleString('id-ID'); }
+  function renderKontenOwner() {
+    var body = $('kBody'), k = st.konten; body.innerHTML = '';
+    var tt = document.querySelector('#v-konten .big-title'); if (tt) tt.textContent = 'Konten'; $('kSub').textContent = 'Approval, jadwal & performa minggu ini';
+    if (st.kTab !== 'ideas') st.kTab = 'minggu';
+    var seg = el('div', 'seg', '<button role="tab" type="button" data-tab="minggu">Minggu ini</button><button role="tab" type="button" data-tab="ideas">Bank ide</button>');
+    seg.setAttribute('role', 'tablist'); seg.setAttribute('aria-label', 'Tampilan');
+    seg.querySelectorAll('[data-tab]').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.tab === st.kTab)); b.onclick = function () { st.kTab = b.dataset.tab; loadKontenOwner(); }; });
+    body.appendChild(seg);
+    var nAp = (st.tim && st.tim.review) || 0, bAp = el('button', 'btn-line', '👀 Approval caption' + (nAp ? ' · ' + nAp + ' menunggu' : '')); bAp.type = 'button'; bAp.style.width = '100%'; bAp.onclick = bukaApproval; body.appendChild(bAp);
+    if (st.kTab === 'ideas') { renderIdeas(body); return; }
+    if (!k) { body.appendChild(el('p', 'center-msg', esc(st.kontenErr || 'Memuat jadwal minggu ini…'))); return; }
+    var cols = twoCols(body, 'even'), left = cols[0], right = cols[1], J = k.jadwal || [], tb = J.filter(function (x) { return x.sumber !== 'Pribadi'; });
+    var nT = tb.filter(function (x) { return knStatus(x.post) === 'tayang'; }).length, nJ = tb.filter(function (x) { return knStatus(x.post) === 'terjadwal'; }).length;
+    var h = '<div class="sec"><h3>Jadwal posting minggu ini</h3><button class="link" type="button" id="knSegar" style="color:var(--rose)">Segarkan</button></div>' +
+      '<p class="mu" style="margin:-4px 0 8px;font-size:13px">Dari ThinKerBelle (hanya lihat) · ' + nT + ' dari ' + tb.length + ' tayang · ' + nJ + ' terjadwal</p>';
+    (k.minggu || []).forEach(function (ds) {
+      var hr = J.filter(function (x) { return x.tgl === ds; }), ini = ds === k.hariIni;
+      h += '<div class="group kn-hari' + (ini ? ' ini' : '') + '">' + esc(dayLabel(ds)) + '</div>';
+      if (!hr.length) { h += '<div class="kn-kosong">Tidak ada posting</div>'; return; }
+      h += hr.map(function (x, i) {
+        var s = knStatus(x.post), sub = [x.jam ? x.jam.replace(':', '.') : '', x.platform, x.format, x.pic ? 'PIC ' + x.pic : ''].filter(Boolean).join(' · ');
+        var tag = x.sumber === 'Pribadi' ? '🌸 Pribadi' : x.sumber === 'Threads & katalog' ? 'Threads & katalog' : '';
+        return '<div class="row"' + (x.id ? ' data-kp="' + esc(x.id) + '" data-kt="' + esc(x.tgl) + '" style="cursor:pointer"' : '') + '><span class="ic" style="background:' + (s === 'tayang' ? '#DDF2E6' : s === 'terjadwal' ? 'var(--t-lilac)' : 'var(--t-peach)') + '">' + I.cal + '</span>' +
+          '<span class="t"><small>' + esc(sub || 'Tanpa jam') + '</small><b>' + esc(x.topik) + '</b>' + (tag || x.konten ? '<span>' + esc([tag, x.konten ? 'Konten: ' + x.konten : ''].filter(Boolean).join(' · ')) + '</span>' : '') +
+          (x.link ? '<a class="link" href="' + esc(x.link) + '" target="_blank" rel="noopener" style="font-size:13px">Lihat hasil ↗</a>' : '') + '</span><span class="kn-st ' + s + '">' + esc(s === 'tayang' ? 'Tayang' : s === 'terjadwal' ? 'Terjadwal' : 'Belum') + '</span></div>';
+      }).join('');
+    });
+    var kj = el('div', 'card', h); left.appendChild(kj);
+    var pb = el('button', 'btn-line', '＋ Posting pribadi'); pb.type = 'button'; pb.style.width = '100%'; pb.onclick = function () { openPost(null, st.boot.today, function () { invalidate(); loadKontenOwner(true); }); }; left.appendChild(pb);
+    var P = k.performa, ph = '<div class="sec"><h3>Performa ringkas</h3><span class="mu">' + esc(P ? P.akun : 'Instagram') + '</span></div>';
+    if (!P) ph += '<p class="empty">Data performa belum terbaca dari ThinKerBelle.</p>';
+    else {
+      ph += '<div class="row"><span class="ic" style="background:var(--t-mint)">📈</span><span class="t"><small>Reach kemarin · ' + esc(dayLabel(P.kemarin)) + '</small><b>' + (P.reach != null ? knAngka(P.reach) : 'Belum tersedia') + '</b><span>' +
+        esc(P.posting + ' posting tayang' + (P.viewsKemarin ? ' · ' + knAngka(P.viewsKemarin) + ' views' : '') + (P.reach == null ? ' · reach dari Meta masih 0, muncul otomatis setelah izin insight beres' : '')) + '</span></span></div>';
+      ph += '<div class="group">3 posting ER tertinggi minggu ini</div>' + (P.top && P.top.length ? P.top.map(function (r, i) {
+        return '<div class="row"><span class="ic" style="background:var(--t-pink)">' + (i + 1) + '</span><span class="t"><small>' + esc([r.format, dayLabel(r.tgl), 'ER ' + String(r.er).replace('.', ',') + '%'].filter(Boolean).join(' · ')) + '</small><b>' + esc(r.caption || 'Tanpa caption') + '</b><span>' +
+          esc(knAngka(r.views) + ' views · ' + knAngka(r.inter) + ' interaksi' + (r.reach ? ' · reach ' + knAngka(r.reach) : '')) + '</span>' + (r.link ? '<a class="link" href="' + esc(r.link) + '" target="_blank" rel="noopener" style="font-size:13px">Buka posting ↗</a>' : '') + '</span></div>';
+      }).join('') : '<p class="empty">Belum ada posting dengan data performa minggu ini.</p>');
+    }
+    if (k.galat && k.galat.length) ph += '<p class="mu" style="font-size:12px">⚠️ ' + esc(k.galat.join(' · ')) + '</p>';
+    right.appendChild(el('div', 'card', ph));
+    $('knSegar').onclick = function () { st.konten = null; forget('konten'); loadKontenOwner(true); };
+    kj.querySelectorAll('[data-kp]').forEach(function (r) { r.onclick = function (e) { if (e.target.closest('a')) return; bukaPostPribadi(r.dataset.kp, r.dataset.kt); }; });
+  }
+  async function bukaPostPribadi(id, tgl) {
+    var ym = tgl.slice(0, 7), cari = function () { return (st.postsMonth === ym ? st.posts : []).filter(function (p) { return p.id === id; })[0]; }, p = cari();
+    if (!p) { try { var res = await call('getPosts', ym); setPosts(res.month, res.items); p = cari(); } catch (e) { fail(e); return; } }
+    if (p) openPost(p, null, function () { invalidate(); loadKontenOwner(true); }); else toast('Posting tidak ditemukan, mungkin sudah dihapus', true);
+  }
+  // Report keuangan (dulu tab Report di Kalender konten) — di halaman Keuangan
+  async function reportKeuangan(holder, b) {
+    b.disabled = true; holder.innerHTML = '<p class="center-msg">Memuat report…</p>';
+    try { var ym = st.fMonth, r = st.rep[ym] || (st.rep[ym] = await call('getReport', ym)); holder.innerHTML = ''; if (r.fin) financeReport(holder, r.fin, r.finPrev); else holder.innerHTML = '<p class="empty">Report keuangan belum tersedia.</p>'; b.hidden = true; }
+    catch (e) { holder.innerHTML = '<p class="center-msg">' + esc(errMsg(e)) + '</p>'; b.disabled = false; }
+  }
   function renderCal(body) {
     var ym = st.kMonth, p = ym.split('-').map(Number), days = new Date(p[0], p[1], 0).getDate();
     var byDay = {}, cnt = { idea: 0, made: 0, sched: 0, done: 0 };
@@ -4211,10 +4318,35 @@ function salinTautan_(u, selesai) {
     $('pIde').value = p.ide || ''; $('pCaption').value = p.caption || ''; $('pLink').value = p.link || '';
     METRIC_KEYS.forEach(function (k) { $(METRIC_IDS[k]).value = p[k] != null ? Number(p[k]).toLocaleString('id-ID') : ''; });
     var del = $('pDelete'); del.hidden = isNew; del.textContent = 'Hapus'; delete del.dataset.armed; del.classList.remove('armed');
-    updateCount(); toggleMetrics();
+    updateCount(); toggleMetrics(); tplIsi();
+    $('pCekIsi').innerHTML = ''; CEK_LEWATI = false; tampilCekPost();   // rilis fitur: jangkar tidak bergantung pada fitur template
     $('postDlg').showModal();
     if (isNew) setTimeout(function () { $('pIde').focus(); }, 50);
   }
+  // Template caption & hashtag (fitur template): disimpan di sheet Syifa ("Template Caption"), sama di semua HP
+  var TPL = null, TPL_JALAN = null;
+  function tplMuat(paksa) { if (TPL && !paksa) return Promise.resolve(TPL); if (TPL_JALAN) return TPL_JALAN; TPL_JALAN = call('listTemplates').then(function (a) { TPL = Array.isArray(a) ? a : []; return TPL; }).finally(function () { TPL_JALAN = null; }); return TPL_JALAN; }
+  function tplIsi() { var s = $('pTpl'); if (!TPL) { s.innerHTML = '<option value="">Memuat template…</option>'; $('pTplHapus').hidden = true; tplMuat().then(tplIsi).catch(function () { s.innerHTML = '<option value="">Template belum bisa dimuat</option>'; }); return; }
+    s.innerHTML = '<option value="">' + (TPL.length ? 'Pilih template (' + TPL.length + ')' : 'Belum ada template') + '</option>' + TPL.map(function (x, i) { return '<option value="' + i + '">' + esc(x.nama) + '</option>'; }).join(''); $('pTplHapus').hidden = !TPL.length; }
+  function tplPakai() { var i = $('pTpl').value; if (i === '' || !TPL) return toast('Pilih template dulu', true); var x = TPL[Number(i)]; if (!x) return; var c = $('pCaption'); c.value = (c.value.trim() ? c.value.replace(/\s+$/, '') + '\n\n' : '') + x.isi; updateCount(); toast('Template ditempel'); }
+  function tplSimpan() { var isi = $('pCaption').value.trim(); if (!isi) return toast('Caption masih kosong', true); var nama = prompt('Nama template (misalnya: Hashtag scarf, Penutup PO):', isi.split('\n')[0].slice(0, 30)); if (!nama || !nama.trim()) return;
+    return call('saveTemplate', { nama: nama.trim(), isi: isi }).then(function (a) { TPL = a; tplIsi(); toast('Template disimpan'); }).catch(function (e) { toast(errMsg(e), true); }); }
+  function tplHapus() { var i = $('pTpl').value; if (i === '' || !TPL) return toast('Pilih template yang mau dihapus', true); var x = TPL[Number(i)]; if (!x || !confirm('Hapus template "' + x.nama + '"?')) return;
+    return call('deleteTemplate', x.id).then(function (a) { TPL = a; tplIsi(); toast('Template dihapus'); }).catch(function (e) { toast(errMsg(e), true); }); }
+  // Checklist sebelum posting (fitur checklist): wajib saat status BERUBAH ke Terjadwal / Sudah Posting
+  var CEK_POST = ['Caption sudah dibaca ulang (typo, CTA, mention)', 'Hashtag sudah ada', 'Cover / visual sudah final', 'Link produk / aset sudah benar', 'Tanggal & jam tayang sudah benar'];
+  // Wajib sekali: posting LAMA naik dari Ide/Dibuat ke Terjadwal/Sudah Posting, atau posting BARU langsung Sudah Posting. Posting baru (bawaan Terjadwal) dan yang sudah Terjadwal tidak ditanya.
+  function perluCekPost() { var s = $('pStatus').value, lama = st.editing ? st.editing.status : ''; if (lama === S.SCHED || lama === S.DONE) return false; if (s === S.DONE) return true; return s === S.SCHED && !!st.editing; }
+  function tampilCekPost() {
+    var w = $('pCek'), perlu = perluCekPost(); w.hidden = !perlu; if (!perlu) return;
+    if (!$('pCekIsi').children.length) $('pCekIsi').innerHTML = CEK_POST.map(function (t, i) { return '<label class="cekpost-b"><input type="checkbox" data-cek="' + i + '"> ' + esc(t) + '</label>'; }).join('');
+  }
+  var CEK_LEWATI = false;
+  function cekPostBelum() { if (!perluCekPost() || CEK_LEWATI) return 0; return CEK_POST.length - $('pCekIsi').querySelectorAll('input:checked').length; }
+  function cekLewati() { if (!confirm('Lewati checklist untuk posting ini? Namamu akan tercatat di Log Checklist.')) return; CEK_LEWATI = true; $('pCek').hidden = true; savePost(); }
+  // Dicatat setelah simpan berhasil (tidak menahan simpan; gagal mencatat = diam)
+  function catatCekPost(d, perlu) { if (!perlu) return; var belum = CEK_POST.filter(function (t, i) { var x = $('pCekIsi').querySelector('[data-cek="' + i + '"]'); return !x || !x.checked; });
+    call('catatChecklist', { id: d.id || '', ide: d.ide || d.caption.slice(0, 80), status: d.status, keputusan: CEK_LEWATI ? 'Lewati' : 'Lengkap', belum: CEK_LEWATI ? belum : [] }).catch(function () {}); }
   function updateCount() { $('capCount').textContent = $('pCaption').value.length + ' / 2200'; }
 
   async function savePost() {
@@ -4225,10 +4357,11 @@ function salinTautan_(u, selesai) {
     METRIC_KEYS.forEach(function (k) { d[k] = $(METRIC_IDS[k]).value.replace(/\D/g, ''); });
     if (!d.date) { toast('Tanggal belum diisi', true); return; }
     if (!d.ide && !d.caption.trim()) { toast('Isi ide atau caption dulu', true); $('pIde').focus(); return; }
+    var cekPerlu = perluCekPost(), cekBelum = cekPostBelum(); if (cekBelum) { tampilCekPost(); toast('Checklist sebelum posting: ' + cekBelum + ' butir belum dicentang', true); $('pCek').scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
     st.busy = true; $('pSave').disabled = true; $('pSave').textContent = 'Menyimpan…';
     try {
       var res = await call('savePost', d);
-      setPosts(res.month, res.items); st.kDay = d.date; invalidate();
+      setPosts(res.month, res.items); st.kDay = d.date; invalidate(); catatCekPost(d, cekPerlu);
       $('postDlg').close();
       toast(d.id ? 'Posting diperbarui' : 'Dijadwalkan ' + shortDate(d.date) + (d.time ? ' jam ' + d.time : ''));
       if (afterPost) afterPost(); else if (st.view === 'konten') renderKonten();
@@ -4349,11 +4482,11 @@ function salinTautan_(u, selesai) {
     var wadah = el('div', 'card'); wadah.id = 'jAgenda'; box.appendChild(wadah);
     if (!st.agenda) { wadah.innerHTML = '<p class="mu">Memuat agenda &amp; dinas…</p>';
       call('listAgenda').then(function (a) { st.agenda = a; mark('agenda', a); if (st.view === 'harian') agendaDiJadwal(); }).catch(function () { wadah.innerHTML = '<p class="mu">Agenda belum bisa dimuat.</p>'; }); return; }
-    var dari = (st.day && st.day.date) || st.hDate || st.boot.today, semua = st.agenda.filter(function (a) { return a.date > dari; }), later = agendaDiJadwal.penuh ? semua : semua.slice(0, 5), lastD = '';
+    var dari = (st.day && st.day.date) || st.hDate || st.boot.today, semua = unikAg(st.agenda.filter(function (a) { return a.date > dari; })), later = agendaDiJadwal.penuh ? semua : semua.slice(0, 5), lastD = '';
     wadah.innerHTML = '<div class="sec"><h3>Agenda &amp; dinas berikutnya</h3><button class="link" type="button" id="jAgBaru">＋ Agenda / dinas</button></div>' +
       '<p class="mu" style="margin:-4px 0 6px;font-size:13px">Agenda & dinas di tanggal terpilih sudah masuk garis waktu di atas.</p>' + (later.length ? later.map(function (a) {
       var grp = a.date !== lastD ? '<div class="group">' + esc(dayLabel(a.date)) + '</div>' : '', milik = !/^TB/.test(String(a.id || '')); lastD = a.date;
-      return grp + '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(a.time || 'Sepanjang hari') + ' · ' + esc(a.tag || 'Agenda') + '</small><b>' + esc(a.title) + '</b>' + (a.note ? '<span>' + esc(a.note) + '</span>' : '') + '</span>' +
+      return grp + '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(a.time || (a.hari ? shortDate(a.start) + '–' + shortDate(a.until) : 'Sepanjang hari')) + ' · ' + esc(a.tag || 'Agenda') + '</small><b>' + esc(a.title) + '</b>' + (a.note ? '<span>' + esc(a.note) + '</span>' : '') + '</span>' +
         (milik ? '<span class="acts2"><button class="link" type="button" data-jedit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-jdel="' + esc(a.id) + '" aria-label="Hapus">×</button></span>' : '') + '</div>';
     }).join('') + (semua.length > 5 ? '<button class="link" type="button" id="jAgAll" style="margin-top:8px;color:var(--rose);font-weight:600">' + (agendaDiJadwal.penuh ? 'Ringkas' : 'Lihat semua (' + semua.length + ')') + '</button>' : '') : '<p class="empty">Belum ada agenda atau dinas berikutnya.</p>');
     if ($('jAgAll')) $('jAgAll').onclick = function () { agendaDiJadwal.penuh = !agendaDiJadwal.penuh; agendaDiJadwal(); };
@@ -4634,12 +4767,12 @@ function salinTautan_(u, selesai) {
       var h = a.time ? a.time.split(':') : null, hr = h ? Number(h[0]) : 0;
       return '<span class="hr">' + (h ? esc(h[0]) + '<br><span class="mu" style="font-size:12px;font-weight:400">' + (hr < 11 ? 'pagi' : hr < 15 ? 'siang' : hr < 18 ? 'sore' : 'malam') + '</span>' : '–') + '</span>' +
         '<div class="block" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '"><div class="top"><span><b>' + esc(a.title) + '</b><br><span class="k">' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span>' +
-        '<span class="acts2"><button class="link" type="button" data-edit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></span></div><div class="tm">' + I.clock + esc(a.time || 'Sepanjang hari') + '</div></div>';
+        '<span class="acts2"><button class="link" type="button" data-edit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></span></div><div class="tm">' + I.clock + esc(a.time || jamAg(a)) + '</div></div>';
     }).join('')));
-    var later = list.filter(function (a) { return a.date >= today; }), lastD = '';
+    var later = unikAg(list.filter(function (a) { return a.date >= today; })), lastD = '';
     right.appendChild(el('div', 'card', '<div class="sec"><h3>Agenda akan datang</h3><span class="mu">' + later.length + ' agenda</span></div>' + (later.length ? later.map(function (a) {
       var grp = a.date !== lastD ? '<div class="group">' + esc(dayLabel(a.date)) + '</div>' : ''; lastD = a.date;
-      return grp + '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(dayLabel(a.date)) + (a.time ? ' · ' + esc(a.time) : '') + '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span><span class="acts2"><button class="link" type="button" data-edit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></span></div>';
+      return grp + '<div class="row"><span class="ic" style="background:' + (TAG_BG[a.tag] || 'var(--t-pink)') + '">' + I.clock + '</span><span class="t"><small>' + esc(dayLabel(a.date) + rentangAg(a)) + (a.time ? ' · ' + esc(a.time) : '') + '</small><b>' + esc(a.title) + '</b><span>' + esc(a.tag) + (a.note ? ' · ' + esc(a.note) : '') + '</span></span><span class="acts2"><button class="link" type="button" data-edit="' + esc(a.id) + '" style="color:var(--rose);padding:4px 2px">Ubah</button><button class="del" type="button" data-id="' + esc(a.id) + '">Hapus</button></span></div>';
     }).join('') : '<p class="empty">Belum ada agenda yang akan datang.</p>')));
     box.querySelectorAll('[data-edit]').forEach(function (b) {
       b.onclick = function () { var a = list.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (a) openAgendaDlg(a); };
@@ -4664,7 +4797,8 @@ function salinTautan_(u, selesai) {
     if (!sel.options.length) sel.innerHTML = st.boot.tags.map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
     $('agTitleH').textContent = agEdit ? 'Ubah agenda' : 'Agenda baru';
     $('agAdd').textContent = agEdit ? 'Simpan perubahan' : 'Simpan agenda';
-    $('agDate').value = agEdit ? agEdit.date : (st.aDay || st.boot.today);
+    $('agDate').value = agEdit ? (agEdit.start || agEdit.date) : (st.aDay || st.boot.today);
+    $('agUntil').value = agEdit && agEdit.until ? agEdit.until : ''; setAgMode(agEdit && agEdit.until ? 'n' : '1');
     $('agTitle').value = agEdit ? agEdit.title : ''; $('agTime').value = agEdit ? agEdit.time : '';
     var raw = agEdit ? String(agEdit.note || '') : '', names = (st.tim && st.tim.nama) || [];
     var low = function (x) { return String(x).toLowerCase().replace(/\s+/g, ''); };
@@ -4690,6 +4824,20 @@ function salinTautan_(u, selesai) {
     $('agDlg').showModal(); if (!agEdit) setTimeout(function () { $('agTitle').focus(); }, 50);
   }
 
+  // 18 Nov · agenda beberapa hari (fitur agenda)
+  var AG_MODE = '1';
+  function setAgMode(m) {
+    AG_MODE = m; $('agMode').querySelectorAll('[data-m]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.m === m)); });
+    var n = m === 'n'; $('agTimeW').hidden = n; $('agUntilW').hidden = !n; $('agDateL').textContent = n ? 'Tanggal mulai' : 'Tanggal';
+    if (n && (!$('agUntil').value || $('agUntil').value <= $('agDate').value)) $('agUntil').value = addDays($('agDate').value || st.boot.today, 1);
+    infoRentang();
+  }
+  function lamaHari(a, b) { return Math.round((parseDate(b) - parseDate(a)) / 864e5) + 1; }
+  function infoRentang() { var p = $('agRentang'), a = $('agDate').value, b = $('agUntil').value; p.hidden = AG_MODE !== 'n' || !a || !b; if (p.hidden) return;
+    p.textContent = b < a ? '⚠️ Tanggal selesai sebelum tanggal mulai' : lamaHari(a, b) > 60 ? '⚠️ Paling lama 60 hari' : lamaHari(a, b) + ' hari · tampil di setiap harinya'; }
+  function jamAg(a) { return a.hari ? 'Hari ' + a.hari + ' · s.d. ' + shortDate(a.until) : 'Sepanjang hari'; }
+  function rentangAg(a) { return a && a.hari && a.start && a.until ? ' · ' + shortDate(a.start) + '–' + shortDate(a.until) : ''; }
+  function unikAg(list) { var ada = {}; return list.filter(function (a) { if (!a.hari) return true; var k = a.grup || a.id; if (ada[k]) return false; ada[k] = 1; return true; }); }
   async function addAgenda() {
     if (st.busy) return;
     var pilih = Array.prototype.slice.call($('agTim').querySelectorAll('.agt[aria-pressed="true"]')).map(function (b) { return b.dataset.n; });
@@ -4698,6 +4846,11 @@ function salinTautan_(u, selesai) {
     var d = { id: agEdit ? agEdit.id : '', date: $('agDate').value, time: $('agTime').value, title: $('agTitle').value.trim(), tag: $('agTag').value, note: note };
     if (!d.title) { toast('Judul agenda belum diisi', true); $('agTitle').focus(); return; }
     if (!d.date) { toast('Tanggal belum diisi', true); return; }
+    if (AG_MODE === 'n') { d.until = $('agUntil').value; d.time = '';
+      if (!d.until) { toast('Tanggal selesai belum diisi', true); return; }
+      if (d.until < d.date) { toast('Tanggal selesai tidak boleh sebelum tanggal mulai', true); return; }
+      if (lamaHari(d.date, d.until) > 60) { toast('Agenda beberapa hari paling lama 60 hari', true); return; }
+      if (d.until === d.date) d.until = ''; } else d.until = '';
     st.busy = true; $('agAdd').disabled = true;
     try {
       st.agenda = await call('addAgenda', d); mark('agenda', st.agenda);
@@ -4708,6 +4861,123 @@ function salinTautan_(u, selesai) {
     } catch (e) { fail(e); }
     finally { st.busy = false; $('agAdd').disabled = false; }
   }
+
+  // =====================================================================
+  // NASKAH (fitur naskah, 18 Nov) — hanya Owner
+  // =====================================================================
+  var NK = { list: null, q: '', buka: null, kotor: false, jalan: false, ulang: false, t: 0, cariT: 0, coba: 0, bentrok: false };
+  var NK_DRAF = 'syNaskahDraf1';
+  function nkDraf(v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(NK_DRAF) || 'null'); if (v) localStorage.setItem(NK_DRAF, JSON.stringify(v)); else localStorage.removeItem(NK_DRAF); } catch (e) { return null; } }
+  function nkJam(ms) { if (!ms) return ''; var d = new Date(ms), p = function (x) { return ('0' + x).slice(-2); }; return d.getDate() + ' ' + BULAN_SHORT[d.getMonth()] + ' ' + p(d.getHours()) + '.' + p(d.getMinutes()); }
+  function nkStatus(t, k) { var e = $('nkSt'); if (!e) return; e.textContent = t; e.className = 'nk-st' + (k ? ' ' + k : ''); }
+  async function loadNaskah() {
+    if (NK.buka) { renderNkEditor(); return; }
+    renderNkDaftar();
+    try { NK.list = await call('listNaskah', NK.q); if (st.view === 'naskah' && !NK.buka) renderNkDaftar(); }
+    catch (e) { if (!NK.list && st.view === 'naskah') $('nkBody').innerHTML = '<p class="center-msg">' + esc(errMsg(e)) + '</p>'; }
+  }
+  function renderNkDaftar() {
+    var box = $('nkBody'), dr = nkDraf(), fokus = document.activeElement && document.activeElement.id === 'nkCari';
+    var h = '<div class="nk-cari"><input class="in" id="nkCari" type="search" placeholder="Cari judul atau isi…" aria-label="Cari naskah" value="' + esc(NK.q) + '"><button class="btn" type="button" id="nkBaru">＋ Naskah baru</button></div>';
+    if (dr && !dr.id && (dr.judul || dr.isi)) h += '<button class="nk-item" type="button" id="nkDrafBaru" style="background:var(--pink-soft)"><b>📝 ' + esc(dr.judul || 'Tanpa judul') + '</b><p>Belum tersimpan di server. Ketuk untuk melanjutkan.</p></button>';
+    if (!NK.list) h += '<p class="center-msg">Memuat naskah…</p>';
+    else if (!NK.list.length) h += '<p class="empty">' + (NK.q ? 'Tidak ada naskah yang cocok dengan “' + esc(NK.q) + '”.' : 'Belum ada naskah. Ketuk ＋ Naskah baru untuk mulai menulis.') + '</p>';
+    else h += NK.list.map(function (n) { return '<button class="nk-item" type="button" data-nk="' + esc(n.id) + '"><b>' + esc(n.judul) + '</b><p>' + esc(n.cuplikan || '(belum ada isi)') + '</p><small>Diubah ' + esc(nkJam(n.diubah)) + ' · ' + Number(n.panjang || 0).toLocaleString('id-ID') + ' huruf' + (n.link ? ' · ada di Google Docs' : '') + '</small></button>'; }).join('');
+    box.innerHTML = h;
+    var c = $('nkCari'); c.oninput = function () { clearTimeout(NK.cariT); NK.cariT = setTimeout(function () { NK.q = c.value.trim(); NK.list = null; loadNaskah(); }, 400); };
+    if (fokus) { c.focus(); try { c.setSelectionRange(c.value.length, c.value.length); } catch (e) {} }
+    $('nkBaru').onclick = function () { nkBuka({ id: '', judul: '', isi: '', versi: 0, link: '' }); };
+    if ($('nkDrafBaru')) $('nkDrafBaru').onclick = function () { nkBuka({ id: '', judul: dr.judul, isi: dr.isi, versi: 0, link: '' }, true); };
+    box.querySelectorAll('[data-nk]').forEach(function (b) { b.onclick = function () { nkBukaId(b.dataset.nk); }; });
+  }
+  async function nkBukaId(id) {
+    $('nkBody').innerHTML = '<p class="center-msg">Membuka naskah…</p>';
+    try { var n = await call('getNaskah', id), dr = nkDraf();
+      if (dr && dr.id === id && dr.t > (n.versi || 0) && (dr.isi !== n.isi || dr.judul !== n.judul)) { n.judul = dr.judul; n.isi = dr.isi; nkBuka(n, true); toast('Melanjutkan tulisan yang belum tersimpan di HP ini'); return; }
+      nkBuka(n, false);
+    } catch (e) { fail(e); NK.buka = null; renderNkDaftar(); }
+  }
+  function nkBuka(n, kotor) { NK.buka = n; NK.kotor = !!kotor; NK.bentrok = false; NK.coba = 0; try { history.pushState({ nk: 1 }, '', '#naskah/' + (n.id || 'baru')); } catch (e) {} renderNkEditor(); if (kotor) nkJadwal(); }
+  function renderNkEditor() {
+    var n = NK.buka, box = $('nkBody');
+    box.innerHTML = '<div class="nk-atas"><button class="btn-line btn-sm" type="button" id="nkKembali">‹ Semua naskah</button><span class="nk-st" id="nkSt"></span></div>' +
+      '<div class="nk-bentrok" id="nkBentrok" hidden>⚠️ Naskah ini sudah diubah di perangkat lain.<div class="nk-bawah"><button class="btn btn-sm" type="button" id="nkMuat">Muat versi terbaru</button><button class="btn-line btn-sm" type="button" id="nkTimpa">Pakai versi di sini</button></div></div>' +
+      '<input class="in" id="nkJudul" maxlength="200" placeholder="Judul naskah" aria-label="Judul naskah">' +
+      '<textarea class="in" id="nkIsi" placeholder="Mulai menulis… tersimpan otomatis" aria-label="Isi naskah"></textarea>' +
+      '<div class="nk-bawah"><button class="btn" type="button" id="nkDocs">📄 Salin ke Google Docs</button><a class="link" id="nkDocLink" target="_blank" rel="noopener" hidden>Buka di Google Docs ↗</a><span class="mu" id="nkHitung" style="font-size:13px"></span>' +
+      '<button class="del" type="button" id="nkHapus" style="margin-left:auto">Hapus</button></div>';
+    $('nkJudul').value = n.judul || ''; $('nkIsi').value = n.isi || ''; nkHitung(); nkLink(n.link);
+    nkStatus(NK.kotor ? 'Belum tersimpan…' : n.id ? 'Tersimpan' : 'Baru', NK.kotor ? '' : 'ok');
+    $('nkBentrok').hidden = !NK.bentrok;
+    $('nkJudul').oninput = $('nkIsi').oninput = nkKetik;
+    $('nkKembali').onclick = function () { nkTutup(); };
+    $('nkDocs').onclick = nkKeDocs; $('nkHapus').onclick = function () { nkHapus($('nkHapus')); };
+    $('nkMuat').onclick = function () { if (confirm('Muat versi terbaru? Tulisan di layar ini akan diganti.')) { NK.kotor = false; nkDraf(null); nkBukaId(n.id); } };
+    $('nkTimpa').onclick = function () { NK.bentrok = false; $('nkBentrok').hidden = true; nkSimpan(true); };
+    if (!n.id && !n.isi) setTimeout(function () { $('nkJudul').focus(); }, 60);
+  }
+  function nkHitung() { var x = $('nkIsi'); if (!x) return; var n = x.value.length, kata = (x.value.match(/\S+/g) || []).length; $('nkHitung').textContent = kata.toLocaleString('id-ID') + ' kata · ' + n.toLocaleString('id-ID') + ' huruf' + (n > 40000 ? ' (maks 45.000)' : ''); }
+  function nkLink(u) { var a = $('nkDocLink'); if (!a) return; a.hidden = !u; if (u) a.href = u; }
+  function nkKetik() {
+    var n = NK.buka; if (!n) return;
+    n.judul = $('nkJudul').value; n.isi = $('nkIsi').value; NK.kotor = true; nkHitung();
+    nkDraf({ id: n.id || '', judul: n.judul, isi: n.isi, versi: n.versi || 0, t: Date.now() });
+    if (!NK.bentrok) nkStatus('Belum tersimpan…'); nkJadwal();
+  }
+  function nkJadwal(ms) { clearTimeout(NK.t); NK.t = setTimeout(function () { nkSimpan(false); }, ms || 1500); }
+  async function nkSimpan(paksa) {
+    var n = NK.buka; if (!n || !NK.kotor || (NK.bentrok && !paksa)) return;
+    if (!n.judul.trim() && !n.isi.trim()) return;
+    if (NK.jalan) { NK.ulang = true; return; }
+    NK.jalan = true; NK.kotor = false; nkStatus('Menyimpan…');
+    var kirim = { id: n.id || '', judul: n.judul, isi: n.isi, versi: n.versi || 0, paksa: !!paksa };
+    try {
+      var r = await call('saveNaskah', kirim);
+      n.id = r.id; n.versi = r.versi; NK.coba = 0; if (!NK.kotor) nkDraf(null); NK.list = null;
+      if (NK.buka === n) nkStatus('Tersimpan ' + nkJam(r.versi).split(' ').pop(), 'ok');
+      try { history.replaceState({ nk: 1 }, '', '#naskah/' + n.id); } catch (e) {}
+    } catch (e) {
+      NK.kotor = true; var m = errMsg(e);
+      if (/^BENTROK/.test(m)) { NK.bentrok = true; if ($('nkBentrok')) $('nkBentrok').hidden = false; nkStatus('⚠️ Diubah di perangkat lain', 'err'); }
+      else if (/terlalu panjang|kosong|tidak ditemukan|khusus owner/i.test(m)) { nkStatus('⚠️ ' + m, 'err'); }
+      else { NK.coba++; nkStatus('Belum tersimpan · dicoba lagi', 'err'); nkJadwal(Math.min(60000, 5000 * NK.coba)); }
+    } finally { NK.jalan = false; if (NK.ulang) { NK.ulang = false; if (NK.kotor) nkSimpan(false); } }
+  }
+  function nkTutup(dariRiwayat) {
+    if (!NK.buka) return;
+    if (NK.kotor) { clearTimeout(NK.t); nkSimpan(false); }
+    NK.buka = null; NK.bentrok = false;
+    if (!dariRiwayat) { try { history.back(); } catch (e) {} }
+    if (st.view === 'naskah') loadNaskah();
+  }
+  async function nkKeDocs() {
+    var n = NK.buka, b = $('nkDocs'); if (!n) return;
+    if (!n.id && !n.isi.trim() && !n.judul.trim()) { toast('Tulis naskahnya dulu ya', true); return; }
+    var w = null; try { w = window.open('', '_blank'); } catch (e) {}   // dibuka saat diketuk supaya tidak diblokir Safari
+    b.disabled = true; b.textContent = 'Menyalin…';
+    try {
+      clearTimeout(NK.t); while (NK.jalan) await new Promise(function (r) { setTimeout(r, 200); });
+      if (NK.kotor || !n.id) { NK.kotor = true; await nkSimpan(false); }
+      if (NK.kotor || !n.id) throw new Error(NK.bentrok ? 'Selesaikan bentrok dulu (Muat versi terbaru / Pakai versi di sini).' : 'Naskah belum tersimpan. Cek internet lalu coba lagi.');
+      var r = await call('naskahKeDocs', n.id);
+      n.link = r.url; nkLink(r.url); NK.list = null;
+      if (w) w.location.href = r.url; else toast('Google Docs siap. Ketuk “Buka di Google Docs”.');
+      toast(r.baru ? 'Disalin ke Google Docs (Drive: Syifa Studio/Naskah)' : 'Google Docs diperbarui dengan isi terbaru');
+    } catch (e) { if (w) try { w.close(); } catch (x) {} fail(e); }
+    finally { b.disabled = false; b.textContent = '📄 Salin ke Google Docs'; }
+  }
+  function nkHapus(b) {
+    var n = NK.buka; if (!n) return;
+    if (!n.id) { if (confirm('Buang naskah yang belum tersimpan ini?')) { NK.kotor = false; nkDraf(null); nkTutup(); } return; }
+    armDelete(b, async function () {
+      b.disabled = true;
+      try { await call('hapusNaskah', n.id); NK.kotor = false; nkDraf(null); NK.list = null; toast('Naskah dihapus'); nkTutup(); }
+      catch (e) { b.disabled = false; fail(e); }
+    });
+  }
+  window.addEventListener('popstate', function () { if (NK.buka && !/^#naskah\//.test(location.hash)) nkTutup(true); });
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && NK.buka && NK.kotor) { clearTimeout(NK.t); nkSimpan(false); } });
+  window.addEventListener('online', function () { if (NK.buka && NK.kotor && !NK.bentrok) nkJadwal(300); });
 
   // =====================================================================
   // KEUANGAN
@@ -4766,6 +5036,8 @@ function salinTautan_(u, selesai) {
     nb.type = 'button'; nb.style.cssText = 'border-style:dashed;text-align:left;width:100%;cursor:pointer';
     nb.onclick = function () { openTxDlg(null); setTimeout(function () { $('txNotaFile').click(); }, 200); };
     right.appendChild(nb);
+    var rk = el('div', 'stack'), rb = el('button', 'btn-line', '📊 Report keuangan ' + monthLabel(f.month)); rb.type = 'button'; rb.style.width = '100%'; rb.onclick = function () { reportKeuangan(rk, rb); };
+    right.appendChild(rb); right.appendChild(rk); if (st.fReport) { st.fReport = false; reportKeuangan(rk, rb); setTimeout(function () { rb.scrollIntoView({ block: 'start', behavior: 'smooth' }); }, 300); }
     card.querySelectorAll('[data-edit]').forEach(function (b) {
       b.onclick = function () { var t = f.items.filter(function (x) { return x.id === b.dataset.edit; })[0]; if (t) openTxDlg(t); };
     });
@@ -4984,11 +5256,16 @@ function salinTautan_(u, selesai) {
   $('pSave').onclick = savePost;
   $('pDelete').onclick = deletePostClick;
   $('pCaption').oninput = updateCount;
-  $('pStatus').onchange = toggleMetrics;
+  $('pTplPakai').onclick = tplPakai; $('pTplSimpan').onclick = tplSimpan; $('pTplHapus').onclick = tplHapus;
+  $('pStatus').onchange = function () { toggleMetrics(); tampilCekPost(); };
+  $('pCekLewati').onclick = cekLewati;
   $('pLink').oninput = toggleMetrics;
   METRIC_KEYS.forEach(function (k) { var inp = $(METRIC_IDS[k]); inp.addEventListener('input', function () { formatAmount(inp); }); });
   $('agOpen').onclick = function () { openAgendaDlg(null); };
   $('agAdd').onclick = addAgenda;
+  $('agMode').querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { setAgMode(b.dataset.m); }; });
+  $('agDate').addEventListener('change', function () { if (AG_MODE === 'n' && $('agUntil').value <= $('agDate').value) $('agUntil').value = addDays($('agDate').value, 1); infoRentang(); });
+  $('agUntil').addEventListener('change', infoRentang);
   $('txOpen').onclick = function () { openTxDlg(null); };
   $('txSave').onclick = saveTx;
   $('txAmount').addEventListener('input', function () { formatAmount($('txAmount')); });
@@ -5066,7 +5343,9 @@ function salinTautan_(u, selesai) {
     }
     function sorted(list) { return list.slice().sort(function (a, b) { return (a.date + (a.time || '99')).localeCompare(b.date + (b.time || '99')); }); }
     function month(ym) { return { month: ym, items: sorted(posts.filter(function (p) { return p.date.slice(0, 7) === ym; })) }; }
-    function upcoming() { return agenda.filter(function (a) { return a.date >= T; }).sort(function (a, b) { return (a.date + a.time).localeCompare(b.date + b.time); }); }
+    function pecahDemo(a) { if (!a.until || a.until <= a.date) return [a]; var o = [], n = Math.round((parseDate(a.until) - parseDate(a.date)) / 864e5) + 1; for (var i = 0; i < n; i++) o.push(Object.assign({}, a, { date: addDays(a.date, i), start: a.date, hari: (i + 1) + '/' + n })); return o; }
+    var NASKAH_DEMO = [{ id: 'n1', judul: 'Cerita awal Arabelle', isi: 'Dulu semuanya dimulai dari satu scarf yang dijahit sendiri…\n\nParagraf kedua.', versi: Date.now() - 3600e3, link: '' }];
+    function upcoming() { return [].concat.apply([], agenda.map(pecahDemo)).filter(function (a) { return a.date >= T; }).sort(function (a, b) { return (a.date + a.time).localeCompare(b.date + b.time); }); }
     var finCfg = { opening: 11200000, target: 15000000, budgets: { 'Iklan': 500000, 'Belanja bahan': 3000000 } };
     function fin(ym) {
       var sum = function (l, ty) { return l.filter(function (m) { return m.type === ty; }).reduce(function (a, m) { return a + m.amount; }, 0); };
@@ -5172,9 +5451,19 @@ function salinTautan_(u, selesai) {
       deleteRoutine: function (t, id, date) { var u = auth(t); routines = routines.filter(function (r) { return r.id !== id; }); return dayOf(u, date || T); },
       toggleRoutine: function (t, id, date, done) { var u = auth(t), k = u.name + '|' + date + '|' + id; if (done) rlog[k] = 1; else delete rlog[k]; return dayOf(u, date); },
       listAgenda: function (t) { auth(t, true); return upcoming(); },
-      addAgenda: function (t, d) { auth(t, true); var a = d.id ? agenda.filter(function (x) { return x.id === d.id; })[0] : null; if (!a) { a = { id: 'a' + (++seq) }; agenda.push(a); } a.date = d.date; a.time = d.time; a.title = d.title; a.tag = d.tag; a.note = d.note; return upcoming(); },
+      addAgenda: function (t, d) { auth(t, true); var a = d.id ? agenda.filter(function (x) { return x.id === d.id; })[0] : null; if (!a) { a = { id: 'a' + (++seq) }; agenda.push(a); } a.date = d.date; a.time = d.time; a.title = d.title; a.tag = d.tag; a.note = d.note; a.until = d.until || ''; return upcoming(); },
       searchPosts: function (t, q) { auth(t); var w = q.toLowerCase().split(/\s+/); return posts.filter(function (p) { var h = [p.ide, p.caption, p.pilar, p.platform, p.format, p.status].join(' ').toLowerCase(); return w.every(function (x) { return h.indexOf(x) >= 0; }); }).sort(function (a, b) { return b.date.localeCompare(a.date); }).slice(0, 60); },
       listIdeas: function (t) { auth(t); return ideas; },
+      getKonten: function (t) { auth(t, true); var m = []; var w = (parseDate(T).getDay() + 6) % 7; for (var i = 0; i < 7; i++) m.push(addDays(T, i - w));
+        var J = [{ tgl: m[0], jam: '09:00', sumber: 'Akun utama', platform: 'IG', format: 'Reels', topik: 'Spill warna baru Qum Scarf', pic: 'Ria', konten: 'Approved', post: 'Tayang', link: 'https://www.instagram.com/' }, { tgl: T, jam: '19:00', sumber: 'Akun utama', platform: 'IG', format: 'Carousel', topik: 'OOTD kantor 3 gaya', pic: 'Inces', konten: 'Review', post: 'Terjadwal', link: '' }, { tgl: T, jam: '12:00', sumber: 'Threads & katalog', platform: 'Threads', format: '', topik: 'Cerita di balik motif', pic: 'Cici', konten: '', post: 'Belum', link: '' }];
+        posts.filter(function (p) { return p.date >= m[0] && p.date <= m[6]; }).forEach(function (p) { J.push({ tgl: p.date, jam: p.time || '', sumber: 'Pribadi', platform: plain(p.platform), format: plain(p.format), topik: p.ide || 'Konten Syifa', pic: '', konten: plain(p.status), post: /sudah/i.test(p.status) ? 'Tayang' : /terjadwal/i.test(p.status) ? 'Terjadwal' : 'Belum', link: p.link || '', id: p.id }); });
+        J.sort(function (a, b) { return (a.tgl + (a.jam || '99')).localeCompare(b.tgl + (b.jam || '99')); });
+        return { minggu: m, hariIni: T, jadwal: J, galat: [], performa: { kemarin: addDays(T, -1), posting: 2, reach: null, viewsKemarin: 5230, akun: 'Instagram akun utama Arabelle', top: [{ tgl: m[0], format: 'Reels', caption: 'Spill warna baru Qum Scarf', er: 6.4, views: 4100, inter: 262, reach: 0, link: 'https://www.instagram.com/' }, { tgl: m[0], format: 'Carousel', caption: 'Mix & match scarf polos', er: 4.1, views: 2100, inter: 86, reach: 0, link: '' }] } }; },
+      listNaskah: function (t, q) { auth(t, true); q = String(q || '').toLowerCase(); return NASKAH_DEMO.filter(function (n) { return !q || (n.judul + ' ' + n.isi).toLowerCase().indexOf(q) >= 0; }).sort(function (a, b) { return b.versi - a.versi; }).map(function (n) { return { id: n.id, judul: n.judul || 'Tanpa judul', cuplikan: n.isi.slice(0, 140), panjang: n.isi.length, diubah: n.versi, link: n.link || '' }; }); },
+      getNaskah: function (t, id) { auth(t, true); var n = NASKAH_DEMO.filter(function (x) { return x.id === id; })[0]; if (!n) throw new Error('Naskah tidak ditemukan, mungkin sudah dihapus.'); return JSON.parse(JSON.stringify(n)); },
+      saveNaskah: function (t, d) { auth(t, true); var n = d.id ? NASKAH_DEMO.filter(function (x) { return x.id === d.id; })[0] : null; if (n && !d.paksa && d.versi && n.versi > d.versi) throw new Error('BENTROK: naskah ini sudah diubah di perangkat lain.'); if (!n) { n = { id: 'n' + (++seq), link: '' }; NASKAH_DEMO.push(n); } n.judul = d.judul; n.isi = d.isi; n.versi = Date.now(); return { id: n.id, versi: n.versi, judul: n.judul }; },
+      hapusNaskah: function (t, id) { auth(t, true); NASKAH_DEMO = NASKAH_DEMO.filter(function (x) { return x.id !== id; }); return true; },
+      naskahKeDocs: function (t, id) { auth(t, true); var n = NASKAH_DEMO.filter(function (x) { return x.id === id; })[0]; var baru = !n.link; n.link = n.link || 'https://docs.google.com/document/d/contoh-' + id + '/edit'; return { url: n.link, baru: baru }; },
       saveIdea: function (t, d) { auth(t); var x = d.id ? ideas.filter(function (i) { return i.id === d.id; })[0] : null; if (!x) { x = { id: 'i' + (++seq), date: T }; ideas.unshift(x); } x.text = d.text; x.pilar = d.pilar || ''; x.source = d.source || ''; x.note = d.note || ''; return ideas; },
       deleteIdea: function (t, id) { auth(t); ideas = ideas.filter(function (i) { return i.id !== id; }); return ideas; },
       getKabar: function (t) { auth(t); return KABAR; },
