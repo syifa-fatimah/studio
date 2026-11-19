@@ -3,7 +3,7 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
-<meta name="syifa-tampilan" content="2026.11.20-2">
+<meta name="syifa-tampilan" content="2026.11.20-3">
 <meta name="syifa-app" content="2026.10.20-20">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syifa Studio</title>
@@ -914,7 +914,7 @@
       <label class="lbl">Catatan<input class="in" id="agNote" maxlength="400" placeholder="Opsional, misalnya lokasi"></label>
       <div class="lbl" id="agTimWrap">Ajak tim Arabelle<div id="agTim" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px"></div>
         <span class="mu" id="agTimInfo">Tidak ada yang dipilih = info saja untuk tim (Syifa sendiri).</span></div>
-      <label style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)"><input type="checkbox" id="agPriv" style="width:20px;height:20px;accent-color:var(--fill)"> 🔒 Rahasiakan dari tim (tidak tampil di ThinKerBelle)</label>
+      <div class="lbl">Siapa yang bisa lihat<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px"><button type="button" class="agt" id="agLihatTim" aria-pressed="true" onclick="agLihat(false)">👥 Tim</button><button type="button" class="agt" id="agLihatPri" aria-pressed="false" onclick="agLihat(true)">🔒 Pribadi</button></div><span class="mu" id="agLihatInfo" style="font-size:13px">Tim = tampil di ThinKerBelle. Pribadi = hanya di app Syifa.</span><input type="checkbox" id="agPriv" hidden></div>
       <div class="dlg-actions">
         <button class="btn-line" type="button" data-close>Batal</button>
         <button class="btn" id="agAdd" type="button">Simpan agenda</button>
@@ -3348,7 +3348,7 @@ function salinTautan_(u, selesai) {
         '<button type="button" class="agt" data-n="Semua" aria-pressed="false">👥 Semua tim</button></div>' +
         '<span class="mu" id="perUntukInfo" style="font-size:13px">Pilih minimal 1 orang, atau Semua tim.</span></div>' +
       '<label class="lbl">Tanggal tenggat (opsional)<input class="in" id="perTgt" type="date"></label>' +
-      '<p class="mu" style="margin:0;font-size:13px">📲 Langsung tampil di app ThinKerBelle orang yang di-tag. Untuk Semua tim: diumumkan sekali di grup WA bersama pengingat terdekat. Untuk nama tertentu: tidak diumumkan di grup, cukup ke orangnya (app + japri pagi).</p>' +
+      '<p class="mu" style="margin:0;font-size:13px">📲 Langsung tampil di app ThinKerBelle orang yang di-tag. Untuk Semua tim: diumumkan sekali di grup WA bersama pengingat terdekat. Untuk nama tertentu: langsung WA japri ke orangnya + tampil di app (tidak diumumkan di grup).</p>' +
       '<div class="dlg-actions"><button class="btn" type="button" id="perKirim">📣 Kirim perintah</button></div><div id="perList"><p class="mu">Memuat perintah sebelumnya…</p></div>' +
       (SY_AUTH ? '' : '<button class="link" type="button" id="perKeluar" style="margin-top:6px">Putuskan sambungan ThinKerBelle di HP ini</button>');
     var info = function () {
@@ -3422,11 +3422,24 @@ function salinTautan_(u, selesai) {
   // Ringkasan angka kemarin (fitur angka): kosong kalau server belum mengirim t.angka atau reach belum ada
   function barisAngka(t) { var a = t && t.angka; if (!a || !(a.reach || a.views)) return ''; return '<p class="mu" style="margin:6px 0 0;font-size:13px">📈 Kemarin: ' + (a.posting || 0) + ' posting IG · ' + (a.reach ? 'reach ' + Number(a.reach).toLocaleString('id-ID') : Number(a.views).toLocaleString('id-ID') + ' views') + '</p>'; }   // 19 Nov: reach belum ada → views
   // Perintah untuk Umi & catatan tim (fitur untuk): kosong kalau server belum mengirim t.untukku / t.catatan
+  // Siapa yang bisa lihat (fitur lihatagenda): #agPriv = keadaan (#pribadi). Ada tim dipilih di "Ajak tim" → otomatis Tim.
+  function agLihatSegar() {
+    var p = $('agPriv'), t = $('agLihatTim'), r = $('agLihatPri'), info = $('agLihatInfo'); if (!p || !t || !r) return;
+    var ajak = !!document.querySelector('#agTim .agt[aria-pressed="true"]'); if (ajak) p.checked = false;
+    t.setAttribute('aria-pressed', p.checked ? 'false' : 'true'); r.setAttribute('aria-pressed', p.checked ? 'true' : 'false'); r.disabled = ajak; r.style.opacity = ajak ? '.45' : '';
+    info.textContent = ajak ? 'Mengajak tim → otomatis Tim (tampil di ThinKerBelle).' : p.checked ? 'Pribadi = hanya di app Syifa: tidak tampil di ThinKerBelle, tidak masuk pesan WA, tidak membebaskan laporan.' : 'Tim = tampil di ThinKerBelle (Kalender tim & Kabar).';
+  }
+  function agLihat(pri) { $('agPriv').checked = !!pri; agLihatSegar(); }
+  window.agLihat = agLihat;   // dipanggil onclick tombol Tim/Pribadi
+  document.addEventListener('click', function (e) { if (e.target && e.target.closest && e.target.closest('#agTim')) setTimeout(agLihatSegar, 0); });
+  (function () { var pasang = function () { var d = $('agDlg'); if (d && 'MutationObserver' in window) new MutationObserver(function () { if (d.open) agLihatSegar(); }).observe(d, { attributes: true, attributeFilter: ['open'] }); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pasang); else pasang(); })();
   function barisUntuk(t) {
     var U = t && t.untukku, h = '', tg = function (x) { return /^\d{4}-\d{2}-\d{2}$/.test(String(x || '')) ? dayLabel(x) : String(x || ''); };
     if (U && U.n) h += '<div class="pg-it" data-untuk><i>📣</i><p><b>' + U.n + ' perintah untukmu belum selesai</b>' + (U.list || []).slice(0, 3).map(function (p) {
       return '<small>' + esc(p.dari || 'Tim') + ': ' + esc(p.isi) + (p.tenggat ? ' · ⏰ ' + esc(tg(p.tenggat)) : '') + '</small>'; }).join('') +
       (U.n > 3 ? '<small>+' + (U.n - 3) + ' lainnya</small>' : '') + '<small style="font-size:12px">Tandai selesai di ThinKerBelle.</small></p></div>';
+    ((t && t.catatanku) || []).slice(0, 3).forEach(function (c) { h += '<div class="pg-it" data-catku><i>📌</i><p><b>Catatan untukmu dari ' + esc(c.dari || 'tim') + '</b><small>' + esc(c.isi) + '</small></p></div>'; });   // fitur catatanku
     ((t && t.catatan) || []).slice(0, 3).forEach(function (c) { h += '<div class="pg-it" data-cattim><i>📌</i><p><b>Catatan tim dari ' + esc(c.dari || 'tim') + '</b><small>' + esc(c.isi) + '</small></p></div>'; });
     return h;
   }
@@ -5664,7 +5677,7 @@ function salinTautan_(u, selesai) {
         var u = auth(t); if (u.role !== 'Owner') return null;
         return { review: 1, perintahBuka: 1, kinerja: null, laporanTim: {}, nama: ['Ria', 'Cici', 'Atin'], lapor: 2, wajib: 3, belum: ['Atin'], post: 3, tayang: 2,
           launch: [{ date: addDays(T, 2), text: 'Launching Contoh Scarf' }], agenda: [{ date: T, text: 'Photoshoot: Contoh', tim: 'Ria, Cici' }],
-          perintah: [{ isi: 'Contoh perintah ke tim', untuk: 'Ria', dibaca: 1, selesai: 0 }], catatan: [{ dari: 'Mas Bontot', isi: 'Contoh catatan tim dari ThinKerBelle' }], untukku: { n: 1, list: [{ dari: 'Mas Bontot', isi: 'Contoh perintah untuk Umi', waktu: T, tenggat: addDays(T, 1) }] }, kirimAlasan: 'mode contoh' };
+          perintah: [{ isi: 'Contoh perintah ke tim', untuk: 'Ria', dibaca: 1, selesai: 0 }], catatan: [{ dari: 'Mas Bontot', isi: 'Contoh catatan tim dari ThinKerBelle' }], catatanku: [{ dari: 'Ria', isi: 'Contoh catatan untuk Umi saja' }], untukku: { n: 1, list: [{ dari: 'Mas Bontot', isi: 'Contoh perintah untuk Umi', waktu: T, tenggat: addDays(T, 1) }] }, kirimAlasan: 'mode contoh' };
       },
       getDashboard: function (t) {
         var u = auth(t, true), up = upcoming(), week = [];
