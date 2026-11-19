@@ -3,7 +3,7 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
-<meta name="syifa-tampilan" content="2026.11.19-2">
+<meta name="syifa-tampilan" content="2026.11.20-2">
 <meta name="syifa-app" content="2026.10.20-20">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syifa Studio</title>
@@ -1099,7 +1099,7 @@
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<!-- RVB:mulai sha=932532d998c11ed9a29edd6938da0015c4863f786e746ecc7773444ee2348f1f sumber=ef0c4aa -->
+<!-- RVB:mulai sha=de22960af279e0fa9ab9dc399ccd343c0e8a81235b8e259a530d5dec857d5317 sumber=a86493a -->
 <style id="rvbCss">
 /* RVB · pengaman (atas): token warna TKB terang di wilayah Review, dasar huruf TKB, svg sebaris seperti di TKB */
 #rvIsi.rvb,#rvbSheet,#rvbDim,.rvgl,.rvpv,#rvbLoad{--bg:#FFEFF5;--card:#FFF8FB;--ink:#4A1D33;--mut:#8A4C68;--deep:#BE2B66;--mid:#D9558A;--acc:#F7B3CE;--chip:#FFE3EE;--line:#F5CADB;--sh:rgba(190,43,102,.10);--ok:#2F7A55;--okbg:#E4F3EA;--warn:#C9822B;--acct:#BE2B66;--fade:rgba(255,239,245,.9);--nav:#BE2B66;--navt:#FFE3EE;color-scheme:light;--tile:#FFE3EE;--tile2:#FBCFE0;--chipnc:rgba(255,255,255,.7);--n-pink:#FBCFE0;--n-kuning:#FFDDE9;--n-hijau:#FFE6EE;--n-ungu:#F1D7F0;--n-biru:#F8C4DA}
@@ -1115,6 +1115,7 @@
 #rvIsi.rvb .acts,#rvbSheet .acts,.rvgl .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 #rvIsi.rvb .sbtn,#rvbSheet .sbtn,.rvgl .sbtn{border:0;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;background:var(--chip);color:var(--acct)}
 #rvIsi.rvb .sbtn.pri,#rvbSheet .sbtn.pri,.rvgl .sbtn.pri{background:var(--deep);color:#fff}
+#rvIsi.rvb .sbtn.okb,#rvbSheet .sbtn.okb,.rvgl .sbtn.okb{background:var(--okbg);color:var(--ok)}
 #rvIsi.rvb .chip,#rvbSheet .chip,.rvgl .chip{display:inline-flex;align-items:center;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;background:var(--chip);color:var(--acct);white-space:nowrap}
 #rvIsi.rvb .chip.ok,#rvbSheet .chip.ok,.rvgl .chip.ok{background:var(--okbg);color:var(--ok)}
 #rvIsi.rvb .chip.wr,#rvbSheet .chip.wr,.rvgl .chip.wr{background:#FBEDE6;color:#A4472F}
@@ -1145,6 +1146,15 @@ body.rvglon #load{z-index:70}
 .rvglw svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .rvglpin{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:#FFC400;color:#3A0F26;border:2px solid #4A1230;display:grid;place-items:center;font-size:13px;font-weight:700;pointer-events:none}
 .rvglpin.kirim{opacity:.6}
+.rvgltd{display:flex;flex-direction:column;gap:6px;margin:4px 0 12px}
+.rvgltdb{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:12px;background:var(--card);border:1.5px solid var(--line);cursor:pointer}
+.rvgltdb.on{border-color:var(--acct)}
+.rvgltdb .x{flex:1;min-width:0}
+.rvgltdb p{margin:0;font-size:14px;white-space:pre-line}
+.rvgltdb small{display:block;color:var(--mut);font-size:12px}
+.rvgltdb textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:8px;font:inherit}
+.rvgltdn{flex:none;width:24px;height:24px;border-radius:50%;background:#FFC400;color:#3A0F26;border:2px solid #4A1230;display:grid;place-items:center;font-size:12px;font-weight:700}
+.rvgltde{border:0;background:none;color:var(--acct);font-weight:700;padding:4px 0 0;font-size:13px}
 .rvglpin.gagal{background:#F5A3A3}
 .rvglmuat{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff;font-size:13px;pointer-events:none}
 #rvIsi.rvb .rvspin,#rvbSheet .rvspin,.rvgl .rvspin{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;animation:rvputar .8s linear infinite}
@@ -1247,6 +1257,8 @@ body.rvglon #load{z-index:70}
 #rvIsi.rvb .fm input,#rvbSheet .fm input,.rvgl .fm input,#rvIsi.rvb .fm textarea,#rvbSheet .fm textarea,.rvgl .fm textarea,#rvIsi.rvb .fm select,#rvbSheet .fm select,.rvgl .fm select{width:100%;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;font:15px 'Outfit',sans-serif;background:var(--bg);color:var(--ink)}
 #rvIsi.rvb .fm textarea,#rvbSheet .fm textarea,.rvgl .fm textarea{min-height:84px;resize:vertical}
 #rvIsi.rvb .fm input[type=range],#rvbSheet .fm input[type=range],.rvgl .fm input[type=range]{padding:0;border:0;background:none;accent-color:var(--acct)}
+#rvIsi.rvb .fm input[type=date],#rvbSheet .fm input[type=date],.rvgl .fm input[type=date],#rvIsi.rvb .fm input[type=time],#rvbSheet .fm input[type=time],.rvgl .fm input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;display:block;min-height:48px;text-align:left}
+#rvIsi.rvb .fm input::-webkit-date-and-time-value,#rvbSheet .fm input::-webkit-date-and-time-value,.rvgl .fm input::-webkit-date-and-time-value{text-align:left}
 #rvIsi.rvb .big:disabled,#rvbSheet .big:disabled,.rvgl .big:disabled{opacity:.5}
 #rvIsi.rvb .info,#rvbSheet .info,.rvgl .info{background:var(--chip);color:var(--acct);border-radius:16px;padding:10px 12px;font-size:12.5px;margin-top:12px;line-height:1.55}
 #rvIsi.rvb .big,#rvbSheet .big,.rvgl .big{width:100%;border:0;border-radius:18px;padding:14px;font-weight:600;font-size:15px;background:var(--deep);color:#fff;margin-top:16px}
@@ -1323,7 +1335,7 @@ function render() {
 // pemetaan google.script.run TKB → jembatan Syifa (args[0] = TOKEN dibuang)
 const GET_RVB = { apiReviewFoto: ['reviewV2', a => ({ arsip: !!(a[0] && a[0].arsip) }), 1], apiReviewSampul: ['sampul', a => ({ ids: a[0] })],
   apiReviewFolder: ['folder', a => ({ id: a[0], segar: !!a[1] })], apiReviewTanda: ['tanda', a => ({ indukId: a[0], folderId: a[1] })] };
-const POST_RVB = /^api(ReviewPutusKelompok|ReviewTandaSimpan|ReviewTandaHapus|ReviewSampulPilih|ReviewPutus)$/;
+const POST_RVB = /^api(ReviewPutusKelompok|ReviewTandaSimpan|ReviewTandaHapus|ReviewTandaCatatan|ReviewSampulPilih|ReviewPerbarui|ReviewPutus)$/;   // 20 Nov: + catatan pin & Perbarui revisi (rilis 21 syReviewTandaCatatan/syReviewPerbarui)
 function gsr(fn, args, ok, fail) {
   const s = SY_RVB(), a = (args || []).slice(1), salah = e => { loading(false); (fail || (x => react('gagal', '⚠️ ' + x.message)))(e instanceof Error ? e : new Error(String(e))); };
   if (!s) return salah(new Error('Syifa Studio belum siap.'));
@@ -1340,7 +1352,7 @@ new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { const e =
   ANTRE_IKON_RVB.add(e); if (!JADWAL_IKON_RVB) JADWAL_IKON_RVB = requestAnimationFrame(() => { JADWAL_IKON_RVB = 0; const a = [...ANTRE_IKON_RVB]; ANTRE_IKON_RVB.clear();
     a.forEach(x => { if (x.isConnected && !a.some(y => y !== x && y.contains(x))) rapikanIkon(x); }); }); }))).observe(document.body, { childList: true, subtree: true });
 
-// ==== BLOK SALINAN ThinKerBelle Apps.html (ef0c4aa) ====
+// ==== BLOK SALINAN ThinKerBelle Apps.html (a86493a) ====
 const I = { home: '<path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/>', cal: '<rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>', plus: '<path d="M12 5v14M5 12h14"/>',
   task: '<path d="M4 6.5l1.5 1.5L8 5.5M4 12.5 5.5 14 8 11.5M4 18.5 5.5 20 8 17.5"/><path d="M11 7h9M11 13h9M11 19h9"/>', more: '<rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/>',
   bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>', arr: '<path d="M9 6l6 6-6 6"/>', up: '<path d="M12 19V5M6 11l6-6 6 6"/>', down: '<path d="M12 5v14M6 13l6 6 6-6"/>', cam: '<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>' };
@@ -1528,8 +1540,8 @@ function bukaKelompokRv(gid, j) {
     ${gridFotoF(k.foto, i => `bukaGaleriRv('${esc(sk)}',${i})`)}
     <div class="rvlk"><a class="sbtn" href="https:\/\/drive.google.com/drive/folders/${esc(k.id)}" target="_blank" rel="noopener">${ic('link', 14)} Buka asli di Drive</a></div>
     <div class="card"><small style="display:block">📤 ${esc(x.oleh || g.oleh)} · ${esc(x.waktu || g.waktu)}</small>${x.reviewer && S.st !== 'Menunggu' ? `<small style="display:block">${S.st === 'Disetujui' ? '✅' : '✏️'} ${esc(x.reviewer === 'Syifa' ? 'Umi Syifa' : x.reviewer)} · ${esc(x.waktuReview)}</small>` : ''}
-      ${x.pesan ? `<div class="info">💬 Catatan pengaju: ${esc(x.pesan)}</div>` : ''}${x.catatan && S.st !== 'Menunggu' ? `<div class="info">✏️ ${esc(x.catatan)}</div>` : ''}${x.riwayat ? `<details style="margin-top:8px"><summary><small>Riwayat</small></summary><small style="white-space:pre-line;display:block;color:var(--mut)">${esc(x.riwayat)}</small></details>` : ''}</div>
-    ${S.st === 'Revisi' ? `<div class="info">✏️ Untuk revisi: ganti foto langsung di folder Drive ini, lalu ketuk Muat ulang isi folder.</div>` : ''}
+      ${x.pesan ? `<div class="info">💬 Catatan pengaju: ${esc(x.pesan)}</div>` : ''}${x.catatan && S.st !== 'Menunggu' ? `<div class="info">✏️ ${esc(x.catatan)}</div>` : ''}${x.riwayat ? riwayatPutaranRv(x.riwayat) : ''}</div>
+    ${S.st === 'Revisi' ? `<div class="info">✏️ Untuk revisi: ganti atau tambah foto di folder Drive ini, lalu ketuk <b>Perbarui revisi</b>. Catatan putaran ini pindah ke Riwayat.</div>${!x.arsip && !LIHAT && ((x.oleh || g.oleh) === D.nama || D.leaderRv) ? `<button class="big" onclick="perbaruiRevisiRv('${esc(gid)}',${j})">📤 Perbarui revisi</button>` : ''}` : ''}
     ${!x.arsip && D.bolehSetujuV2 && S.st === 'Disetujui' ? `<div class="info">✅ Disetujui${x.reviewer ? ' oleh ' + esc(x.reviewer) : ''}.</div><button class="big alt" onclick="keputusanRv('${esc(gid)}',${j},'batal')">↩️ Batalkan persetujuan</button>` : ''}
     ${!x.arsip && D.bolehSetujuV2 && S.st !== 'Disetujui' ? `<button class="big" onclick="keputusanRv('${esc(gid)}',${j},'setuju')">✅ Setujui folder ini</button><div class="fm"><textarea id="rvc" style="min-height:70px" placeholder="Catatan revisi (boleh kosong kalau sudah ada tanda atau komentar di foto)" oninput="drafRv('${esc(kunci)}',this.value)">${esc(RVC[kunci] || '')}</textarea></div><button class="big alt" onclick="keputusanRv('${esc(gid)}',${j},'revisi')">✏️ Minta revisi</button>` : ''}`);
 }
@@ -1538,14 +1550,30 @@ function keputusanRv(gid, j, kep, yakin, ditanya) {
   const g = seriRv().find(x => x.id === gid), d = g && FRV[g.folderId] && FRV[g.folderId].d, k = d && d.grup[j]; if (!k) return;
   if (kep === 'batal' && !ditanya) return tanyaBatalRv(gid, j, k);   // App 5.11: Batalkan persetujuan selalu dikonfirmasi dulu
   const c = kep === 'revisi' && $('rvc') ? $('rvc').value.trim() : '';
+  if (kep === 'revisi' && !yakin && !ditanya) { const tc = tandaTanpaCatatanRv(gid, j); if (tc.length && !confirm(tc.length + ' tanda belum punya catatan:\n' + tc.slice(0, 8).join('\n') + (tc.length > 8 ? '\n…' : '') + '\n\nPengirim hanya melihat titiknya tanpa penjelasan. Tetap kirim Minta revisi?')) return; }
+  const KEP_JALAN = keputusanRv.jalan || (keputusanRv.jalan = {}), kj = gid + '|' + k.id + '|' + kep; if (KEP_JALAN[kj] && Date.now() - KEP_JALAN[kj] < 20000) return; KEP_JALAN[kj] = Date.now();   // 5.16: klik ganda tidak mengirim dua kali
   loading(true, 'Menyimpan…');
-  gsr('apiReviewPutusKelompok', [TOKEN, g.induk, k.id, kep, c, { yakin: !!yakin }], r => { loading(false);
+  gsr('apiReviewPutusKelompok', [TOKEN, g.induk, k.id, kep, c, { yakin: !!yakin }], r => { loading(false); delete KEP_JALAN[kj];
     if (r && r.perluYakin) return yakinRv(gid, j, r.pesan);
     if (!r || !r.ok) return react('gagal', (r && r.pesan) || 'Gagal');
     const kk = g.induk + '|' + k.id; if (GLT[kk] && kep !== 'setuju') GLT[kk].kunciRevisi = kep === 'revisi';
     drafRv(gid + '|' + k.id, ''); if (GL) tutupGl(); tutup(); react('selesai', r.pesan); RVKOTOR = Date.now(); muatReview(); muat(true); },
-    e => { loading(false); react('gagal', '⚠️ ' + ((e && e.message) || 'Gagal')); });
+    e => { loading(false); delete KEP_JALAN[kj]; react('gagal', '⚠️ ' + ((e && e.message) || 'Gagal')); });
 }
+// 5.16 (Review 1.9.1): Riwayat per putaran. Baris "… putaran N dikirim oleh …" membuka putaran N; "· catatan putaran M: …" pindah ke putaran M.
+function kelompokRiwayatRv(teks) { const P = {}, tambah = (n, x) => (P[n] = P[n] || []).push(x); let kini = 1;
+  String(teks || '').split('\n').map(x => x.trim()).filter(Boolean).forEach(l => { const m = l.match(/putaran (\d+) dikirim oleh/);
+    if (m) { const c = l.match(/ · catatan putaran (\d+): (.*)$/); if (c) { tambah(Number(c[1]), '✏️ Catatan revisi: ' + c[2]); l = l.slice(0, c.index); } kini = Number(m[1]); } tambah(kini, l); });
+  return Object.keys(P).map(Number).sort((a, b) => a - b).map(n => ({ n, baris: P[n] })); }
+function riwayatPutaranRv(teks) { const G = kelompokRiwayatRv(teks); if (!G.length) return '';
+  return `<details style="margin-top:8px"><summary><small>Riwayat${G.length > 1 ? ' · ' + G.length + ' putaran' : ''}</small></summary>` + G.map(g => `<small style="display:block;margin-top:6px;font-weight:600">Putaran ${g.n}</small><small style="white-space:pre-line;display:block;color:var(--mut)">${esc(g.baris.join('\n'))}</small>`).join('') + '</details>'; }
+// Review 1.9 · Perbarui revisi: pengirim (atau Leader) mengirim ulang folder Revisi setelah foto diganti di Drive
+function perbaruiRevisiRv(gid, j) { const g = seriRv().find(x => x.id === gid), d = g && FRV[g.folderId] && FRV[g.folderId].d, k = d && d.grup[j]; if (!k) return;
+  if (!confirm('Kirim ' + (d.grup.length > 1 ? k.nama : g.nama) + ' untuk direview lagi?\n\nPastikan foto sudah diganti di folder Drive. Catatan revisi sekarang pindah ke Riwayat, dan penyetuju dikabari.')) return;
+  loading(true, 'Memeriksa folder…');
+  gsr('apiReviewPerbarui', [TOKEN, g.induk, k.id], r => { loading(false); if (!r || !r.ok) return react(r && r.tanpaUbah ? 'bingung' : 'gagal', (r && r.pesan) || 'Gagal');
+      tutup(); react('selesai', r.pesan); RVKOTOR = Date.now(); delete FRV[g.folderId]; muatReview(); muat(true); },
+    e => { loading(false); react('gagal', '⚠️ ' + ((e && e.message) || 'Gagal')); }); }
 // Konfirmasi Batalkan persetujuan (K2-3 B). Folder di Foto Final tidak dipindah balik; status kembali Menunggu.
 function tanyaBatalRv(gid, j, k) {
   const isi = `<h2>Batalkan persetujuan?</h2><div class="info" style="margin-top:0"><b>${esc((k && k.nama) || 'Folder ini')}</b> kembali berstatus <b>Menunggu</b> dan perlu disetujui lagi. File yang sudah ada di folder Foto Final tidak dipindah balik.</div><button class="big" onclick="keputusanRv('${esc(gid)}',${j},'batal',false,true)">↩️ Ya, batalkan persetujuan</button><button class="big alt" onclick="${GL ? 'tampilPutGl(true)' : 'tutup()'}">Tidak jadi</button>`;
@@ -1589,7 +1617,7 @@ const hakGl = () => { const T = GLT[kunciGl()]; if (T && T.hak) return T.hak; co
 function muatTandaGl() { const k = kunciGl(); if (GL) { GL.galatTanda = ''; }
   const galat = p => { if (GL && kunciGl() === k) { GL.galatTanda = p; alatGl(); } };   // tampil di petunjuk galeri (+ Coba lagi), tanpa pop-up
   gsr('apiReviewTanda', [TOKEN, GL.S.induk, GL.S.folderId], r => { if (!r || !r.ok) return galat((r && r.pesan) || 'Tanda belum termuat.'); if (GL && kunciGl() === k) GL.galatTanda = ''; const lokal = ((GLT[k] || {}).tanda || []).filter(t => t.status);   // yang belum terkirim tetap tampil
-    GLT[k] = { tanda: r.tanda.concat(lokal.filter(t => !r.tanda.some(x => x.id === t.id))), hak: r.hak, revisi: r.revisi, lama: r.lama, bisaUrung: r.bisaUrung, kunciRevisi: !!r.kunciRevisi };
+    GLT[k] = { tanda: r.tanda.concat(lokal.filter(t => !r.tanda.some(x => x.id === t.id))), hak: r.hak, revisi: r.revisi, lama: r.lama, bisaUrung: r.bisaUrung, kunciRevisi: !!r.kunciRevisi, kunciCatatan: !!r.kunciCatatan, bisaEditCatatan: r.bisaEditCatatan !== false, riwayat: r.riwayatTanda || [] };
     if (GL && kunciGl() === k) { gambarTandaGl(); stripGl(); panelGl(); } }, () => galat('Sinyal putus: tanda belum termuat.')); }
 // ---------- foto ----------
 function tampilGl() { if (!GL) return; const f = fotoGl(), n = GL.S.foto.length, id = ++GL.muatId;
@@ -1609,7 +1637,7 @@ function ukurGl() { if (!GL) return; const st = $('gls'), w = $('glw'), im = $('
   const ww = W / H > r ? H * r : W, hh = W / H > r ? H : W / r; Object.assign(w.style, { width: ww + 'px', height: hh + 'px', left: (W - ww) / 2 + 'px', top: (H - hh) / 2 + 'px' }); }
 function pramuatGl() { if (!GL) return; const n = GL.S.foto.length; if (n < 2) return; [GL.pos + 1, GL.pos - 1].forEach(i => { const f = GL.S.foto[(i + n) % n]; if (f) { const b = new Image(); b.referrerPolicy = 'no-referrer'; b.src = urlFotoRv(f.id, 1600); } }); }
 function ubahGl() { const w = $('glw'); if (!w || !GL) return; w.style.transform = 'translate(' + GL.x + 'px,' + GL.y + 'px) scale(' + GL.s + ')'; $('glz').textContent = GL.s > 1.05 ? 'Zoom ' + GL.s.toFixed(1) + '×' : '';
-  document.querySelectorAll('#glpin .rvglpin').forEach(p => { p.style.transform = 'scale(' + (1 / GL.s) + ')'; });
+  document.querySelectorAll('#glpin .rvglpin').forEach(p => { p.style.transform = 'scale(' + (1 / GL.s) + ')' + (p.dataset.g ? ' translate(' + p.dataset.g + ')' : ''); });   // 5.16.1: geseran pin bertumpuk (K4) tidak hilang saat zoom/geser
   if (GL.s > 1.6 && !GL.besar) { GL.besar = true; const f = fotoGl(), b = new Image(); b.referrerPolicy = 'no-referrer'; b.onload = () => { if (GL && fotoGl() === f) $('gli').src = b.src; }; b.src = urlFotoRv(f.id, 2400); } }
 function zoomGl(s, cx, cy) { if (!GL) return; const box = $('gls').getBoundingClientRect(), s2 = Math.max(1, Math.min(5, s));
   if (cx != null) { const ox = cx - box.left - box.width / 2, oy = cy - box.top - box.height / 2; GL.x = ox - (ox - GL.x) * s2 / GL.s; GL.y = oy - (oy - GL.y) * s2 / GL.s; }
@@ -1640,9 +1668,12 @@ function gerakGl(el) { const P = new Map(); let awal = null, ketuk = 0;
     if (GL.alat === 'pin' && !awal.gerak && !awal.dua && hakGl().tanda) { const p = persenGl(e); simpanTandaGl({ jenis: 'pin', x: p[0], y: p[1] }); }
     else if (GL.alat === 'zoom' && !awal.gerak && !awal.dua) zoomGl(GL.s >= 3 ? 1 : GL.s + 1, e.clientX, e.clientY);
     else if (!awal.dua && GL.s === 1 && Math.abs(dx) > 60 && GL.alat !== 'pin') geserGl(dx < 0 ? 1 : -1);
-    else if (!awal.gerak && !awal.dua && GL.alat === 'lihat') { const kini = Date.now(); if (kini - ketuk < 320) { ketuk = 0; zoomGl(GL.s > 1 ? 1 : 2.5, e.clientX, e.clientY); } else ketuk = kini; }
+    else if (!awal.gerak && !awal.dua && GL.alat === 'lihat') { const kini = Date.now(); if (kini - ketuk < 320) { ketuk = 0; zoomGl(GL.s > 1 ? 1 : 2.5, e.clientX, e.clientY); } else { ketuk = kini; const id = pinDekatGl(e.clientX, e.clientY); if (id) pilihPinGl(id); } }
     awal = null; };
 }
+// 5.16.1 (K4): ketuk pin di mode Geser → barisnya di daftar tanda tersorot & digulir ke tampilan (pin tidak menerima ketukan sendiri: pointer-events none)
+function pinDekatGl(x, y) { let id = null, d0 = 22; document.querySelectorAll('#glpin .rvglpin').forEach(p => { const r = p.getBoundingClientRect(), d = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2)); if (d < d0) { d0 = d; id = p.dataset.id; } }); return id; }
+function pilihPinGl(id) { if (!GL) return; GL.sorot = id; gambarTandaGl(); panelGl(); setTimeout(() => { const b = document.querySelector('#glkom .rvgltdb.on'); if (b) b.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 30); }
 // Ramer–Douglas–Peucker (toleransi 0,5 %), lalu maks 80 titik
 function sederhanaGl(pts) {
   const rdp = (a, eps) => { if (a.length < 3) return a; const [x1, y1] = a[0], [x2, y2] = a[a.length - 1], L = Math.hypot(x2 - x1, y2 - y1) || 1; let m = 0, i0 = 0;
@@ -1654,20 +1685,22 @@ function sederhanaGl(pts) {
 function gambarTandaGl() { if (!GL) return; const f = fotoGl(), T = tandaGl().filter(t => t.foto === f.id && t.jenis !== 'komentar'), dl = g => 'M ' + g.trim().split(/\s+/).map(p => p.replace(',', ' ')).join(' L ');
   const garis = T.filter(t => t.jenis === 'coret' && t.garis).map(t => dl(t.garis)).concat(GL.draw && GL.draw.length ? [dl(GL.draw.map(p => p[0] + ',' + p[1]).join(' '))] : []).join(' ');
   $('glsvg').innerHTML = garis ? `<path d="${garis}" fill="none" stroke="#4A1230" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><path d="${garis}" fill="none" stroke="#FFC400" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>` : '';
-  $('glpin').innerHTML = T.map(t => `<span class="rvglpin ${t.status || ''}" style="left:${t.x}%;top:${t.y}%;transform:scale(${1 / GL.s})">${t.n || '•'}</span>`).join('');
+  // K4 (Review 1.8): pin yang berdekatan (< 3,5% gambar) digambar bergeser melingkar, posisi tersimpan tidak berubah; pin yang dipilih di daftar diberi cincin
+  const geser = T.map((t, i) => { const dekat = T.slice(0, i).filter(u => u.jenis === 'pin' && Math.hypot(u.x - t.x, u.y - t.y) < 3.5).length; return dekat ? [Math.round(Math.cos(dekat * 2.1) * 16), Math.round(Math.sin(dekat * 2.1) * 16)] : [0, 0]; });
+  $('glpin').innerHTML = T.map((t, i) => `<span class="rvglpin ${t.status || ''}${GL.sorot === t.id ? ' sorot' : ''}" data-id="${t.id}" data-g="${geser[i][0]}px,${geser[i][1]}px" style="left:${t.x}%;top:${t.y}%;transform:scale(${1 / GL.s}) translate(${geser[i][0]}px,${geser[i][1]}px)">${t.n || '•'}</span>`).join('');
 }
 function idTandaRv() { return 'T' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function simpanTandaGl(d) { if (!GL) return; const k = kunciGl(), f = fotoGl(); GLT[k] = GLT[k] || { tanda: [] };
   const sendiri = GLT[k].tanda.filter(t => t.foto === f.id && t.jenis !== 'komentar'), t = Object.assign({ id: idTandaRv(), foto: f.id, oleh: D.nama, waktu: 'baru saja', status: 'kirim', n: d.jenis === 'komentar' ? (d.n || 0) : sendiri.reduce((a, x) => Math.max(a, x.n || 0), 0) + 1 }, d);
-  GLT[k].tanda.push(t); if (d.jenis !== 'komentar') GL.aktifN = t.n; gambarTandaGl(); stripGl(); panelGl();
+  GLT[k].tanda.push(t); if (d.jenis !== 'komentar') { GL.aktifN = t.n; GL.edit = t.id; GL.sorot = t.id; } gambarTandaGl(); stripGl(); panelGl(); fokusCatatanGl();
   const kirim = { id: t.id, indukId: GL.S.induk, folderId: GL.S.folderId, fotoId: f.id, jenis: t.jenis, x: t.x, y: t.y, garis: t.garis || '', teks: t.teks || '', n: t.n };
   kirimTandaRv(kirim, t);
 }
 function kirimTandaRv(kirim, t) {
-  gsr('apiReviewTandaSimpan', [TOKEN, kirim], r => { if (r && r.ok) { hapusAntreTanda(kirim.id); if (t && t.batal) return hapusDiamRv(kirim.id, 1); if (t) Object.assign(t, r.tanda, { status: '' }); }
+  gsr('apiReviewTandaSimpan', [TOKEN, kirim], r => { if (r && r.ok) { hapusAntreTanda(kirim.id); if (t && t.batal) return hapusDiamRv(kirim.id, 1); if (t) { const tunda = t.tundaCatatan; Object.assign(t, r.tanda, { status: '' }); if (tunda != null) { t.tundaCatatan = null; kirimCatatanGl(t, tunda); } } }
       else { if (t) { t.status = 'gagal'; t.pesan = (r && r.pesan) || 'Gagal'; } react('gagal', (r && r.pesan) || 'Tanda belum tersimpan'); hapusAntreTanda(kirim.id); }
       if (GL) { gambarTandaGl(); stripGl(); panelGl(); } },
-    e => { if (t && t.batal) return; if (t) t.status = 'gagal'; simpanAntreTanda(kirim); if (GL) { gambarTandaGl(); panelGl(); } react('bingung', 'Sinyal putus: tanda disimpan di HP dan dikirim lagi otomatis.'); });
+    e => { if (t && t.batal) return; if (t) t.status = 'gagal'; simpanAntreTanda(t && t.tundaCatatan != null ? Object.assign({}, kirim, { teks: t.tundaCatatan }) : kirim); if (GL) { gambarTandaGl(); panelGl(); } react('bingung', 'Sinyal putus: tanda disimpan di HP dan dikirim lagi otomatis.'); });
 }
 const ANTRE_T = 'tkbTandaAntre1';
 function simpanAntreTanda(k) { const a = (bacaLokal(ANTRE_T) || []).filter(x => x.id !== k.id); a.push(k); simpanLokal(ANTRE_T, a.slice(-100)); }
@@ -1694,7 +1727,7 @@ function urungkanGl() { if (!GL) return; const k = kunciGl(), mine = tandakuGl()
       if (r && r.kunciRevisi) T0.kunciRevisi = true; else if (/Dihapus pada|REVIEW TANDA|Siapkan Review V2/i.test(p)) T0.bisaUrung = false;   // ketukan berikutnya tidak menghapus sementara
       balik(pesanUrungRv(p)); }, () => balik('Sinyal putus: tanda dikembalikan, coba lagi saat online.'));
 }
-function kirimKomentarGl() { const i = $('glin'), teks = i ? i.value.trim() : ''; if (!teks) return; i.value = ''; simpanTandaGl({ jenis: 'komentar', teks: teks, n: GL.aktifN || 0 }); GL.aktifN = null; panelGl(); }
+function kirimKomentarGl() { const i = $('glin'), teks = i ? i.value.trim() : ''; if (!teks) return; i.value = ''; simpanTandaGl({ jenis: 'komentar', teks: teks, n: 0 }); GL.aktifN = null; panelGl(); }   // 1.8: komentar selalu umum; catatan pin di daftar tanda
 // ---------- panel: alat, komentar, keputusan, sampul ----------
 function alatGl() { if (!GL) return; const h = hakGl(), b = (a, label, ik, boleh) => `<button class="${GL.alat === a ? 'on' : ''}" ${boleh === false ? 'disabled' : ''} onclick="alatPilihGl('${a}')" aria-pressed="${GL.alat === a}">${ic(ik, 20)}${label}</button>`;
   const tk = tandakuGl(), al = alasanUrungGl(tk[tk.length - 1]), mine = tk.length > 0 && !al, lain = !mine && tandaGl().some(t => t.foto === fotoGl().id && t.jenis !== 'komentar');
@@ -1714,15 +1747,45 @@ function alatPilihGl(a) { if (!GL) return; GL.alat = a; if (a === 'pin' || a ===
 function stripGl() { if (!GL) return; const per = {}; tandaGl().forEach(t => { per[t.foto] = (per[t.foto] || 0) + 1; });
   $('glstrip').innerHTML = GL.S.foto.map((f, i) => `<button class="${i === GL.pos ? 'on' : ''}" onclick="keFotoGl(${i})" aria-label="Foto ${i + 1}${per[f.id] ? ', ' + per[f.id] + ' tanda/komentar' : ''}"><img loading="lazy" alt="" referrerpolicy="no-referrer" src="${urlFotoRv(f.id, 200)}">${per[f.id] ? '<i></i>' : ''}</button>`).join('');
   const on = $('glstrip').querySelector('.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' }); }
-function panelGl() { if (!GL) return; const f = fotoGl(), h = hakGl(), T = tandaGl().filter(t => t.foto === f.id), kom = T.filter(t => t.jenis === 'komentar'), tnd = T.filter(t => t.jenis !== 'komentar');
+function panelGl() { if (!GL) return; const sedangTd = document.activeElement && document.activeElement.id === 'gltd'; setTimeout(() => { if (sedangTd && $('gltd') && document.activeElement !== $('gltd')) { const x = $('gltd'); x.focus(); x.setSelectionRange(x.value.length, x.value.length); } }, 0); const f = fotoGl(), h = hakGl(), T = tandaGl().filter(t => t.foto === f.id), kom = T.filter(t => t.jenis === 'komentar'), tnd = T.filter(t => t.jenis !== 'komentar');
   $('glkom').style.display = GL.S.induk ? '' : 'none';
-  if (GL.S.induk) $('glkom').innerHTML = `<h4>Komentar · foto ${GL.pos + 1}${kom.length ? ' (' + kom.length + ')' : ''}</h4>${tnd.length ? `<small style="color:var(--mut)">${tnd.length} tanda di foto ini</small>` : ''}
+  if (GL.S.induk) $('glkom').innerHTML = daftarTandaGl(tnd) + riwayatTandaGl(f.id) + `<h4>Komentar · foto ${GL.pos + 1}${kom.length ? ' (' + kom.length + ')' : ''}</h4>
     ${kom.length ? kom.map(c => `<div class="rvglc"><div><b style="color:var(--ink)">${esc(c.oleh)}</b><span>${esc(c.waktu || '')}${c.status === 'kirim' ? ' · mengirim…' : c.status === 'gagal' ? ' · belum terkirim' : ''}</span></div><p>${c.n ? 'Tanda ' + c.n + (tnd.some(x => x.n === c.n) ? '' : ' (diurungkan)') + ': ' : ''}${esc(c.teks)}</p></div>`).join('') : `<div class="rvglc"><p style="color:var(--mut)">Belum ada komentar di foto ini.${h.tanda ? ' Taruh pin atau coretan, lalu tulis catatannya di sini.' : ''}</p></div>`}
-    ${h.komentar ? `${GL.aktifN ? `<div style="margin-top:8px"><span class="chip">Catatan untuk tanda ${GL.aktifN}</span></div>` : ''}<div class="rvgltulis"><input id="glin" placeholder="Tulis komentar…" aria-label="Tulis komentar" onkeydown="if(event.key==='Enter'){event.preventDefault();kirimKomentarGl()}"><button onclick="kirimKomentarGl()" aria-label="Kirim komentar">${ic('arr', 20)}</button></div>` : ''}`;
+    ${h.komentar ? `<div class="rvgltulis"><input id="glin" placeholder="Tulis komentar…" aria-label="Tulis komentar" onkeydown="if(event.key==='Enter'){event.preventDefault();kirimKomentarGl()}"><button onclick="kirimKomentarGl()" aria-label="Kirim komentar">${ic('arr', 20)}</button></div>` : ''}`;
   tampilPutGl(); alatGl();
   const s0 = seriRv().find(x => x.id === GL.S.gid) || {}, bisaSampul = GL.S.induk && h.sampul, jadi = s0.sampul === f.id;
   $('gllk').innerHTML = `<a href="${fileDriveRv(f.id)}" target="_blank" rel="noopener">Buka asli di Drive</a>${bisaSampul ? (jadi ? '<span>⭐ Sampul seri</span>' : `<button onclick="sampulGl('${esc(f.id)}')">⭐ Jadikan sampul</button>`) : ''}`;
 }
+// ---------- 1.8 · catatan pin (K1 A: terkunci setelah Minta revisi · K3 komentar lama "Tanda n" · K4 daftar + geser) ----------
+const PESAN_KUNCI_CATATAN = 'Sudah terkirim ke pengunggah bersama Minta revisi. Tambahkan komentar koreksi.';
+function kunciCatatanGl(t) { const T = GLT[kunciGl()] || {}; return !!(T.kunciCatatan || T.kunciRevisi || (T.revisi != null && t.revisi != null && t.revisi !== T.revisi)); }
+function daftarTandaGl(tnd) { if (!tnd.length) return '';
+  const urut = tnd.slice().sort((a, b) => (a.n || 0) - (b.n || 0));
+  return `<h4>Tanda di foto ini (${urut.length})</h4><div class="rvgltd">` + urut.map(t => { const milik = t.oleh === D.nama, kunci = kunciCatatanGl(t), isi = String(t.teks || '').trim();
+    if (GL.edit === t.id && milik && !kunci) return `<div class="rvgltdb on"><span class="rvgltdn">${t.n || '•'}</span><div class="x"><textarea id="gltd" data-id="${t.id}" rows="2" maxlength="600" placeholder="Catatan untuk tanda ${t.n || ''} (boleh nanti)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();simpanCatatanGl('${t.id}')}if(event.key==='Escape'){GL.edit=null;panelGl()}">${esc($('gltd') && $('gltd').dataset.id === t.id ? $('gltd').value : isi)}</textarea>
+      <div class="acts"><button class="sbtn okb" onclick="simpanCatatanGl('${t.id}')">✓ Simpan</button><button class="sbtn" onclick="GL.edit=null;panelGl()">Nanti</button></div></div></div>`;
+    const teks = isi ? esc(isi) : t.dariKomentar ? esc(t.dariKomentar) + ' <span class="chip">dari komentar</span>' : '<span style="color:var(--mut)">Belum ada catatan</span>';
+    return `<div class="rvgltdb${GL.sorot === t.id ? ' on' : ''}" onclick="sorotTandaGl('${t.id}')"><span class="rvgltdn">${t.n || '•'}</span><div class="x"><p>${teks}</p><small>${t.jenis === 'coret' ? 'Coret' : 'Pin'} · ${esc(t.oleh || '')} · ${esc(t.waktu || '')}${t.diedit ? ' · diedit' : ''}${t.status === 'kirim' ? ' · mengirim…' : t.status === 'gagal' ? ' · belum terkirim' : ''}</small>
+      ${milik ? (kunci ? `<small style="color:var(--mut)">🔒 Terkunci: sudah terkirim bersama Minta revisi.</small>` : `<button class="lnk rvgltde" onclick="event.stopPropagation();GL.edit='${t.id}';GL.sorot='${t.id}';panelGl();gambarTandaGl();fokusCatatanGl()">${isi ? '✏️ Edit catatan' : '✍️ Tambah catatan'}</button>`) : ''}</div></div>`; }).join('') + '</div>'; }
+// 5.16.1 (Review 1.9.3 · P4): tanda & komentar putaran sebelumnya di foto ini, per putaran (hanya baca)
+function riwayatTandaGl(fid) { const R = ((GLT[kunciGl()] || {}).riwayat || []).filter(t => t.foto === fid); if (!R.length) return ''; const P = {}; R.forEach(t => (P[t.r] = P[t.r] || []).push(t));
+  return `<details ${GL.riwBuka ? 'open' : ''} ontoggle="GL.riwBuka=this.open" style="margin:0 0 12px"><summary><small>Riwayat revisi di foto ini (${R.length})</small></summary>` + Object.keys(P).map(Number).sort((a, b) => a - b).map(r => `<small style="display:block;margin-top:6px;font-weight:600">Putaran ${r + 1}</small>` +
+    P[r].sort((a, b) => (a.n || 0) - (b.n || 0)).map(t => `<small style="display:block;color:var(--mut)">${t.jenis === 'komentar' ? 'Komentar' : (t.jenis === 'coret' ? 'Coret ' : 'Pin ') + (t.n || '')}: ${t.teks ? esc(t.teks) + (t.dk ? ' (dari komentar)' : '') : 'tanpa catatan'} · ${esc(t.oleh || '')} · ${esc(t.waktu || '')}</small>`).join('')).join('') + '</details>'; }
+function fokusCatatanGl() { setTimeout(() => { const x = $('gltd'); if (x) { x.focus(); x.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 60); }
+function sorotTandaGl(id) { if (!GL) return; GL.sorot = GL.sorot === id ? null : id; gambarTandaGl(); panelGl(); }
+function simpanCatatanGl(id) { const t = tandaGl().find(x => x.id === id), el = $('gltd'); if (!t || !el) return; const teks = el.value.trim().slice(0, 600); GL.edit = null;
+  if (teks === String(t.teks || '').trim()) return panelGl();
+  if (t.status === 'kirim' || t.status === 'gagal') { t.tundaCatatan = teks; t.teks = teks; const a = bacaLokal(ANTRE_T) || [], q = a.find(x => x.id === id); if (q) { q.teks = teks; simpanLokal(ANTRE_T, a); }   // 5.16.1: antrean HP ikut membawa catatan (aman bila app dimuat ulang sebelum online)
+    panelGl(); return react('baca', 'Catatan disimpan setelah tanda terkirim'); }
+  kirimCatatanGl(t, teks); }
+function kirimCatatanGl(t, teks) { const lama = t.teks; t.teks = teks; panelGl();
+  gsr('apiReviewTandaCatatan', [TOKEN, t.id, teks], r => { if (r && r.ok) { Object.assign(t, r.tanda || {}); if (GL) panelGl(); return; }
+      t.teks = lama; if (r && r.kunciCatatan) { const T = GLT[kunciGl()]; if (T) T.kunciCatatan = true; } if (GL) panelGl(); react('gagal', (r && r.kunciCatatan) ? PESAN_KUNCI_CATATAN : (r && r.pesan) || 'Catatan belum tersimpan'); },
+    () => { t.teks = lama; if (GL) panelGl(); react('gagal', 'Sinyal putus: catatan belum tersimpan, coba lagi.'); }); }
+// Peringatan sebelum Minta revisi: tanda di folder ini yang belum punya catatan (boleh lanjut)
+function tandaTanpaCatatanRv(gid, j) { const g = seriRv().find(x => x.id === gid), d = g && FRV[g.folderId] && FRV[g.folderId].d, k = d && d.grup[j]; if (!k) return [];
+  const T = (GLT[g.induk + '|' + k.id] || { tanda: [] }).tanda.filter(t => t.jenis !== 'komentar' && !String(t.teks || t.dariKomentar || '').trim()), no = {}; (k.foto || []).forEach((f, i) => { no[f.id] = i + 1; });
+  return T.map(t => 'Foto ' + (no[t.foto] || '?') + ' · tanda ' + (t.n || '•')); }
 function tampilPutGl() { if (!GL) return; const p = $('glput'); if (!p) return; if (!GL.S.induk || !D.bolehSetujuV2) { p.innerHTML = ''; return; }
   const g = seriRv().find(x => x.id === GL.S.gid), d = g && FRV[g.folderId] && FRV[g.folderId].d, k = d && d.grup[GL.S.j]; if (!k) { p.innerHTML = ''; return; }
   const S = stKelompokRv(g, k, d.grup.length), nT = tandaGl().length;
@@ -1772,7 +1835,7 @@ function bukaReview(i) {
     <div class="rvlk">${satuGbr(x) ? `<button class="sbtn" onclick="bukaPenampil(${i})">${ic('search', 14)} Perbesar</button>` : ''}${x.link ? `<a class="sbtn" href="${esc(x.link)}" target="_blank" rel="noopener">${ic('link', 14)} Buka asli di Drive</a>` : ''}</div>
     <div class="card">${x.ps ? `<small style="display:block">📸 ${esc(x.ps)}</small>` : ''}<small style="display:block">📤 ${esc(x.oleh)} · ${esc(x.waktu)}</small>
       ${x.reviewer ? `<small style="display:block">${x.status === 'Disetujui' ? '✅' : '✏️'} ${esc(x.reviewer === 'Syifa' ? 'Umi Syifa' : x.reviewer)} · ${esc(x.waktuReview)}</small>` : ''}
-      ${x.pesan ? `<div class="info">💬 Catatan pengaju: ${esc(x.pesan)}</div>` : ''}${x.catatan ? `<div class="info">✏️ ${esc(x.catatan)}</div>` : ''}${x.riwayat ? `<details style="margin-top:8px"><summary><small>Riwayat</small></summary><small style="white-space:pre-line;display:block;color:var(--mut)">${esc(x.riwayat)}</small></details>` : ''}</div>
+      ${x.pesan ? `<div class="info">💬 Catatan pengaju: ${esc(x.pesan)}</div>` : ''}${x.catatan ? `<div class="info">✏️ ${esc(x.catatan)}</div>` : ''}${x.riwayat ? riwayatPutaranRv(x.riwayat) : ''}</div>
     ${bolehUp ? `<button class="big" onclick="bukaForm('review',${i})">📤 Upload hasil revisi</button>` : ''}
     ${x.arsip ? `<div class="info">📦 ${x.arsip.otomatis ? 'Masuk Arsip otomatis: disetujui lebih dari ' + (x.arsip.hari || 7) + ' hari lalu' : 'Diarsipkan' + (x.arsip.oleh ? ' oleh ' + esc(x.arsip.oleh) : '') + (x.arsip.pada ? ' · ' + esc(x.arsip.pada) : '')}.</div>${x.arsip.manual && x.bolehArsip ? `<button class="big alt" onclick="pulihkanRv(${i})">Pulihkan ke daftar</button>` : ''}` : ''}
     ${x.seri && x.status === 'Revisi' ? `<div class="info">✏️ Untuk revisi: ganti foto langsung di folder Drive ini. Tombol kirim ulang per folder menyusul.</div>` : ''}${!x.arsip && x.bolehArsip && !x.seri ? `<button class="big alt" onclick="arsipRv(${i})">📦 Arsipkan</button>` : ''}
@@ -3285,7 +3348,7 @@ function salinTautan_(u, selesai) {
         '<button type="button" class="agt" data-n="Semua" aria-pressed="false">👥 Semua tim</button></div>' +
         '<span class="mu" id="perUntukInfo" style="font-size:13px">Pilih minimal 1 orang, atau Semua tim.</span></div>' +
       '<label class="lbl">Tanggal tenggat (opsional)<input class="in" id="perTgt" type="date"></label>' +
-      '<p class="mu" style="margin:0;font-size:13px">📲 Langsung tampil di app ThinKerBelle orang yang di-tag, lalu diumumkan sekali di grup WA bersama pengingat terdekat.</p>' +
+      '<p class="mu" style="margin:0;font-size:13px">📲 Langsung tampil di app ThinKerBelle orang yang di-tag. Untuk Semua tim: diumumkan sekali di grup WA bersama pengingat terdekat. Untuk nama tertentu: tidak diumumkan di grup, cukup ke orangnya (app + japri pagi).</p>' +
       '<div class="dlg-actions"><button class="btn" type="button" id="perKirim">📣 Kirim perintah</button></div><div id="perList"><p class="mu">Memuat perintah sebelumnya…</p></div>' +
       (SY_AUTH ? '' : '<button class="link" type="button" id="perKeluar" style="margin-top:6px">Putuskan sambungan ThinKerBelle di HP ini</button>');
     var info = function () {
