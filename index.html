@@ -3,7 +3,7 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
-<meta name="syifa-tampilan" content="2026.11.21-2">
+<meta name="syifa-tampilan" content="2026.11.21-3">
 <meta name="syifa-app" content="2026.10.20-20">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syifa Studio</title>
@@ -3750,7 +3750,7 @@ function salinTautan_(u, selesai) {
     return r + '<small style="margin-top:6px">Kehadiran: ' + (hz.length ? esc(hz.join(' · ')) : 'tanpa izin/sakit/cuti') + ' (tidak masuk skor)</small>';
   }
   function kpiTimIsi(r) {
-    if (!r) return '<p class="mu" style="margin:0;font-size:13px">Memuat KPI tim…</p>';
+    if (!r) return '<p class="mu" style="margin:0;font-size:13px">Memuat KPI bulan ini…</p>';
     if (r.hub === false) return '<p class="empty">Arabelle Hub belum tersambung.</p>';
     var I = r.ini, L = r.lalu, h = '<p class="mu" style="margin:0 0 4px;font-size:13px">' + esc(I.label) + ' · ' + I.hariKerja + ' hari kerja sampai hari ini · dibanding ' + esc(L ? L.label : '-') + '</p>';
     h += (I.orang || []).map(function (o, i) { var lalu = L ? (L.orang || []).filter(function (x) { return x.nama === o.nama; })[0] : null;
@@ -3784,11 +3784,12 @@ function salinTautan_(u, selesai) {
   }
   function kpiTimKartu(induk) {
     if (KPIT_MATI) return;
-    var kartu = el('div', 'card', '<div class="sec"><h3>KPI tim bulan ini</h3><button class="link" type="button" data-ktu aria-label="Muat ulang KPI tim">↻ Muat ulang</button></div><div class="kt-isi">' + kpiTimIsi(KPIT) + '</div>');
-    taruh(induk, kartu, 'kpitim', '👥 KPI tim bulan ini', '');
+    var kartu = el('div', 'card', '<div class="sec"><h3>KPI bulan ini</h3><button class="link" type="button" data-ktu aria-label="Muat ulang KPI tim">↻ Muat ulang</button></div><div class="kt-isi">' + kpiTimIsi(KPIT) + '</div>');
+    taruh(induk, kartu, 'kpitim', '🎯 KPI bulan ini', '');
     var u = kartu.querySelector('[data-ktu]'); if (u) u.onclick = function () { kpiTimMuat(kartu, true); };
     var d = kartu.closest('details');
     if (d && !d.open) d.addEventListener('toggle', function () { if (d.open) kpiTimMuat(kartu); }); else kpiTimMuat(kartu);
+    if (d) { var ib = kartu.querySelector('.sec [data-ktu]'); if (ib && ib.closest('.sec')) ib.closest('.sec').remove(); }   // lipatan HP: cukup ↻ di judul
     if (d) { var s = d.querySelector('summary'); if (s && !s.querySelector('[data-ktu]')) { var b = el('button', 'link', '↻'); b.type = 'button'; b.setAttribute('data-ktu', ''); b.setAttribute('aria-label', 'Muat ulang KPI tim'); b.style.cssText = 'padding:0 6px;min-height:0'; b.onclick = function (e) { e.preventDefault(); e.stopPropagation(); kpiTimMuat(kartu, true); }; s.insertBefore(b, s.querySelector('.cv')); } }
   }
   function kpiKartu(induk) {
@@ -3886,7 +3887,7 @@ function salinTautan_(u, selesai) {
       (d.trips.length ? '<div class="row"><span class="ic" style="background:var(--t-pink)">' + I.clock + '</span><span class="t"><small>Dinas berikutnya</small><b>' + esc(d.trips[0].title) + '</b><span>' + esc(dayLabel(d.trips[0].date) + rentangAg(d.trips[0])) + (d.trips[0].time ? ', ' + esc(d.trips[0].time) : '') + '</span></span></div>' : '') +
       (d.events && d.events.length ? '<div class="row"><span class="ic" style="background:' + TAG_BG.Event + '">🎉</span><span class="t"><small>Event berikutnya</small><b>' + esc(d.events[0].title) + '</b><span>' + esc(dayLabel(d.events[0].date) + rentangAg(d.events[0])) + (d.events[0].time ? ', ' + esc(d.events[0].time) : '') + '</span></span></div>' : '') +
       '<button class="row" type="button" data-go="catatan" style="width:100%;border-left:0;border-right:0;border-bottom:0;background:none;text-align:left;cursor:pointer"><span class="ic" style="background:var(--t-lilac)">' + I.note + '</span><span class="t"><small>' + (d.notes.length ? 'Catatan terbaru · ' + d.noteCount + ' catatan' : 'Catatan') + '</small><b>' + esc(d.notes.length ? d.notes[0].text : 'Tulis catatan singkat') + '</b></span><span class="mu" style="font-size:18px">›</span></button>'), 'ringkasan', '📊 Ringkasan konten', c.total ? c.done + '/' + c.total + ' tayang' : '');
-    if (isOwner()) { kpiKartu(right); kpiTimKartu(right); }   // fitur kpitim
+    if (isOwner()) kpiTimKartu(right);   // fitur kpisatu: satu kartu KPI (KPI sosmed lama tidak ditampilkan; tab KPI Bulanan A–K tetap)
     if (isOwner()) logKartu(right);
     var semuaAg = st.agenda || [].concat.apply([], d.week.map(function (w) { return w.agenda; }));
     var up = unikAg(semuaAg.filter(function (a) { return a.date >= today; })).slice(0, 5);
