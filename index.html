@@ -3,7 +3,7 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
-<meta name="syifa-tampilan" content="2026.11.20-3">
+<meta name="syifa-tampilan" content="2026.11.21-1">
 <meta name="syifa-app" content="2026.10.20-20">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syifa Studio</title>
@@ -254,6 +254,16 @@
   .pg-it > i { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 12px; background: var(--pink-soft); display: flex; align-items: center; justify-content: center; font-size: 16px; font-style: normal; }
   .pg-it > i.av { border-radius: 50%; background: var(--rose); color: #fff; font-weight: 700; font-size: 14px; }
   .pg-it > i.tg { flex: 0 0 auto; width: auto; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--rose); white-space: nowrap; }
+  .pg-it .pu-wrap { flex: 1; min-width: 0; }
+  .pu { margin-top: 8px; padding: 10px 12px; border-radius: 14px; background: var(--pink-soft); }
+  .pu .pu-isi { display: block; font-size: 14px; line-height: 1.45; color: var(--ink); overflow-wrap: anywhere; white-space: pre-line; } .pu .pu-dari { font-weight: 700; }
+  .pu .pu-meta { display: block; font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .pu .pu-bl { display: block; font-size: 12.5px; color: var(--muted); margin-top: 5px; padding-left: 8px; border-left: 2px solid var(--line); overflow-wrap: anywhere; }
+  .pu-act { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .pu-act button { min-height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); padding: 0 14px; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .pu-act button.pu-ok { background: var(--rose); border-color: var(--rose); color: #fff; } .pu-act button:disabled { opacity: .55; }
+  .pu-act .pu-chip { display: inline-flex; align-items: center; min-height: 40px; padding: 0 6px; font-size: 13px; color: var(--muted); }
+  .pu.pu-sudah { background: var(--surface); border: 1px solid var(--line); }
   .pg-it em.jm { font-style: normal; font-weight: 500; color: var(--muted); }
   .pg-it p { margin: 0; flex: 1; min-width: 0; } .pg-it b { display: block; font-size: 14.5px; } .pg-it small { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
   .card .pg-it { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px dashed var(--line); } .card .sec + .pg-it { border-top: 0; }
@@ -3434,12 +3444,71 @@ function salinTautan_(u, selesai) {
   document.addEventListener('click', function (e) { if (e.target && e.target.closest && e.target.closest('#agTim')) setTimeout(agLihatSegar, 0); });
   (function () { var pasang = function () { var d = $('agDlg'); if (d && 'MutationObserver' in window) new MutationObserver(function () { if (d.open) agLihatSegar(); }).observe(d, { attributes: true, attributeFilter: ['open'] }); };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pasang); else pasang(); })();
+  // ---------- Tanggapan Umi: ✓ Dibaca / 💬 Balas perintah & catatan dari tim (fitur perintahumi, jembatan ThinKerBelle syTanggapUmi) ----------
+  var PU_KUNCI = 'syifa_tanggap_v1';
+  function puSimpan() { try { var x = JSON.parse(localStorage.getItem(PU_KUNCI) || '{}'); return x && typeof x === 'object' ? x : {}; } catch (e) { return {}; } }
+  function puTulis(kunci) { try { var x = puSimpan(), batas = Date.now() - 15 * 864e5; x[kunci] = Date.now();
+    Object.keys(x).forEach(function (k) { if (x[k] < batas) delete x[k]; }); localStorage.setItem(PU_KUNCI, JSON.stringify(x)); } catch (e) {} }
+  function puKirim(d) {
+    if (!hasAPI) return Promise.resolve({ ok: true, pesan: d.aksi === 'balas' ? '💬 Balasan terkirim (mode contoh)' : '✓ Ditandai dibaca (mode contoh)' });
+    if (!SY_AUTH && !tbToken()) return Promise.reject(new Error('Sambungan ke ThinKerBelle belum aktif. Muat ulang Beranda, lalu coba lagi.'));
+    return tbPakai('tanggapUmi', d);
+  }
+  function puJam(t) { if (!t) return ''; var d = new Date(t); return d.getDate() + '/' + (d.getMonth() + 1) + ' ' + ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2); }
+  // p = { jenis: 'perintah'|'catatan', id, dari, isi, tenggat?, t?, dibaca?, balasan? }
+  function puItem(p, sudah) {
+    var tg = /^\d{4}-\d{2}-\d{2}$/.test(String(p.tenggat || '')) ? dayLabel(p.tenggat) : String(p.tenggat || ''), bl = p.balasan || [];
+    if (!p.id) return '<small>' + esc(p.dari || 'Tim') + ': ' + esc(p.isi) + (tg ? ' · ⏰ ' + esc(tg) : '') + '</small>';   // server tanpa id: tampil saja
+    var meta = [p.jenis === 'catatan' ? '📌 Catatan' : '📣 Perintah', p.t ? puJam(p.t) : '', tg ? '⏰ ' + tg : ''].filter(Boolean).join(' · ');
+    return '<div class="pu' + (sudah ? ' pu-sudah' : '') + '" data-pu="' + esc(p.id) + '" data-puj="' + (p.jenis === 'catatan' ? 'catatan' : 'perintah') + '"><span class="pu-isi"><span class="pu-dari">' + esc(p.dari || 'Tim') + ':</span> ' + esc(p.isi) + '</span>' +
+      '<span class="pu-meta">' + esc(meta) + '</span>' +
+      bl.map(function (b) { return '<span class="pu-bl">💬 ' + esc(b.dari ? b.dari + ': ' : '') + esc(b.isi) + (b.waktu ? ' · ' + esc(b.waktu) : '') + '</span>'; }).join('') +
+      '<div class="pu-act">' + (sudah ? '<span class="pu-chip">✓ Dibaca</span>' : '<button type="button" class="pu-ok" data-pubaca>✓ Dibaca</button>') +
+      '<button type="button" data-publs>💬 Balas' + (bl.length ? ' (' + bl.length + ')' : '') + '</button></div></div>';
+  }
+  function puKunci(jenis, id) { return jenis + ':' + id; }
+  function puDaftar(t) {   // Beranda: yang belum ditanggapi (perintah aktif + catatan belum dibaca), dikurangi yang sudah ditanggapi di HP ini
+    var M = puSimpan(), U = (t && t.untukku) || { n: 0, list: [] }, PL = (U.list || []).filter(function (p) { return !(p.id && M[puKunci('perintah', p.id)]); });
+    var n = Math.max((U.n || 0) - ((U.list || []).length - PL.length), 0);
+    var CL = ((t && t.catatanku) || []).filter(function (c) { return !(c.id && M[puKunci('catatan', c.id)]); });
+    return { n: n, list: PL.map(function (p) { return Object.assign({ jenis: 'perintah' }, p); }), cat: CL.slice(0, 3).map(function (c) { return Object.assign({ jenis: 'catatan' }, c); }) };
+  }
+  function puSesudah(jenis, id, aksi, teks) {   // perbarui data tim di HP setelah ditanggapi
+    var T = st.tim; if (!T) return; var d = new Date(), bl = { dari: 'Kamu', isi: teks, waktu: d.getDate() + '/' + (d.getMonth() + 1) + ' ' + ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2) };
+    if (jenis === 'perintah' && T.untukku) { var a = (T.untukku.list || []).length; T.untukku.list = (T.untukku.list || []).filter(function (p) { return p.id !== id; }); if (T.untukku.list.length < a) T.untukku.n = Math.max((T.untukku.n || 1) - 1, 0); }
+    if (jenis === 'catatan' && T.catatanku) T.catatanku = T.catatanku.filter(function (c) { return c.id !== id; });
+    (T.untukRiwayat || []).forEach(function (x) { if (x.jenis === jenis && x.id === id) { x.dibaca = true; if (aksi === 'balas') x.balasan = (x.balasan || []).concat([bl]).slice(-2); } });
+    simpanTim(T);
+  }
+  function puTanggap(box, aksi, tombol) {
+    var id = box.dataset.pu, jenis = box.dataset.puj, teks = '';
+    if (aksi === 'balas') { teks = prompt('Tulis balasan singkat untuk ' + (jenis === 'catatan' ? 'catatan' : 'perintah') + ' ini:'); if (!teks || !teks.trim()) return; teks = teks.replace(/\s+/g, ' ').trim().slice(0, 500); }
+    if (tombol) tombol.disabled = true;
+    puKirim({ jenis: jenis, id: id, aksi: aksi, teks: teks }).then(function (j) {
+      if (!j || !j.ok) throw new Error((j && j.pesan) || 'Gagal menyimpan');
+      puTulis(puKunci(jenis, id)); toast(j.pesan || (aksi === 'balas' ? '💬 Balasan terkirim' : '✓ Ditandai dibaca')); puSesudah(jenis, id, aksi, teks);
+      if (hasAPI) call('segarkanTim').catch(function () {});   // server: hapus tim_v9 supaya data berikutnya membaca PERINTAH/CATATAN baru
+      if (st.view === 'dasbor') isiSlotTim(); else if (st.view === 'tim' && typeof tampilTabTim === 'function') tampilTabTim();
+    }).catch(function (e) { if (tombol) tombol.disabled = false; toast(errMsg(e), true); });
+  }
+  function pasangUntuk(c) {
+    c.querySelectorAll('[data-pu]').forEach(function (box) {
+      var b = box.querySelector('[data-pubaca]'); if (b) b.onclick = function () { puTanggap(box, 'baca', b); };
+      var r = box.querySelector('[data-publs]'); if (r) r.onclick = function () { puTanggap(box, 'balas', r); };
+    });
+  }
+  function kartuUntukUmi(t) {   // tab Tim → 📥 Untuk Umi (server 21 Nov: t.untukRiwayat)
+    var R = (t && t.untukRiwayat) || []; if (!R.length) return null; var M = puSimpan();
+    var c = el('div', 'card', '<div class="sec"><h3>📥 Untuk Umi</h3><span class="mu">14 hari</span></div>' +
+      R.map(function (x) { return puItem(x, x.dibaca || !!M[puKunci(x.jenis, x.id)]); }).join(''));
+    pasangUntuk(c); return c;
+  }
   function barisUntuk(t) {
     var U = t && t.untukku, h = '', tg = function (x) { return /^\d{4}-\d{2}-\d{2}$/.test(String(x || '')) ? dayLabel(x) : String(x || ''); };
-    if (U && U.n) h += '<div class="pg-it" data-untuk><i>📣</i><p><b>' + U.n + ' perintah untukmu belum selesai</b>' + (U.list || []).slice(0, 3).map(function (p) {
-      return '<small>' + esc(p.dari || 'Tim') + ': ' + esc(p.isi) + (p.tenggat ? ' · ⏰ ' + esc(tg(p.tenggat)) : '') + '</small>'; }).join('') +
-      (U.n > 3 ? '<small>+' + (U.n - 3) + ' lainnya</small>' : '') + '<small style="font-size:12px">Tandai selesai di ThinKerBelle.</small></p></div>';
-    ((t && t.catatanku) || []).slice(0, 3).forEach(function (c) { h += '<div class="pg-it" data-catku><i>📌</i><p><b>Catatan untukmu dari ' + esc(c.dari || 'tim') + '</b><small>' + esc(c.isi) + '</small></p></div>'; });   // fitur catatanku
+    var PD = puDaftar(t);   // fitur perintahumi: ✓ Dibaca / 💬 Balas per perintah & catatan untuk Umi
+    if (PD.n) h += '<div class="pg-it" data-untuk><i>📣</i><div class="pu-wrap"><b>' + PD.n + ' perintah untukmu belum dibaca</b>' + PD.list.map(function (p) { return puItem(p, false); }).join('') +
+      (PD.n > PD.list.length ? '<small>+' + (PD.n - PD.list.length) + ' lainnya (tab Tim → 📥 Untuk Umi)</small>' : '') + '</div></div>';   // <div>, bukan <p>: kotak berisi <div>
+    PD.cat.forEach(function (c) { h += '<div class="pg-it" data-catku><i>📌</i><div class="pu-wrap"><b>Catatan untukmu dari ' + esc(c.dari || 'tim') + '</b>' + puItem(c, false) + '</div></div>'; });   // fitur catatanku + perintahumi
     ((t && t.catatan) || []).slice(0, 3).forEach(function (c) { h += '<div class="pg-it" data-cattim><i>📌</i><p><b>Catatan tim dari ' + esc(c.dari || 'tim') + '</b><small>' + esc(c.isi) + '</small></p></div>'; });
     return h;
   }
@@ -3454,7 +3523,7 @@ function salinTautan_(u, selesai) {
     if (t.belum && t.belum.length) isi += '<p class="mu" style="margin:8px 0 0;font-size:13px">Belum lapor: ' + esc(t.belum.join(', ')) + '</p>';
     isi += barisAngka(t);
     isi += '<button class="btn-line" type="button" data-gotim style="width:100%;margin-top:12px">Buka tab Tim Arabelle ›</button>';
-    var c = el('div', 'pagi', isi); c.querySelector('[data-gotim]').onclick = function () { go('tim'); };
+    var c = el('div', 'pagi', isi); pasangUntuk(c); c.querySelector('[data-gotim]').onclick = function () { go('tim'); };
     return c;
   }
   // ---------- B1 · kartu Tim Arabelle terpisah dari getBoot (getTimArabelle), tampil dari simpanan HP lalu diperbarui ----------
@@ -3553,6 +3622,7 @@ function salinTautan_(u, selesai) {
     aksi.querySelector('[data-a="review"]').onclick = function () { bukaReviewFoto(); };
     if (barisAngka(t)) aksi.insertAdjacentHTML('beforeend', barisAngka(t));
     b.appendChild(aksi);
+    var ku = kartuUntukUmi(t); if (ku) b.appendChild(ku);   // fitur perintahumi: 📥 Untuk Umi
     // yang dikerjakan hari ini
     var hk = '<div class="sec"><h3>Dikerjakan hari ini</h3></div>' + h.ag.map(function (a) { return '<div class="pg-it"><i>🗓️</i><p><b>' + esc(a.text) + '</b>' + (a.tim ? '<small>👥 ' + esc(a.tim) + '</small>' : '') + '</p></div>'; }).join('') +
       h.kerja.map(function (k) { return '<div class="pg-it"><i class="av">' + esc(k.nama.charAt(0)) + '</i><p><b>' + esc(k.nama) + (k.x.jam ? ' <em class="jm">· ' + esc(k.x.jam) + '</em>' : '') + '</b>' +
@@ -5677,7 +5747,7 @@ function salinTautan_(u, selesai) {
         var u = auth(t); if (u.role !== 'Owner') return null;
         return { review: 1, perintahBuka: 1, kinerja: null, laporanTim: {}, nama: ['Ria', 'Cici', 'Atin'], lapor: 2, wajib: 3, belum: ['Atin'], post: 3, tayang: 2,
           launch: [{ date: addDays(T, 2), text: 'Launching Contoh Scarf' }], agenda: [{ date: T, text: 'Photoshoot: Contoh', tim: 'Ria, Cici' }],
-          perintah: [{ isi: 'Contoh perintah ke tim', untuk: 'Ria', dibaca: 1, selesai: 0 }], catatan: [{ dari: 'Mas Bontot', isi: 'Contoh catatan tim dari ThinKerBelle' }], catatanku: [{ dari: 'Ria', isi: 'Contoh catatan untuk Umi saja' }], untukku: { n: 1, list: [{ dari: 'Mas Bontot', isi: 'Contoh perintah untuk Umi', waktu: T, tenggat: addDays(T, 1) }] }, kirimAlasan: 'mode contoh' };
+          perintah: [{ isi: 'Contoh perintah ke tim', untuk: 'Ria', dibaca: 1, selesai: 0 }], catatan: [{ dari: 'Mas Bontot', isi: 'Contoh catatan tim dari ThinKerBelle' }], catatanku: [{ id: 'CC1', dari: 'Ria', isi: 'Contoh catatan untuk Umi saja', balasan: [] }], untukku: { n: 1, list: [{ id: 'PC1', dari: 'Mas Bontot', isi: 'Contoh perintah untuk Umi', waktu: T, tenggat: addDays(T, 1), dibaca: false, balasan: [{ dari: 'Mas Bontot', isi: 'Contoh balasan', waktu: '20/11 09.30' }] }] }, untukRiwayat: [{ jenis: 'perintah', id: 'PC1', dari: 'Mas Bontot', isi: 'Contoh perintah untuk Umi', t: Date.now() - 36e5, dibaca: false, balasan: [{ dari: 'Mas Bontot', isi: 'Contoh balasan', waktu: '20/11 09.30' }] }, { jenis: 'catatan', id: 'CC1', dari: 'Ria', isi: 'Contoh catatan untuk Umi saja', t: Date.now() - 72e5, dibaca: false, balasan: [] }, { jenis: 'perintah', id: 'PC0', dari: 'Cici', isi: 'Contoh perintah yang sudah dibaca', t: Date.now() - 864e5, dibaca: true, balasan: [{ dari: 'Syifa', isi: 'Siap', waktu: '19/11 10.00' }] }], kirimAlasan: 'mode contoh' };
       },
       getDashboard: function (t) {
         var u = auth(t, true), up = upcoming(), week = [];
